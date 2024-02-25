@@ -3,5 +3,6 @@ Lo Verde Gastronom Online Food
 
 Sito Web per visionare in tempo reale i prodotti disponibili del Lo Verde Gastronom
 
-Provided by Simone Sarro and Riccardo Sarro
+Sviluppato da Simone Sarro
+Supervisionato da Riccardo Sarro
 
