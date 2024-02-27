@@ -8,12 +8,14 @@
   .form textarea {
     display: block;
     width: 100%;
+    margin-bottom: 0.2rem;
   }
   
   .form input,
   .form textarea {
     font: inherit;
     padding: 0.25rem;
+    
   }
   
   .actions {
@@ -28,22 +30,25 @@
     cursor: pointer;
     padding: 0.5rem 1.5rem;
     border-radius: 4px;
-    background-color: var(--color-gray-300);
-    color: var(--color-gray-800);
+    background-color: lightgreen;
+    color: black;
     border: none;
   }
   
   .actions a {
     text-decoration: none;
-    background-color: transparent;
-    color: var(--color-gray-300);
+    background-color: grey;
+    border-radius: 4px;
+    color: black;
+    cursor: pointer;
+    padding: 0.5rem 1.5rem;
   }
   
   .actions button:hover {
-    background-color: var(--color-primary-300);
+    background-color: green;
   }
   
   .actions a:hover {
-    background-color: var(--color-gray-800);
+    background-color: green;
   }
   

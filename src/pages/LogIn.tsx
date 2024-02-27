@@ -14,19 +14,19 @@ export default function LogInPage() {
         <Header title={"Log In"} message={"Log In Page in lavorazione..."} />
       </div>
       <div>
-        <Form method="post">
+        <Form method="post" className={classes.form}>
           <p>
-            <label htmlFor="email">Email </label>
+            <label htmlFor="email">Email</label>
             <input id="email" type="email" name="email" required />
           </p>
           <p>
-            <label htmlFor="image">Password </label>
+            <label htmlFor="image">Password</label>
             <input id="password" type="password" name="password" required />
           </p>
           <div className={classes.actions}>
-          <Link to='/'>Log In</Link>
+          <Link to='/'>Torna alla Home</Link>
           <button disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Save"}
+            {isSubmitting ? "Submitting..." : "Log In"}
           </button>
         </div>
         </Form>
