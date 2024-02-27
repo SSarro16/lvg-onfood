@@ -1,6 +1,7 @@
-import lvglogo from "../lvglogo/lvglogo.png";
+import React from "react";
+import lvglogo from '../lvglogo/lvglogo.png'
 
-const Header: React.FC<{ title: string; message: string }> = (props) => {
+const Header: React.FC<{ title: string, message: string }> = (props) => {
   return (
     <div>
       <header>

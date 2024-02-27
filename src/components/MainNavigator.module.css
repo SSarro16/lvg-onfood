@@ -14,12 +14,12 @@
 .header a {
   font-size: 1.25rem;
   text-decoration: none;
-  color: #8032e0;
+  color: #078803;
 }
 
 .header a:hover,
 .header a.active {
-  color: #530080;
+  color: #00691a;
 }
 
 nav {
@@ -28,7 +28,7 @@ nav {
 
 ul {
   list-style-type: none;
-  margin: 0;
+  margin: 0.3rem;
   padding: 0;
   top: 0;
   right: 0;
