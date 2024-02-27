@@ -1,16 +1,12 @@
 import lvglogo from "../lvglogo/lvglogo.png";
 
-export default function Header() {
+export default function Header(title: string, message: string) {
   return (
     <div>
       <header>
         <img src={lvglogo} />
-        <h1>Benvenuti al LVG Online Food</h1>
-        <p>
-          Qui potrai prenotare e visionare tutti i prodotti offerti dal nostro
-          servizio di gastronomia e sarai aggiornato anche sui prodotti che sono
-          in lavorazione
-        </p>
+        <h1>{title}</h1>
+        <p>{message}</p>
       </header>
     </div>
   );
