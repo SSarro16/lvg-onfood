@@ -1,13 +1,15 @@
 import lvglogo from "../lvglogo/lvglogo.png";
 
-export default function Header() {
+const Header: React.FC<{ title: string; message: string }> = (props) => {
   return (
     <div>
       <header>
         <img src={lvglogo} />
-        <h1>titolo</h1>
-        <p>messagge</p>
+        <h1>{props.title}</h1>
+        <p>{props.message}</p>
       </header>
     </div>
   );
-}
+};
+
+export default Header;
