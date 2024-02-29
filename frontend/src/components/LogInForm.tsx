@@ -1,14 +1,22 @@
 import React from "react";
-import { Form, Link, useNavigation } from "react-router-dom";
+import { Form, Link, useActionData, useNavigation } from "react-router-dom";
 import classes from "../pages/LogIn.module.css";
 
 export default function LogInForm() {
     const navigation = useNavigation();
-
     const isSubmitting = navigation.state === "submitting";
+    const data = useActionData()
 
   return (
     <Form method="post" className={classes.form}>
+      {data && data.errors && (
+        <ul>
+          {Object.values(data.errors).map((err) => (
+            <li key={err}>{err}</li>
+          ))}
+        </ul>
+      )}
+      {data && data.message && <p>{data.message}</p>}
       <p>
         <label htmlFor="email">Email</label>
         <input id="email" type="email" name="email" required />
