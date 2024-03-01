@@ -1,6 +1,6 @@
 import React from "react";
 import { Form, Link, useActionData, useNavigation } from "react-router-dom";
-import classes from "../../pages/LogIn.module.css";
+import classes from "./Form.module.css";
 
 export default function LogInForm() {
     const navigation = useNavigation();

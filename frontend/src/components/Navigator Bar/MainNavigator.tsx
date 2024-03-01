@@ -1,7 +1,6 @@
 import React from "react";
 import { NavLink, useRouteLoaderData } from "react-router-dom";
 import classes from "./MainNavigator.module.css";
-import { Form } from "react-router-dom";
 
 function MainNavigator() {
   const token = useRouteLoaderData("root");
@@ -44,9 +43,7 @@ function MainNavigator() {
               </NavLink>
               </li>
               <li>
-                <Form action="/logout" method="post">
-                  <button>Logout</button>
-                </Form>
+                <button><NavLink to="/logout">Log Out</NavLink></button>
               </li>
             </>
           )}

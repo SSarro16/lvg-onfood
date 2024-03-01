@@ -33,8 +33,14 @@ router.post("/login", async (req, res) => {
 
 // Logout - POST /logout BODY {token}
 router.post("/logout", async(req, res, next) => {
-  const token = createJSONToken(email)
-  res.json({token})
+  // logic to call signout on firebase ...
+
+  // if all good
+  if (true) {
+    res.json({success: true})
+  } else {
+    next({error: 'Error while logging out'})
+  }
 });
 
 module.exports = router;
