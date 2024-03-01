@@ -38,12 +38,12 @@
 }
 
 section {
-  width: 59%
+  width: 60%;
 }
 
 aside {
   height: 100vh;
-  width: 40%;
+  width: 30%;
   justify-content: space-between;
   flex-direction: column;
   float: right

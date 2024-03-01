@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "../components/Header";
+import Product from "../components/Products/Product";
 
 export default function HomePage() {
   return (
@@ -12,22 +13,16 @@ export default function HomePage() {
           }
         />
       </div>
-      <section>
-        <p>Product list in lavorazione...</p>
+      <div style={{ display: "flex" }}>
+        <h2>Product list in lavorazione...</h2>
+        <Product />
+        <h3>Prodotti WIP in lavorazione...</h3>
         <ol>
           <li>P1</li>
           <li>P2</li>
           <li>P3</li>
         </ol>
-      </section>
-      <aside>
-        <p>Prodotti WIP in lavorazione...</p>
-        <ol>
-          <li>P1</li>
-          <li>P2</li>
-          <li>P3</li>
-        </ol>
-      </aside>
+      </div>
     </>
   );
 }

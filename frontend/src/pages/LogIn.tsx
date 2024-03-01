@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../components/Header";
-import LogInForm from "../components/LogInForm";
+import LogInForm from "../components/Form/LogInForm";
 import { ActionFunction, json, redirect } from 'react-router-dom'
 
 const backendUrl = "http://localhost:8080"
@@ -16,7 +16,7 @@ export default function LogInPage() {
     </>
   );
 }
-type LoginResBody = {token: string};
+type LoginResBody = {token: string };
 
 const action: ActionFunction<any> = async (args) => {
   const data = await args.request.formData()
@@ -42,7 +42,6 @@ const action: ActionFunction<any> = async (args) => {
     throw json({ message: 'Could not authenticate user.' }, { status: 500 });
   }
   const resData: LoginResBody  = await response.json();
-  console.log(resData)
   const token = resData.token;
   localStorage.setItem('token', token)
 
