@@ -1,8 +1,9 @@
 import React from "react";
 import Header from "../components/Header";
 import LogInForm from "../components/LogInForm";
-import { json, redirect } from 'react-router-dom'
+import { ActionFunction, json, redirect } from 'react-router-dom'
 
+const backendUrl = "http://localhost:8080"
 export default function LogInPage() {
   return (
     <>
@@ -15,15 +16,16 @@ export default function LogInPage() {
     </>
   );
 }
+type LoginResBody = {token: string};
 
-async function action(request: Request) {
-  const data = await request.formData()
+const action: ActionFunction<any> = async (args) => {
+  const data = await args.request.formData()
   const authData = {
     email: data.get('email'),
     password: data.get('password')
   };
 
-  const response = await fetch('https://lvg-onfood-default-rtdb.europe-west1.firebasedatabase.app/', {
+  const response = await fetch(`${backendUrl}/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -31,6 +33,7 @@ async function action(request: Request) {
     body: JSON.stringify(authData)
   })
 
+  console.log(response)
   if (response.status === 401) {
     return response
   }
@@ -38,8 +41,12 @@ async function action(request: Request) {
   if (!response.ok) {
     throw json({ message: 'Could not authenticate user.' }, { status: 500 });
   }
+  const resData: LoginResBody  = await response.json();
+  console.log(resData)
+  const token = resData.token;
+  localStorage.setItem('token', token)
 
   return redirect('/')
 }
 
-export action;
+export {action};

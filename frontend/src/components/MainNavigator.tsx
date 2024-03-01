@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import classes from "./MainNavigator.module.css";
 
 function MainNavigator() {
+
   return (
     <header className={classes.header}>
       <nav>

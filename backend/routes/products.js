@@ -14,24 +14,35 @@ const PRODUCTS = [{
 
 }]
 
+// TODO: Ricky
+// Get products - GET '/products'
 router.get('/', async (req, res, next) => {
   console.log(req.token);
-  try {
-    const events = await getAll();
-    res.json({ events: events });
-  } catch (error) {
-    next(error);
-  }
   res.json({products:PRODUCTS})
 });
 
-router.put('/add', async (req, res, next) => {
+// TODO: Ricky
+// Add new product - PUT '/products'
+router.put('/', async (req, res, next) => {
   if (req.body.success === true) {
     res.json({success: true})
   } else {
     next({error: "Add product failed"})
   }
 })
+
+// TODO: Ricky
+// Delete product - DELETE '/products/:id'
+router.delete('/', async(req, res, next) => {
+  res.json(PRODUCTS)
+})
+
+// TODO: Ricky
+// Modify existing product - PATCH '/products/:id'
+router.patch('/', async(req, res, next) => {
+  res.json(PRODUCTS)
+})
+
 
 router.get('/:id', async (req, res, next) => {
   try {
