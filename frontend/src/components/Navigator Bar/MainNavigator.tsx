@@ -33,11 +33,22 @@ function MainNavigator() {
               </NavLink>
             </li>
           ) : (
-            <li>
-              <Form action="/logout" method="post">
-                <button>Logout</button>
-              </Form>
-            </li>
+            <>
+              <li>
+                <NavLink to="/newproduct"
+                className={({ isActive }) =>
+                isActive ? classes.active : undefined
+              }
+              >
+                New Product
+              </NavLink>
+              </li>
+              <li>
+                <Form action="/logout" method="post">
+                  <button>Logout</button>
+                </Form>
+              </li>
+            </>
           )}
         </ul>
       </nav>

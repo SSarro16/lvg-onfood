@@ -1,25 +1,30 @@
 import React from "react";
+import { getAuthToken } from "../../util/auth";
 
-export default function ProductItem() {
+const ProductItem: React.FC<{meal: any}> = (props) => {
+  const token = getAuthToken()
+
   return (
-      <li className="meal-item">
-        <article>
-          <img />
-          <div>
-            <h4>Title</h4>
-            <p className="meal-item-description">Description</p>
-            <p className="meal-item-price">Price</p>
-          </div>
-          <div className="meal-item-actions">
-            <p>
-              <button>+</button>
-            </p>
-            <p>quantity</p>
-            <p>
-              <button>-</button>
-            </p>
-          </div>
-        </article>
-      </li>
+    <li>
+      <article>
+        <img src={props.meal.img} alt={props.meal.title} />
+        <div>
+          <h4>{props.meal.title}</h4>
+          <p>{props.meal.description}</p>
+          <p>{props.meal.price}€</p>
+        </div>
+        <div>
+          {token && (<p>
+            <button>+</button>
+          </p>)}
+          <p>{props.meal.quantity} pz</p>
+           {token && (<p>
+            <button>-</button>
+          </p>)}
+        </div>
+      </article>
+    </li>
   );
 }
+
+export {ProductItem};

@@ -14,14 +14,18 @@ export default function HomePage() {
         />
       </div>
       <div style={{ display: "flex" }}>
-        <h2>Product list in lavorazione...</h2>
-        <Product />
-        <h3>Prodotti WIP in lavorazione...</h3>
-        <ol>
-          <li>P1</li>
-          <li>P2</li>
-          <li>P3</li>
-        </ol>
+        <section>
+          <h2>Product list in lavorazione...</h2>
+          <Product />
+        </section>
+        <aside>
+          <h3>Prodotti WIP in lavorazione...</h3>
+          <ol>
+            <li>P1</li>
+            <li>P2</li>
+            <li>P3</li>
+          </ol>
+        </aside>
       </div>
     </>
   );

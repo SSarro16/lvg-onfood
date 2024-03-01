@@ -6,12 +6,13 @@ import LogInPage, { action as authAction } from "./pages/LogIn";
 import RootLayout from "./pages/RootLayout";
 import { action as logoutAction } from "./pages/LogOut";
 import { tokenLoader } from "./util/auth";
+import NewProductPage from "./pages/NewProduct";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
-    id: 'root',
+    id: "root",
     loader: tokenLoader,
     children: [
       {
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
         action: authAction,
       },
       { path: "logout", action: logoutAction },
+      { path: "newproduct", element: <NewProductPage /> },
     ],
   },
 ]);
