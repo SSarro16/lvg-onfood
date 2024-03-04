@@ -10,9 +10,24 @@ const {
 
 const router = express.Router();
 
-const PRODUCTS = [{
-
-}]
+const PRODUCTS = [
+    {
+      id: "1",
+      title: "Gateaux di Patate",
+      description: "Gateaux di Patate con Mozzarella e Prosciutto",
+      image: "https://eu.tastescdns.net/thumbor/lIHXenr2N8RY0R-560pJNz4t2OY=/1050x1050/filters:quality(65):brightness(2):contrast(2):rgb(2,-2,0):sharpen(0.2,0.2,true)/it/recipe/YKS-dsl8dOrM9kgqOBh3/8e5ae36aecc9506c6a93f518b42137.png",
+      price: 6.4,
+      quantity: 6
+    },
+    {
+      id: "2",
+      title: "Lenticchie",
+      description: "Lenticchie",
+      image: "https://www.vitalmentebio.com/wp-content/uploads/2020/01/3A71F517-6914-413F-8B75-FF58C993FE7A.jpg",
+      price: 5.5,
+      quantity: 6
+    },
+]
 
 // TODO: Ricky
 // Get products - GET '/products'
@@ -21,16 +36,30 @@ router.get('/', async (req, res, next) => {
   res.json({products:PRODUCTS})
 });
 
+// Get product detail - GET /products/:id
+router.get('/:id', async (req, res, next) => {
+  try {
+    const event = await get(req.params.id);
+    res.json({ event: event });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// router.use(checkAuth);
+
 // TODO: Ricky
 // Add new product - PUT '/products'
 router.put('/', async (req, res, next) => {
-  if (req.body.success === true) {
+  console.log(req.body)
+  if (true) {
+    console.log('if ok')
     res.json({success: true})
   } else {
-    next({error: "Add product failed"})
+    console.log('if ko')
+    next({message: "Add product failed"})
   }
 })
-
 // TODO: Ricky
 // Delete product - DELETE '/products/:id'
 router.delete('/', async(req, res, next) => {
@@ -44,21 +73,10 @@ router.patch('/', async(req, res, next) => {
 })
 
 
-router.get('/:id', async (req, res, next) => {
-  try {
-    const event = await get(req.params.id);
-    res.json({ event: event });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.use(checkAuth);
-
 router.post('/', async (req, res, next) => {
   console.log(req.token);
   const data = req.body;
-
+  
   let errors = {};
 
   if (!isValidText(data.title)) {
