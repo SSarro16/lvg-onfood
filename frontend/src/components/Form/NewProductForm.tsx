@@ -1,10 +1,12 @@
 import React from "react";
-import { Form, useNavigation, Link } from "react-router-dom";
+import { Form, useNavigation, Link, useActionData } from "react-router-dom";
 import classes from "./Form.module.css";
 
 function NewProductForm(event: any) {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const data = useActionData()
+  console.log('data is: ' , data)
 
   return (
     <Form method="post" className={classes.form}>

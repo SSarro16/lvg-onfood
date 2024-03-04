@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, useRouteLoaderData } from "react-router-dom";
+import { NavLink, useRouteLoaderData, Form } from "react-router-dom";
 import classes from "./MainNavigator.module.css";
 
 function MainNavigator() {
@@ -34,16 +34,19 @@ function MainNavigator() {
           ) : (
             <>
               <li>
-                <NavLink to="/newproduct"
-                className={({ isActive }) =>
-                isActive ? classes.active : undefined
-              }
-              >
-                New Product
-              </NavLink>
+                <NavLink
+                  to="/newproduct"
+                  className={({ isActive }) =>
+                    isActive ? classes.active : undefined
+                  }
+                >
+                  New Product
+                </NavLink>
               </li>
               <li>
-                <NavLink to="/logout">Log Out</NavLink>
+                <Form action="/logout" method="POST">
+                  <button>Log Out</button>
+                </Form>
               </li>
             </>
           )}
