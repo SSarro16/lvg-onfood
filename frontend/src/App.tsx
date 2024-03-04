@@ -6,7 +6,7 @@ import LogInPage, { action as authAction } from "./pages/LogIn";
 import RootLayout from "./pages/RootLayout";
 import { checkAuthLoader, tokenLoader } from "./util/auth";
 import NewProductPage, { action as newproductAction } from "./pages/NewProduct";
-import { action as logoutAction } from "./pages/LogOut";
+import LogoutPage from "./pages/LogOut";
 
 const router = createBrowserRouter([
   {
@@ -24,7 +24,7 @@ const router = createBrowserRouter([
         element: <LogInPage />,
         action: authAction,
       },
-      { path: "logout", action: logoutAction },
+      { path: "logout", element: <LogoutPage /> },
       {
         path: "newproduct",
         element: <NewProductPage />,

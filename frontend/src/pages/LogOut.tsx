@@ -1,4 +1,15 @@
+import { useEffect } from "react";
 import { redirect, json } from "react-router-dom";
+import LoadingPage from "./Loading";
+
+const LogoutPage: React.FC<{}> = () => {
+  // once at initialization
+  useEffect(() => {
+    action()
+  }, [])
+
+  return <LoadingPage text={"Logging you out..."}></LoadingPage>
+}
 
 const action = async () => {
   const response =  await fetch("http://localhost:8080/logout", {
@@ -20,4 +31,4 @@ const action = async () => {
   return redirect("/");
 };
 
-export {action};
+export default LogoutPage;
