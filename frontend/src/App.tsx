@@ -4,9 +4,9 @@ import "./App.css";
 import HomePage from "./pages/Home";
 import LogInPage, { action as authAction } from "./pages/LogIn";
 import RootLayout from "./pages/RootLayout";
-import { tokenLoader } from "./util/auth";
-import NewProductPage from "./pages/NewProduct";
-import {action as logoutAction} from "./pages/LogOut";
+import { checkAuthLoader, tokenLoader } from "./util/auth";
+import NewProductPage, { action as newproductAction } from "./pages/NewProduct";
+import { action as logoutAction } from "./pages/LogOut";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +25,11 @@ const router = createBrowserRouter([
         action: authAction,
       },
       { path: "logout", action: logoutAction },
-      { path: "newproduct", element: <NewProductPage /> },
+      {
+        path: "newproduct",
+        element: <NewProductPage />,
+        action: newproductAction,
+      },
     ],
   },
 ]);

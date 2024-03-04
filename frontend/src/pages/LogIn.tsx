@@ -8,7 +8,7 @@ export default function LogInPage() {
   return (
     <>
       <div>
-        <Header title={"Log In"} message={"Log In Page in lavorazione..."} />
+        <Header title={"Log In"} message={"Inserisci email e password per autenticarti!"} />
       </div>
       <div>
         <LogInForm />
@@ -41,6 +41,7 @@ const action: ActionFunction<any> = async (args) => {
   if (!response.ok) {
     throw json({ message: 'Could not authenticate user.' }, { status: 500 });
   }
+  
   const resData: LoginResBody  = await response.json();
   const token = resData.token;
   localStorage.setItem('token', token)

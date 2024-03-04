@@ -43,7 +43,7 @@ function MainNavigator() {
               </NavLink>
               </li>
               <li>
-                <button><NavLink to="/logout">Log Out</NavLink></button>
+                <button type="submit"><NavLink to="/logout">Log Out</NavLink></button>
               </li>
             </>
           )}

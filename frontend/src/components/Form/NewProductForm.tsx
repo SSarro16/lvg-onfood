@@ -1,7 +1,6 @@
 import React from "react";
 import { Form, useNavigation, Link } from "react-router-dom";
 import classes from "./Form.module.css";
-import { getAuthToken } from "../../util/auth";
 
 function NewProductForm(event: any) {
   const navigation = useNavigation();
@@ -23,7 +22,7 @@ function NewProductForm(event: any) {
         <label htmlFor="image">Product Image</label>
         <input
           id="image"
-          type='url'
+          type="url"
           name="image"
           required
           defaultValue={event ? event.image : ""}
@@ -33,7 +32,7 @@ function NewProductForm(event: any) {
         <label htmlFor="price">Price</label>
         <input
           id="price"
-          type='number'
+          type="number"
           name="price"
           required
           defaultValue={event ? event.price : ""}

@@ -17,7 +17,7 @@ const action = async () => {
   }
 
   localStorage.removeItem("token");
-  return (redirect("/"));
+  return redirect("/");
 };
 
 export {action};
