@@ -1,6 +1,7 @@
 import NewProductForm from "../components/Form/NewProductForm";
 import { ActionFunction, json, redirect } from "react-router-dom";
 import React from "react";
+import { useDispatch } from "react-redux";
 
 const backendUrl = "http://localhost:8080"
 
@@ -11,6 +12,7 @@ function NewProductPage() {
 export default NewProductPage;
 
 const action: ActionFunction<any> = async (args) => {
+  const dispatch = useDispatch()
   const data = await args.request.formData();
   const prodData = {
     id: data.get("id"),
@@ -21,8 +23,8 @@ const action: ActionFunction<any> = async (args) => {
     quantity: 0,
   };
 
-  const response = await fetch(`${backendUrl}/newproduct`, {
-    method: "POST",
+  const response = await fetch('http://localhost:8080/products', {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },

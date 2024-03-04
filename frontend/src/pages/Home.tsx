@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
-import Product from "../components/Products/Product";
+import Product from "../components/Products/Products";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 export default function HomePage() {
+  const products = useSelector((state: RootState) => state.products.products)
+
   return (
     <>
       <div>

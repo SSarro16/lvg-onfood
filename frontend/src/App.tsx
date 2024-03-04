@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import "./App.css";
 import HomePage from "./pages/Home";
@@ -35,6 +35,20 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  const [isFetching, setIsFetching] = useState(false);
+
+  const fetchProducts = async () => {
+    // fetch products in backend
+    // dispatch into redux store
+    setIsFetching(true);
+    await fetch('')
+    setIsFetching(false)
+  }
+  
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+  
   return <RouterProvider router={router} />;
 }
 
