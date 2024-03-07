@@ -1,57 +1,53 @@
 import express from "express";
+import admin from "../util/firebaseAdmin";
 import type { Request } from "../types/express.types";
 import { isValidEmail, isValidText } from "../util/validation";
+import { checkAuth } from "../util/auth";
 
 
 const router = express.Router();
 
-// Login and get token - POST /login BODY {username, password}
-
+// Login and get token - POST /login BODY {username}
 router.post("/login", async (req: Request, res) => {
   let email = req.body.email;
-  let password = req.body.password;
   // validation & sanitization
-  if (!isValidEmail(email) || !isValidText(password, 8)) {
+  if (!isValidEmail(email)) {
     return res.status(422).json({ message: 'Invalid email or password.' });
   } 
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   if (!emailRegex.test(email) || email.length === 0 || email.length > 255) {
     return res.status(422).json({ message: 'Invalid email format.' });
   }
-  if (password.length > 255) {
-    return res.status(422).json({ message: 'Password too long.' });
-  }
   email = email.trim();
-  password = password.trim();
 
-  console.log({email, password})
-
-  // let user;
-  // try {
-  //   user = await get(email);
-  // } catch (error) {
-  //   return res.status(401).json({ message: 'Authentication failed.' });
-  // }
-
-  // const pwIsValid = await isValidPassword(password, user.password);
-  // if (!pwIsValid) {
-  //   return res.status(422).json({
-  //     message: 'Invalid credentials.',
-  //     errors: { credentials: 'Invalid email or password entered.' },
-  //   });
-  // }
-
-  // json example token
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoidXNlcm5hbWUiLCJpYXQiOjE1MTYyMzkwMjJ9.5vB9JQ5';
-  res.json({ token });
+  console.log({email})
+  try {
+    // logic to call login on firebase ...
+    const user = await admin.auth().getUserByEmail(email);
+    const token = await admin.auth().createCustomToken(user.uid);
+    res.json({ token });
+  }
+  catch (error: any) {
+    console.log(error);
+    return res.status(401).json({ message: 'Invalid email or password.' });
+  }
+  // const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoidXNlcm5hbWUiLCJpYXQiOjE1MTYyMzkwMjJ9.5vB9JQ5';
+  // res.json({ token });
 });
+
+router.use(checkAuth);
 
 // Logout - POST /logout 
 router.post("/logout", async(req: Request, res, next) => {
   // if token is valid
   if (req.token) {
     // logic to call signout on firebase ...
-
+    try {
+      await admin.auth().revokeRefreshTokens(req.token.uid);
+      res.json({success: true})
+    } catch (error: any) {
+      next({message: 'Error while logging out'})
+    }
     res.json({success: true})
   } else {
     next({message: 'Error while logging out'})

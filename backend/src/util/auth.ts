@@ -3,6 +3,7 @@ import { compare } from 'bcryptjs';
 import { NotAuthError } from './errors';
 import { Request } from '../types/express.types';
 import { NextFunction, Response } from 'express';
+import admin from './firebaseAdmin';
 
 const KEY = 'supersecret';
 
@@ -33,14 +34,15 @@ function checkAuthMiddleware(req: Request, res: Response, next: NextFunction) {
     return next(new NotAuthError('Not authenticated.'));
   }
   const authToken = authFragments[1];
-  try {
-    const validatedToken = validateJSONToken(authToken);
-    req.token = validatedToken;
-  } catch (error) {
-    console.log('NOT AUTH. TOKEN INVALID.');
-    return next(new NotAuthError('Not authenticated.'));
-  }
-  next();
+  admin.auth().verifyIdToken(authToken)
+    .then((decodedToken) => {
+      req.token = decodedToken;
+      next();
+    })
+    .catch((error) => {
+      console.log('NOT AUTH. TOKEN INVALID.');
+      return next(new NotAuthError('Not authenticated.'));
+    });
 }
 
 export { createJSONToken, validateJSONToken, checkPassword, checkAuthMiddleware as checkAuth };
