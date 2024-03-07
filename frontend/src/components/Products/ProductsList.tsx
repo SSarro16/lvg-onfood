@@ -1,19 +1,21 @@
 import React, { useState } from "react";
-import {ProductItem} from "./ProductItem";
+import { ProductItem } from "./ProductItem";
 import { useSelector } from "react-redux";
 import type { Product } from "../../store/products-slice";
 import type { RootState, AppDispatch } from "../../store";
 
+type ProductsListProps = {
+  products: Product[];
+};
 
-
-export default function Products() {
-  //
-  const products = useSelector((state: RootState) => state.products.products)
+const ProductsList: React.FC<ProductsListProps> = (props) => {
   return (
     <ol style={{ listStyleType: "none" }}>
-      {products.map((product) => (
+      {props.products.map((product) => (
         <ProductItem key={product.id} product={product} />
       ))}
     </ol>
   );
-}
+};
+
+export default ProductsList;

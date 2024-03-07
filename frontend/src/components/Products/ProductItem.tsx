@@ -1,11 +1,9 @@
 import React from "react";
-import { getAuthToken } from "../../util/auth";
 import type { Product } from "../../store/products-slice";
 
 type ProductItemProps = { product: Product };
 
 const ProductItem: React.FC<ProductItemProps> = (props) => {
-  const token = getAuthToken();
 
   return (
     <li>
@@ -17,17 +15,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
           <p>{props.product.price}€</p>
         </div>
         <div>
-          {token && (
-            <p>
-              <button>+</button>
-            </p>
-          )}
           <p>{props.product.quantity} pz</p>
-          {token && (
-            <p>
-              <button>-</button>
-            </p>
-          )}
         </div>
       </article>
     </li>
