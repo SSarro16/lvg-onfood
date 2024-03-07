@@ -8,7 +8,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   return (
     <li>
       <article>
-        <img src={props.product.image} alt={props.product.title} />
+        <img height={100} width={100} src={props.product.image} alt={props.product.title} />
         <div>
           <h4>{props.product.title}</h4>
           <p>{props.product.description}</p>
