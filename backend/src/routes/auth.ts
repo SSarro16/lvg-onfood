@@ -22,7 +22,6 @@ router.post("/login", async (req: Request, res) => {
 
   console.log({email})
   try {
-    // logic to call login on firebase ...
     const user = await admin.auth().getUserByEmail(email);
     const token = await admin.auth().createCustomToken(user.uid);
     res.json({ token });
