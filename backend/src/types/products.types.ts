@@ -1,7 +1,7 @@
 import { isValidString } from "../util/validation";
 
-interface Product {
-  id: string;
+interface NewProduct {
+  id?: string;
   title: string;
   description: string;
   image: string | null;
@@ -9,6 +9,10 @@ interface Product {
   quantity: number;
   estimatedCompletedTime: number;
   lastUpdatedTime: number;
+};
+
+interface Product extends NewProduct {
+  id: string;
 };
 
 const isValidId = (value: any): value is string => {
@@ -38,15 +42,23 @@ const isValidLastUpdatedTime = (value: any): value is number => {
   return typeof value === 'number' && value >= 0;
 }
 
-const isValidProduct = (value: any, strict = false): value is Product => {
+const isValidNewProduct = (value: any, strict = false): value is NewProduct => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
-  let condition = isValidId(value.id) && isValidTitle(value.title) && isValidPrice(value.price);
+
+  let condition = isValidTitle(value.title) && isValidPrice(value.price);
   if (strict) {
     condition = condition && isValidDescription(value.description) && isValidQuantity(value.quantity) && isValidEstimatedCompletedTime(value.estimatedCompletedTime) && isValidLastUpdatedTime(value.lastUpdatedTime);
   }
   return condition;
 }
 
-export {Product, isValidProduct, isValidDescription, isValidId, isValidTitle, isValidPrice, isValidQuantity, isValidEstimatedCompletedTime, isValidLastUpdatedTime}
+const isValidProduct = (value: any, strict = false): value is Product => {
+  if (!isValidNewProduct(value, strict)) {
+    return false;
+  }
+  return isValidId(value.id);
+}
+
+export {Product, NewProduct, isValidNewProduct, isValidProduct, isValidDescription, isValidId, isValidTitle, isValidPrice, isValidQuantity, isValidEstimatedCompletedTime, isValidLastUpdatedTime}

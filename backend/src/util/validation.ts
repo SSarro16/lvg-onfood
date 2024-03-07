@@ -1,4 +1,4 @@
-import { Product, isValidDescription, isValidEstimatedCompletedTime, isValidLastUpdatedTime, isValidProduct } from "../types/products.types";
+import { NewProduct, Product, isValidDescription, isValidEstimatedCompletedTime, isValidLastUpdatedTime, isValidNewProduct, isValidProduct } from "../types/products.types";
 
 const isValidDate = (value: any): value is Date => {
   const date = new Date(value);
@@ -21,13 +21,11 @@ const isValidEmail = (value: any): value is string => {
   return isValidString(value) && value.includes('@');
 }
 
-const sanitizeProduct = (product: any): Product | null => {
-  
+const sanitizeNewProduct = (product: any, withId = true): NewProduct => {
   if (!isValidProduct(product, false)) {
-    return null;
+    throw "Invalid product. Either title or price is missing or invalid.";
   }
 
-  const id = product.id;
   const title = product.title.trim();
   const price = product.price;
 
@@ -39,7 +37,6 @@ const sanitizeProduct = (product: any): Product | null => {
 
 
   return {
-    id,
     title,
     description,
     image,
@@ -50,4 +47,16 @@ const sanitizeProduct = (product: any): Product | null => {
   };
 }
 
-export {isValidString, isValidDate, isValidText, isValidImageUrl, isValidEmail, sanitizeProduct};
+const sanitizeProduct = (product: any): Product => {
+  const newProduct = sanitizeNewProduct(product);
+  if (!isValidString(product.id)) {
+    throw "Invalid product id.";
+  }
+
+  return {
+    ...newProduct,
+    id: product.id,
+  };
+}
+
+export {isValidString, isValidDate, isValidText, isValidImageUrl, isValidEmail, sanitizeProduct, sanitizeNewProduct};
