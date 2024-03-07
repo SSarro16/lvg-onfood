@@ -1,8 +1,9 @@
-const bodyParser = require('body-parser');
-const express = require('express');
+import express, { Express, Request, Response } from "express";
+import dotenv from "dotenv";
+import bodyParser from "body-parser";
 
-const eventRoutes = require('./routes/products');
-const authRoutes = require('./routes/auth');
+import eventRoutes from './routes/products';
+import authRoutes from './routes/auth';
 
 const app = express();
 

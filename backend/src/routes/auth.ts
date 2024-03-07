@@ -1,7 +1,7 @@
-const express = require("express");
-const { add, get } = require("../data/user");
-const { createJSONToken, isValidPassword } = require("../util/auth");
-const { isValidEmail, isValidText } = require("../util/validation");
+import express, { NextFunction, Request, Response } from "express";
+import {createJSONToken} from "../util/auth";
+
+import {isValidEmail, isValidTest} from "../util/validation";
 
 const router = express.Router();
 
