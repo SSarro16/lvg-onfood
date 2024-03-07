@@ -2,7 +2,8 @@ import express from "express";
 import { Request } from "../types/express.types";
 import { checkAuth } from "../util/auth";
 import { Product, isValidId } from "../types/products.types";
-import { sanitizeProduct } from "../util/validation";
+import { sanitizeNewProduct, sanitizeProduct } from "../util/validation";
+import admin from "../util/firebaseAdmin";
 
 const router = express.Router();
 
@@ -51,48 +52,76 @@ const PRODUCTS: Product[] = [
   },
 ];
 
-// TODO: Ricky
 // Get products - GET '/products'
 router.get("/", async (req: Request, res, next) => {
-  console.log(`token is ${req.token}`);
-  // logic to call get on firebase ...
-  res.json({ products: PRODUCTS });
+  try {
+    console.log(`token is ${req.token}`);
+    // logic to call get on firebase ...
+    const db = admin.firestore();
+    const productsRef = db.collection("products");
+    const snapshot = await productsRef.get();
+    const products: Product[] = [];
+    snapshot.forEach((doc) => {
+      const product = sanitizeProduct(doc.data());
+      products.push(product);
+    });
+    res.json({ products });
+  } catch (error: any) {
+    next({ message: error.message || "Failed to get products", error });
+  }
 });
 
 // Get product detail - GET /products/:id
 router.get("/:id", async (req: Request, res, next) => {
   const productId = req.params.id;
-  const product = PRODUCTS.find((p) => p.id === productId);
-  if (product) {
-    // clean product from sensitive data
-    res.json({ product });
+
+  if (isValidId(productId)) {
+    try {
+      // logic to call get on firebase ...
+      const db = admin.firestore();
+      const productsRef = db.collection("products");
+      const snapshot = await productsRef.where("id", "==", productId).get();
+      if (snapshot.empty) {
+        next({ message: "Product not found" });
+      }
+      // sanitize product from firestore
+      const product = sanitizeProduct(snapshot.docs[0].data());
+      // response
+      res.json({ product });
+    } catch (error: any) {
+      next({ message: error.message || "Failed to get product", error });
+    }
   } else {
-    next({ message: "Product not found" });
+    next({ message: "Invalid product id" });
   }
 });
 
 router.use(checkAuth);
 
-// TODO: Ricky
 // Add new product - PUT '/products' BODY {product}
 router.put("/", async (req: Request, res, next) => {
-  const product = sanitizeProduct(req.body);
-  if (product) {
-    console.log("if ok");
-    PRODUCTS.push({
+  try {
+    let product = sanitizeNewProduct(req.body);
+    product = {
       ...product,
       lastUpdatedTime: Date.now(),
-      quantity: 0,
+      quantity: 0, // choice: products start with 0 quantity
       estimatedCompletedTime: 0,
-    });
+    }
+    // logic to call add on firebase ...
+    const db = admin.firestore();
+    const productsRef = db.collection("products");
+    const productRef = await productsRef.add(product);
+
+    const id = productRef.id;
+    await productRef.update({ id });
+
     res.json({ success: true });
-  } else {
-    console.log("if ko");
-    next({ message: "Add product failed" });
+  } catch (error: any) {
+    next({ message: error.message || "Add product failed"});
   }
 });
 
-// TODO: Ricky
 // Delete product - DELETE '/products/:id'
 router.delete("/", async (req: Request, res, next) => {
   // get id
