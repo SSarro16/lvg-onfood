@@ -2,6 +2,7 @@
   padding: 1rem;
   margin: 2rem auto;
   max-width: 40rem;
+  padding-bottom: 5vh;
 }
 
 .header ul {
@@ -34,4 +35,10 @@ ul {
   right: 0;
   width: 100%;
   position: fixed;
+}
+
+.header form {
+  padding: 0;
+  margin: 0.3rem;
+  width: 100%;
 }

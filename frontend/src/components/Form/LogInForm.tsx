@@ -1,11 +1,12 @@
 import React from "react";
-import { Form, Link, useNavigation } from "react-router-dom";
-import classes from "../pages/LogIn.module.css";
+import { Form, Link, useActionData, useNavigation } from "react-router-dom";
+import classes from "./Form.module.css";
 
 export default function LogInForm() {
     const navigation = useNavigation();
-
     const isSubmitting = navigation.state === "submitting";
+    const data = useActionData()
+    console.log('data is: ' , data)
 
   return (
     <Form method="post" className={classes.form}>
