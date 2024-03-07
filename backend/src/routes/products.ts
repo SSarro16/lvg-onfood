@@ -1,23 +1,14 @@
-
 import express from "express";
-import checkAuth from "../util/auth";
+import { Request } from "../types/express.types";
+import { checkAuth } from "../util/auth";
+import { Product, isValidId } from "../types/products.types";
+import { sanitizeProduct } from "../util/validation";
 
 const router = express.Router();
 
-type Product = {
-  id: string;
-  title: string;
-  description: string;
-  image: string | null;
-  price: number;
-  quantity: number;
-  estimatedCompletedTime: number;
-  lastUpdatedTime: number;
-};
-
 const PRODUCTS: Product[] = [
   {
-    id: '1asdfghj',
+    id: "1asdfghj",
     title: "Gateaux di Patate",
     description: "Gateaux di Patate con Mozzarella e Prosciutto",
     image:
@@ -25,7 +16,7 @@ const PRODUCTS: Product[] = [
     price: 6.4,
     quantity: 6,
     estimatedCompletedTime: 0,
-    lastUpdatedTime: Date.now() - 10*60*1000,
+    lastUpdatedTime: Date.now() - 10 * 60 * 1000,
   },
   {
     id: "2hdrftghsd",
@@ -36,7 +27,7 @@ const PRODUCTS: Product[] = [
     price: 5.5,
     quantity: 6,
     estimatedCompletedTime: 0,
-    lastUpdatedTime: Date.now() - 10*60*1000,
+    lastUpdatedTime: Date.now() - 10 * 60 * 1000,
   },
   {
     id: "3dsfkgnlg",
@@ -46,7 +37,7 @@ const PRODUCTS: Product[] = [
     price: 3.0,
     quantity: 0,
     estimatedCompletedTime: 0,
-    lastUpdatedTime: Date.now() - 100*60*1000,
+    lastUpdatedTime: Date.now() - 100 * 60 * 1000,
   },
   {
     id: "4lssdfsdfsdf",
@@ -55,23 +46,25 @@ const PRODUCTS: Product[] = [
     image: null,
     price: 4.5,
     quantity: 0,
-    estimatedCompletedTime: Date.now() + 60*60*1000,
+    estimatedCompletedTime: Date.now() + 60 * 60 * 1000,
     lastUpdatedTime: Date.now(),
-  }
+  },
 ];
 
 // TODO: Ricky
 // Get products - GET '/products'
-router.get("/", async (req, res, next) => {
+router.get("/", async (req: Request, res, next) => {
   console.log(`token is ${req.token}`);
+  // logic to call get on firebase ...
   res.json({ products: PRODUCTS });
 });
 
 // Get product detail - GET /products/:id
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", async (req: Request, res, next) => {
   const productId = req.params.id;
   const product = PRODUCTS.find((p) => p.id === productId);
   if (product) {
+    // clean product from sensitive data
     res.json({ product });
   } else {
     next({ message: "Product not found" });
@@ -82,39 +75,49 @@ router.use(checkAuth);
 
 // TODO: Ricky
 // Add new product - PUT '/products' BODY {product}
-router.put("/", async (req, res, next) => {
-  console.log(req.body);
-  const product = req.body;
-  if (true) {
+router.put("/", async (req: Request, res, next) => {
+  const product = sanitizeProduct(req.body);
+  if (product) {
     console.log("if ok");
-    PRODUCTS.push({...product, lastUpdatedTime: 0, quantity: 5, estimatedCompletedTime: 0});
+    PRODUCTS.push({
+      ...product,
+      lastUpdatedTime: Date.now(),
+      quantity: 0,
+      estimatedCompletedTime: 0,
+    });
     res.json({ success: true });
   } else {
     console.log("if ko");
     next({ message: "Add product failed" });
   }
 });
-// TODO: Ricky
-// Delete product - DELETE '/products/:id'
-router.delete("/", async (req, res, next) => {
-  res.json(PRODUCTS);
-});
-
-// TODO: Ricky
-// Modify existing product - PATCH '/products/:id'
-router.patch("/:id", async (req, res, next) => {
-  res.json(PRODUCTS);
-});
 
 // TODO: Ricky
 // Delete product - DELETE '/products/:id'
-router.delete("/:id", async (req, res, next) => {
-  // logic to call delete on firebase ...
-  if (true) {
+router.delete("/", async (req: Request, res, next) => {
+  // get id
+  const productId = isValidId(req.params.id) ? req.params.id : null;
+  if (productId) {
+    // logic to call delete on firebase ...
     res.json({ success: true });
   } else {
     next({ message: "Delete product failed" });
   }
 });
 
-module.exports = router;
+// TODO: Ricky
+// Modify existing product - PATCH '/products/:id' BODU {product}
+router.patch("/:id", async (req: Request, res, next) => {
+  // get id
+  const productId = isValidId(req.params.id) ? req.params.id : null;
+  const product = sanitizeProduct(req.body);
+  if (productId && product) {
+    // logic to call update on firebase ...
+    res.json({ success: true });
+  } else {
+    next({ message: "Modify product failed" });
+  }
+});
+
+
+export default router;

@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import {createJSONToken} from "../util/auth";
 
-import {isValidEmail, isValidTest} from "../util/validation";
 
 const router = express.Router();
 
@@ -43,4 +42,4 @@ router.post("/logout", async(req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

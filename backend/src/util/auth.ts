@@ -1,7 +1,8 @@
 import { sign, verify } from 'jsonwebtoken';
 import { compare } from 'bcryptjs';
 import { NotAuthError } from './errors';
-import { NextFunction, Request, Response } from 'express';
+import { Request } from '../types/express.types';
+import { NextFunction, Response } from 'express';
 
 const KEY = 'supersecret';
 
@@ -42,4 +43,4 @@ function checkAuthMiddleware(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-export { createJSONToken, validateJSONToken, checkPassword, checkAuthMiddleware };
+export { createJSONToken, validateJSONToken, checkPassword, checkAuthMiddleware as checkAuth };
