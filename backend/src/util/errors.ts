@@ -20,4 +20,4 @@ class NotAuthError extends GenericError {
   }
 }
 
-export {NotFoundError, NotAuthError};
+export {GenericError, NotFoundError, NotAuthError};

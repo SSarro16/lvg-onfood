@@ -1,9 +1,10 @@
-import express, { Express, Request, Response } from "express";
-import dotenv from "dotenv";
+import express, { Express, Response, NextFunction } from "express";
+import { Request } from "./types/express.types";
 import bodyParser from "body-parser";
 
 import eventRoutes from './routes/products';
 import authRoutes from './routes/auth';
+import { GenericError } from "./util/errors";
 
 const app = express();
 
@@ -19,8 +20,7 @@ app.use((req, res, next) => {
 app.use(authRoutes);
 
 app.use('/products', eventRoutes);
-
-app.use((error, req, res, next) => {
+app.use((error: GenericError, req: Request, res: Response, next: NextFunction) => {
   const status = error.status || 500;
   const message = error.message || 'Something went wrong.';
   res.status(status).json({ message: message });
