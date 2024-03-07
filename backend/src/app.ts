@@ -1,4 +1,4 @@
-import express, { Express, Response, NextFunction } from "express";
+import express, { Response, NextFunction } from "express";
 import { Request } from "./types/express.types";
 import bodyParser from "body-parser";
 
