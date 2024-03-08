@@ -76,6 +76,13 @@ form {
   gap: 1rem;
 }
 
+.card {
+  background: var(--surface-card);
+  padding: 2rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
 .button {
   padding: 0.5rem 1rem;
   font-size: 1rem;

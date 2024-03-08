@@ -9,6 +9,7 @@ import NewProductPage, { action as newproductAction } from "./pages/NewProduct";
 import { action as logoutAction } from "./pages/LogOut";
 import { useDispatch } from "react-redux";
 import { productsActions } from "./store/products-slice";
+import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
 import type { Product } from "./store/products-slice";
 
 const router = createBrowserRouter([
@@ -73,7 +74,11 @@ function App() {
     fetchProducts();
   }, []);
 
-  return <RouterProvider router={router} />;
+  return (
+  <PrimeReactProvider>
+    <RouterProvider router={router} />;
+  </PrimeReactProvider>
+  );
 }
 
 export default App;

@@ -1,14 +1,26 @@
 import React from "react";
 import type { Product } from "../../store/products-slice";
+import ProductDetail from "./ProductDetail";
 
 type ProductItemProps = { product: Product };
 
 const ProductItem: React.FC<ProductItemProps> = (props) => {
+  const DetailPageHandler = () => {
+    <ProductDetail product={props.product} />
+  }
 
   return (
     <li>
       <article>
-        <img height={100} width={100} src={props.product.image} alt={props.product.title} />
+        <button type="button" onClick={DetailPageHandler}>
+          <img
+            height={100}
+            width={100}
+            src={props.product.image}
+            alt={props.product.title}
+          />
+        </button>
+
         <div>
           <h4>{props.product.title}</h4>
           <p>{props.product.description}</p>
