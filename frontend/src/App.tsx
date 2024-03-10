@@ -9,7 +9,7 @@ import NewProductPage, { action as newproductAction } from "./pages/NewProduct";
 import { action as logoutAction } from "./pages/LogOut";
 import { useDispatch } from "react-redux";
 import { productsActions } from "./store/products-slice";
-import { PrimeReactProvider, PrimeReactContext } from 'primereact/api';
+import { PrimeReactProvider, PrimeReactContext } from "primereact/api";
 import type { Product } from "./store/products-slice";
 
 const router = createBrowserRouter([
@@ -28,7 +28,6 @@ const router = createBrowserRouter([
         element: <LogInPage />,
         action: authAction,
       },
-      { path: "logout", action: logoutAction },
       {
         path: "newproduct",
         element: <NewProductPage />,
@@ -62,9 +61,9 @@ function App() {
     if (!response.ok) {
       throw json({ message: "Could not fetch" }, { status: 500 });
     }
-    
+
     const fetchedProducts = resData.products as Product[];
-    console.log(fetchedProducts)
+    console.log(fetchedProducts);
     setProductsHandler(fetchedProducts);
 
     setIsFetching(false);
@@ -75,9 +74,9 @@ function App() {
   }, []);
 
   return (
-  <PrimeReactProvider>
-    <RouterProvider router={router} />;
-  </PrimeReactProvider>
+    <PrimeReactProvider>
+      <RouterProvider router={router} />;
+    </PrimeReactProvider>
   );
 }
 

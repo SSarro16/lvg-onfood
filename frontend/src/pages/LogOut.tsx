@@ -2,27 +2,29 @@ import React from "react";
 import {
   redirect,
   json,
+  useRouteLoaderData,
+  NavigateFunction,
 } from "react-router-dom";
 
-
-const action = async () => {
+const action = async (token: string, navigate: NavigateFunction) => {
   const response = await fetch("http://localhost:8080/logout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
     },
   });
   console.log(response);
 
   if (response.status === 401) {
-    return response;
+    throw "Non autenticato";
   }
 
   if (!response.ok) {
-    throw json({ message: "Could not logged user." }, { status: 500 });
+    throw "Log out non effettuato";
   }
 
   localStorage.removeItem("token");
-  return redirect("/");
+  navigate("/");
 };
 export { action };

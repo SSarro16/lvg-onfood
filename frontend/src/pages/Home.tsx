@@ -18,6 +18,7 @@ export default function HomePage() {
       products.map((product) => {
         if (product.quantity > 0) {
           setAvailableProducts((prevState) => {
+            const state = prevState;
             const alrCheckedId = prevState.some((element) => {
               if (element.id === product.id) {
                 return true;
@@ -27,13 +28,14 @@ export default function HomePage() {
             if (alrCheckedId === true) {
               return prevState;
             } else {
-              prevState.push(product);
-              return prevState;
+              state.push(product);
+              return state;
             }
           });
         } else {
           if (product.estimatedCompletedTime > 0) {
             setWipProducts((prevState) => {
+              const state = prevState;
               const alrCheckedId = prevState.some((element) => {
                 if (element.id === product.id) {
                   return true;
@@ -43,12 +45,13 @@ export default function HomePage() {
               if (alrCheckedId === true) {
                 return prevState;
               } else {
-                prevState.push(product);
-                return prevState;
+                state.push(product);
+                return state;
               }
             });
           } else {
             setUnavailableProducts((prevState) => {
+              const state = prevState;
               const alrCheckedId = prevState.some((element) => {
                 if (element.id === product.id) {
                   return true;
@@ -58,8 +61,8 @@ export default function HomePage() {
               if (alrCheckedId === true) {
                 return prevState;
               } else {
-                prevState.push(product);
-                return prevState;
+                state.push(product);
+                return state;
               }
             });
           }
