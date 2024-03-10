@@ -54,7 +54,7 @@ router.post("/login-new", async (req: Request, res) => {
   }
 });
 
-router.use(checkAuth);
+// router.use(checkAuth);
 
 // [old - to be removed]
 // Logout - POST /logout 

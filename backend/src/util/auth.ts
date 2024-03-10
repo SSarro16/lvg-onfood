@@ -39,8 +39,8 @@ function checkAuthMiddleware(req: Request, res: Response, next: NextFunction) {
   console.log(authToken);
   if (authToken) {
     req.token = authToken as unknown as DecodedIdToken;
+    return next();
   }
-  next();
 }
 
 // NEW CHECKAUTH
