@@ -134,7 +134,7 @@ router.get("/new/:id", async (req: Request, res, next) => {
   }
 });
 
-// router.use(checkAuth);
+router.use(checkAuth);
 
 // [old - to be removed]
 // Add new product - PUT '/products' BODY {product}

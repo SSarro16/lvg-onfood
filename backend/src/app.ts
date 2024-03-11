@@ -10,16 +10,17 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use((req, res, next) => {
-  console.log(`Request [${req.method}] ${req.path} ${req.body}`)
+  console.log(`Request [${req.method}] ${req.path} ${JSON.stringify(req.body)}`);
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
   next();
 });
 
-app.use(authRoutes);
+app.use('/auth', authRoutes);
 
 app.use('/products', eventRoutes);
+
 app.use((error: GenericError, req: Request, res: Response, next: NextFunction) => {
   const status = error.status || 500;
   const message = error.message || 'Something went wrong.';
