@@ -1,9 +1,9 @@
 import express from "express";
 import { Request } from "../types/express.types";
-import { checkAuth } from "../util/auth";
+import { checkAuth, checkAuthNew } from "../util/auth";
 import { Product, isValidId } from "../types/products.types";
 import { sanitizeNewProduct, sanitizeProduct } from "../util/validation";
-import admin from "../util/firebaseAdmin";
+import {db} from "../util/firebaseAdmin";
 
 const router = express.Router();
 
@@ -70,7 +70,6 @@ router.get("/new", async (req: Request, res, next) => {
   try {
     console.log(`token is ${req.token}`);
     // logic to call get on firebase ...
-    const db = admin.firestore();
     const productsRef = db.collection("products");
     const snapshot = await productsRef.get();
     const products: Product[] = [];
@@ -116,7 +115,6 @@ router.get("/new/:id", async (req: Request, res, next) => {
   if (isValidId(productId)) {
     try {
       // logic to call get on firebase ...
-      const db = admin.firestore();
       const productsRef = db.collection("products");
       const snapshot = await productsRef.where("id", "==", productId).get();
       if (snapshot.empty) {
@@ -134,7 +132,7 @@ router.get("/new/:id", async (req: Request, res, next) => {
   }
 });
 
-router.use(checkAuth);
+router.use(checkAuthNew);
 
 // [old - to be removed]
 // Add new product - PUT '/products' BODY {product}
@@ -168,7 +166,6 @@ router.put("/new", async (req: Request, res, next) => {
       estimatedCompletedTime: 0,
     }
     // logic to call add on firebase ...
-    const db = admin.firestore();
     const productsRef = db.collection("products");
     const productRef = await productsRef.add(product);
 
@@ -206,7 +203,6 @@ router.delete("/new", async (req: Request, res, next) => {
   const productId = isValidId(req.params.id) ? req.params.id : null;
   if (productId) {
     try {
-      const db = admin.firestore();
       const productsRef = db.collection("products");
       const productRef = productsRef.doc(productId);
       const result = await productRef.delete();
@@ -245,7 +241,6 @@ router.patch("/new/:id", async (req: Request, res, next) => {
   const product = sanitizeProduct(req.body);
   if (productId && product) {
     try {
-      const db = admin.firestore();
       const productsRef = db.collection("products");
       const productRef = productsRef.doc(productId);
       const result = await productRef.set(product);

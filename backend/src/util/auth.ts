@@ -66,9 +66,9 @@ function checkAuthMiddleware1(req: Request, res: Response, next: NextFunction) {
       req.token = decodedToken;
       next();
     })
-    .catch((error) => {
-      console.log("NOT AUTH. TOKEN INVALID.");
-      return next(new NotAuthError("Not authenticated."));
+    .catch((error: any) => {
+      console.log(`NOT AUTH. TOKEN INVALID. ${error.message || ""}`);
+      return next(new NotAuthError("Not authenticated"));
     });
 }
 
@@ -77,4 +77,5 @@ export {
   validateJSONToken,
   checkPassword,
   checkAuthMiddleware as checkAuth,
+  checkAuthMiddleware1 as checkAuthNew,
 };

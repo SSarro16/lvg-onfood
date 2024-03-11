@@ -2,7 +2,7 @@ import express from "express";
 import admin from "../util/firebaseAdmin";
 import type { Request } from "../types/express.types";
 import { isValidEmail, isValidText } from "../util/validation";
-import { checkAuth } from "../util/auth";
+import { checkAuth, checkAuthNew } from "../util/auth";
 
 
 const router = express.Router();
@@ -50,11 +50,11 @@ router.post("/login-new", async (req: Request, res) => {
   }
   catch (error: any) {
     console.log(error);
-    return res.status(401).json({ message: 'Invalid email or password.' });
+    return res.status(401).json({ message: error.message || 'Invalid email or password.' });
   }
 });
 
-router.use(checkAuth);
+router.use(checkAuthNew);
 
 // [old - to be removed]
 // Logout - POST /logout 
@@ -64,7 +64,7 @@ router.post("/logout", async(req: Request, res, next) => {
     try {
       res.json({success: true})
     } catch (error: any) {
-      next({message: 'Error while logging out'})
+      next({message: error.message || 'Error while logging out'})
     }
   } else {
     next({message: 'Error while logging out'})
@@ -81,7 +81,7 @@ router.post("/logout-new", async(req: Request, res, next) => {
       await admin.auth().revokeRefreshTokens(req.token.uid);
       res.json({success: true})
     } catch (error: any) {
-      next({message: 'Error while logging out'})
+      next({message: error.message || 'Error while logging out'})
     }
   } else {
     next({message: 'Error while logging out'})
