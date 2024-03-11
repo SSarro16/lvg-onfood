@@ -1,11 +1,17 @@
 // firebaseAdmin.ts
 import * as admin from 'firebase-admin';
+import {initializeApp, cert} from 'firebase-admin/app';
+import {getFirestore} from 'firebase-admin/firestore';
 
-const DATABASE_NAME = 'lvg-onfood';
+import serviceAccount from '../../service/lvg-onfood-2c56b73bfa25.json';
 
-admin.initializeApp({
-  credential: admin.credential.applicationDefault(),
-  databaseURL: `https://${DATABASE_NAME}.firebaseio.com`
+initializeApp({
+  // @ts-ignore
+  credential: cert(serviceAccount),
+  projectId: 'lvg-onfood'
 });
 
+const db = getFirestore();
+
 export default admin;
+export {db};
