@@ -22,7 +22,7 @@ const isValidEmail = (value: any): value is string => {
 }
 
 const sanitizeNewProduct = (product: any, withId = true): NewProduct => {
-  if (!isValidProduct(product, false)) {
+  if (!isValidNewProduct(product, false)) {
     throw "Invalid product. Either title or price is missing or invalid.";
   }
 

@@ -49,7 +49,7 @@ function App() {
     // fetch products in backend
     // dispatch into redux store
     setIsFetching(true);
-    const response = await fetch("http://localhost:8080/products/new", {
+    const response = await fetch("http://localhost:8080/api/v2/products", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

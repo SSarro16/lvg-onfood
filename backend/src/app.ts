@@ -2,8 +2,11 @@ import express, { Response, NextFunction } from "express";
 import { Request } from "./types/express.types";
 import bodyParser from "body-parser";
 
-import eventRoutes from "./routes/products";
-import authRoutes from "./routes/auth";
+import productsRoutes from "./routes/v1/products";
+import authRoutes from "./routes/v1/auth";
+import productsNewRoutes from "./routes/v2/products";
+import authNewRoutes from "./routes/v2/auth";
+
 import { GenericError } from "./util/errors";
 
 const app = express();
@@ -23,9 +26,18 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/auth", authRoutes);
+const version = "v1";
+const apiPath = `/api/${version}`;
 
-app.use("/products", eventRoutes);
+const authPath = `${apiPath}/auth`;
+const productsPath = `${apiPath}/products`;
+const authNewPath = `/api/v2/auth`;
+const productsNewPath = `/api/v2/products`;
+
+app.use(authPath, authRoutes);
+app.use(productsPath, productsRoutes);
+app.use(authNewPath, authNewRoutes);
+app.use(productsNewPath, productsNewRoutes);
 
 app.use(
   (error: GenericError, req: Request, res: Response, next: NextFunction) => {
