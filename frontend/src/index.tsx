@@ -11,6 +11,7 @@ import App from "./App";
 
 import { Provider } from "react-redux";
 import store from "./store";
+import { AuthProvider } from "./components/Firebase/context/auth-context";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -19,7 +20,9 @@ root.render(
   <React.StrictMode>
     <PrimeReactProvider>
       <Provider store={store}>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </Provider>
     </PrimeReactProvider>
   </React.StrictMode>

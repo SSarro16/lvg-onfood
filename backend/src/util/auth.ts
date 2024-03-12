@@ -64,6 +64,7 @@ function checkAuthMiddleware1(req: Request, res: Response, next: NextFunction) {
     .verifyIdToken(authToken)
     .then((decodedToken) => {
       req.token = decodedToken;
+      console.log('authtoken', decodedToken)
       next();
     })
     .catch((error: any) => {
