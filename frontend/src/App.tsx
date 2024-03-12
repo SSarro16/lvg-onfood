@@ -75,7 +75,7 @@ function App() {
 
   return (
     <PrimeReactProvider>
-      <RouterProvider router={router} />;
+      <RouterProvider router={router} />
     </PrimeReactProvider>
   );
 }
