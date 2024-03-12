@@ -75,8 +75,10 @@ router.post("/logout", async(req: Request, res, next) => {
 // Logout - POST /logout 
 router.post("/logout-new", async(req: Request, res, next) => {
   // if token is valid
+  console.log('REQ TOKEN= ', req.token)
   if (req.token) {
     // logic to call signout on firebase ...
+    console.log('LOGOUT BACKEND TOKEN IS: ',  req.token)
     try {
       await admin.auth().revokeRefreshTokens(req.token.uid);
       res.json({success: true})

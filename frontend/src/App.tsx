@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { RouterProvider, createBrowserRouter, json } from "react-router-dom";
 import "./App.css";
 import HomePage from "./pages/Home";
@@ -49,7 +49,7 @@ function App() {
     // fetch products in backend
     // dispatch into redux store
     setIsFetching(true);
-    const response = await fetch("http://localhost:8080/products", {
+    const response = await fetch("http://localhost:8080/products/new", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
