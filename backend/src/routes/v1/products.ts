@@ -1,9 +1,8 @@
 import express from "express";
-import { Request } from "../types/express.types";
-import { checkAuth, checkAuthNew } from "../util/auth";
-import { Product, isValidId } from "../types/products.types";
-import { sanitizeNewProduct, sanitizeProduct } from "../util/validation";
-import {db} from "../util/firebaseAdmin";
+import { checkAuth } from "../../util/auth";
+import { sanitizeNewProduct, sanitizeProduct } from "../../util/validation";
+import { Request } from "../../types/express.types";
+import { Product, isValidId } from "../../types/products.types";
 
 const router = express.Router();
 
@@ -64,25 +63,6 @@ router.get("/", async (req: Request, res, next) => {
   }
 });
 
-// [new]
-// Get products - GET '/products/new'
-router.get("/new", async (req: Request, res, next) => {
-  try {
-    console.log(`token is ${req.token}`);
-    // logic to call get on firebase ...
-    const productsRef = db.collection("products");
-    const snapshot = await productsRef.get();
-    const products: Product[] = [];
-    snapshot.forEach((doc) => {
-      const product = sanitizeProduct(doc.data());
-      products.push(product);
-    });
-    res.json({ products });
-  } catch (error: any) {
-    next({ message: error.message || "Failed to get products", error });
-  }
-});
-
 // [old - to be removed]
 // Get product detail - GET /products/:id
 router.get("/:id", async (req: Request, res, next) => {
@@ -107,32 +87,7 @@ router.get("/:id", async (req: Request, res, next) => {
   }
 });
 
-// [new]
-// Get product detail - GET /products/new/:id
-router.get("/new/:id", async (req: Request, res, next) => {
-  const productId = req.params.id;
-
-  if (isValidId(productId)) {
-    try {
-      // logic to call get on firebase ...
-      const productsRef = db.collection("products");
-      const snapshot = await productsRef.where("id", "==", productId).get();
-      if (snapshot.empty) {
-        next({ message: "Product not found" });
-      }
-      // sanitize product from firestore
-      const product = sanitizeProduct(snapshot.docs[0].data());
-      // response
-      res.json({ product });
-    } catch (error: any) {
-      next({ message: error.message || "Failed to get product", error });
-    }
-  } else {
-    next({ message: "Invalid product id" });
-  }
-});
-
-router.use(checkAuthNew);
+router.use(checkAuth);
 
 // [old - to be removed]
 // Add new product - PUT '/products' BODY {product}
@@ -147,30 +102,6 @@ router.put("/", async (req: Request, res, next) => {
     }
 
     PRODUCTS.push({...product, id: `${PRODUCTS.length + 1}`});
-
-    res.json({ success: true });
-  } catch (error: any) {
-    next({ message: error.message || "Add product failed"});
-  }
-});
-
-// [new]
-// Add new product - PUT '/products/new' BODY {product}
-router.put("/new", async (req: Request, res, next) => {
-  try {
-    let product = sanitizeNewProduct(req.body);
-    product = {
-      ...product,
-      lastUpdatedTime: Date.now(),
-      quantity: 0, // choice: products start with 0 quantity
-      estimatedCompletedTime: 0,
-    }
-    // logic to call add on firebase ...
-    const productsRef = db.collection("products");
-    const productRef = await productsRef.add(product);
-
-    const id = productRef.id;
-    await productRef.update({ id });
 
     res.json({ success: true });
   } catch (error: any) {
@@ -196,25 +127,6 @@ router.delete("/", async (req: Request, res, next) => {
   }
 });
 
-// [new]
-// Delete product - DELETE '/products/new/:id'
-router.delete("/new", async (req: Request, res, next) => {
-  // get id
-  const productId = isValidId(req.params.id) ? req.params.id : null;
-  if (productId) {
-    try {
-      const productsRef = db.collection("products");
-      const productRef = productsRef.doc(productId);
-      const result = await productRef.delete();
-      res.json({ success: true });
-    } catch (error: any) {
-      next({ message: error.message || "Delete product failed" });
-    }
-  } else {
-    next({ message: "Delete product failed" });
-  }
-});
-
 // [old - to be removed]
 // Modify existing product - PATCH '/products/:id' BODY {product}
 router.patch("/:id", async (req: Request, res, next) => {
@@ -224,27 +136,6 @@ router.patch("/:id", async (req: Request, res, next) => {
   if (productId && product) {
     try {
       PRODUCTS.map(p => p.id === productId ? product : p);
-      res.json({ success: true });
-    } catch (error: any) {
-      next({ message: error.message || "Modify product failed" });
-    }
-  } else {
-    next({ message: "Modify product failed" });
-  }
-});
-
-// [new]
-// Modify existing product - PATCH '/products/new/:id' BODY {product}
-router.patch("/new/:id", async (req: Request, res, next) => {
-  // get id
-  const productId = isValidId(req.params.id) ? req.params.id : null;
-  const product = sanitizeProduct(req.body);
-  if (productId && product) {
-    try {
-      const productsRef = db.collection("products");
-      const productRef = productsRef.doc(productId);
-      const result = await productRef.set(product);
-      console.log(result);
       res.json({ success: true });
     } catch (error: any) {
       next({ message: error.message || "Modify product failed" });
