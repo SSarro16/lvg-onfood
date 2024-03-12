@@ -1,24 +1,8 @@
-import { sign, verify } from "jsonwebtoken";
-import { compare } from "bcryptjs";
 import { NotAuthError } from "./errors";
 import { Request } from "../types/express.types";
 import { NextFunction, Response } from "express";
 import admin from "./firebaseAdmin";
 import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
-
-const KEY = "supersecret";
-
-function createJSONToken(email: string) {
-  return sign({ email }, KEY, { expiresIn: "1h" });
-}
-
-function validateJSONToken(token: string) {
-  return verify(token, KEY);
-}
-
-function checkPassword(password: string, storedPassword: string) {
-  return compare(password, storedPassword);
-}
 
 // OLD CHECKAUTH TO BE REMOVED
 function checkAuthMiddleware(req: Request, res: Response, next: NextFunction) {
@@ -44,7 +28,7 @@ function checkAuthMiddleware(req: Request, res: Response, next: NextFunction) {
 }
 
 // NEW CHECKAUTH
-function checkAuthMiddleware1(req: Request, res: Response, next: NextFunction) {
+function checkAuthMiddlewareV2(req: Request, res: Response, next: NextFunction) {
   if (req.method === "OPTIONS") {
     return next();
   }
@@ -74,9 +58,6 @@ function checkAuthMiddleware1(req: Request, res: Response, next: NextFunction) {
 }
 
 export {
-  createJSONToken,
-  validateJSONToken,
-  checkPassword,
   checkAuthMiddleware as checkAuth,
-  checkAuthMiddleware1 as checkAuthNew,
+  checkAuthMiddlewareV2 as checkAuthV2,
 };
