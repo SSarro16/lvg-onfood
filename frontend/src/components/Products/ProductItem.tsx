@@ -1,31 +1,54 @@
-import React from "react";
-import type { Product } from "../../store/redux/products-slice";
+import React, { useEffect, useState } from "react";
+import { DataView } from "primereact/dataview";
+import { Product } from "../../store/redux/products-slice";
 
 type ProductItemProps = { product: Product };
 
 const ProductItem: React.FC<ProductItemProps> = (props) => {
 
-  return (
-    <li>
-      <article>
-          <img
-            height={100}
-            width={100}
-            src={props.product.image}
-            alt={props.product.title}
-          />
 
-        <div>
-          <h4>{props.product.title}</h4>
-          <p>{props.product.description}</p>
-          <p>{props.product.price}€</p>
+
+  const gridItem = () => {
+    return (
+      <div
+        className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2 w-2 gap-2"
+        key={props.product.id}
+      >
+        <div className="p-4 border-1 surface-border bg-green-500 border-round ">
+          <div className="flex flex-wrap align-items-center justify-content-between gap-2">
+            <div className="flex align-items-center gap-2"></div>
+          </div>
+            <div className="text-xl text-100 text-center font-bold">{props.product.title}</div>
+          <div className="flex flex-column align-items-center gap-3 py-5">
+            <img
+              className="w-9 shadow-2 border-round"
+              src={props.product.image}
+              alt={props.product.title}
+            />
+          </div>
+          <div className="flex align-items-center justify-content-between">
+            <span className="text-xl text-100 font-semibold">
+              €{props.product.price}
+            </span>
+          </div>
         </div>
-        <div>
-          <p>{props.product.quantity} pz</p>
-        </div>
-      </article>
-    </li>
+      </div>
+    );
+  };
+
+  const itemTemplate = () => {
+    if (!props.product) {
+      return;
+    }
+
+    return gridItem();
+  };
+
+  return (
+      <DataView value={[props.product]} itemTemplate={itemTemplate} />
   );
 };
+
+export default ProductItem;
 
 export { ProductItem };

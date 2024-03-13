@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { ProductItem } from "./ProductItem";
-import { useSelector } from "react-redux";
+import ProductItem from "./ProductItem";
 import type { Product } from "../../store/redux/products-slice";
-import type { RootState, AppDispatch } from "../../store/redux";
 
 type ProductsListProps = {
   products: Product[];
@@ -19,3 +17,4 @@ const ProductsList: React.FC<ProductsListProps> = (props) => {
 };
 
 export default ProductsList;
+
