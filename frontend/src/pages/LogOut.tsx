@@ -1,6 +1,6 @@
 import React from "react";
 import { NavigateFunction } from "react-router-dom";
-import { SignOutFunction } from "../components/Firebase/context/auth-context";
+import { SignOutFunction } from "../store/context/auth-context";
 
 const action = async (token: string, navigate: NavigateFunction, signOut: SignOutFunction  ) => {
   try {

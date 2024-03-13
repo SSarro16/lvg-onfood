@@ -1,18 +1,109 @@
-import React from "react";
-import { Form, useNavigation, Link, useActionData } from "react-router-dom";
+import React, { FormEvent, useContext, useState } from "react";
+import {
+  Form,
+  useNavigation,
+  Link,
+  useNavigate,
+} from "react-router-dom";
 import classes from "./Form.module.css";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+import { AuthContext } from "../../store/context/auth-context";
+
+
+type NewProductFormFields = {
+  title: string;
+  image: string;
+  price: number;
+  description: string;
+};
+
+const defaultFormFields: NewProductFormFields = {
+  title: "",
+  image: "",
+  price: 0,
+  description: "",
+};
 
 function NewProductForm(event: any) {
   const navigation = useNavigation();
+  const navigate = useNavigate();
   const isSubmitting = navigation.state === "submitting";
-  const data = useActionData();
-  console.log("data is: ", data);
+  const { getToken } = useContext(AuthContext);
+  const [formFields, setFormFields] =
+    useState<NewProductFormFields>(defaultFormFields);
+  const { title, image, price, description } = formFields;
+
+  const handleChange = (event: FormEvent<HTMLInputElement>) => {
+    const { name, value } = event.currentTarget;
+    setFormFields((prevState) => ({ ...prevState, [name]: value }));
+  };
+
+  const resetFormFields = () => {
+    setFormFields(defaultFormFields);
+  };
+
+  const newProductSubmitHandler = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const token = await getToken();
+    if (token) {
+      const prodData = {
+        title,
+        image,
+        price,
+        description,
+      };
+      let response: Response | undefined;
+      let error: any;
+      try {
+        response = await fetch("http://localhost:8080/products/new", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify(prodData),
+        });
+
+        const resData = response.json();
+        console.log(resData);
+      } catch (thisError: any) {
+        response = undefined;
+        error = thisError;
+      }
+      
+      console.log(response);
+      if (response) {
+        if (response.status === 401) {
+          // 401 Unauthorized
+          // TODO: Handle Errors (Toasts)
+        } else if (!response.ok) {
+          // throw json({ message: "Could not create new product." }, { status: 500 });
+          // TODO: Handle Errors (Toasts)
+        } else {
+          // success
+          // TODO: Handle Success (Toasts)
+          resetFormFields();
+          navigate("/");
+        }
+      } else {
+        // error while fetching
+        // TODO: Handle Errors (Toasts)
+        console.log(error.message || "Error while fetching");
+      }
+    } else {
+      // TODO: Handle Errors (Toasts)
+    }
+  };
 
   return (
-    <Form method="post" className={classes.form}>
+    <Form
+      method="post"
+      className={classes.form}
+      onSubmit={newProductSubmitHandler}
+    >
       <div className="card">
         <div className="grid p-fluid">
           <div className="col-12">
@@ -25,7 +116,8 @@ function NewProductForm(event: any) {
                 type="text"
                 name="title"
                 required
-                defaultValue={event ? event.title : ""}
+                value={title}
+                onChange={handleChange}
                 placeholder="Title"
               />
             </div>

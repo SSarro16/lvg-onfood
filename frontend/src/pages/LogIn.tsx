@@ -9,7 +9,8 @@ import {
 } from "react-router-dom";
 
 const backendUrl = "http://localhost:8080";
-export default function LogInPage() {
+
+const LogInPage: React.FC = () => {
   return (
     <>
       <div>
@@ -24,6 +25,7 @@ export default function LogInPage() {
     </>
   );
 }
+
 type LoginResBody = { token: string };
 
 const action: ActionFunction<ActionFunctionArgs> = async (args) => {
@@ -32,7 +34,7 @@ const action: ActionFunction<ActionFunctionArgs> = async (args) => {
     email: data.get("email"),
     password: data.get("password"),
   };
-
+  console.log('ACTION LOGIN')
   try {
     const response = await fetch(`${backendUrl}/auth/login-new`, {
       method: "POST",
@@ -61,4 +63,5 @@ const action: ActionFunction<ActionFunctionArgs> = async (args) => {
   return redirect("/");
 };
 
+export default LogInPage;
 export { action };

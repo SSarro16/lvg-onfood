@@ -1,5 +1,5 @@
 import React from "react";
-import type { Product } from "../../store/products-slice";
+import type { Product } from "../../store/redux/products-slice";
 
 type ProductItemProps = { product: Product };
 

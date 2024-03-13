@@ -1,7 +1,7 @@
 import NewProductForm from "../components/Form/NewProductForm";
 import React, { useEffect, useState } from "react";
 import { ActionFunction, json, redirect } from "react-router-dom";
-import { AuthContext } from "../components/Firebase/context/auth-context";
+import { AuthContext } from "../store/context/auth-context";
 
 function NewProductPage() {
   return <NewProductForm />;

@@ -2,7 +2,7 @@ import React from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { useActionData } from "react-router-dom";
-import { Product } from "../../store/products-slice";
+import { Product } from "../../store/redux/products-slice";
 
 type ProductItemProps = { product: Product };
 

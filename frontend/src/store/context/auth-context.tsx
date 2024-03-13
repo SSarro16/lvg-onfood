@@ -1,24 +1,24 @@
 import { User } from "firebase/auth";
-import { NavigateFunction, useNavigate } from "react-router-dom";
-import { SignOutUser, userStateListener } from "../Firebase";
+import { NavigateFunction } from "react-router-dom";
+import { SignOutUser, userStateListener } from "../../vendors/firebase";
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 
 interface Props {
   children?: ReactNode;
 }
 
-export type getTokenAction = () => Promise<string | undefined>;
+type GetTokenAction = () => Promise<string | undefined>;
 
-export type SignOutFunction = (navigate: NavigateFunction) => void;
+type SignOutFunction = (navigate: NavigateFunction) => void;
 
 interface AuthContext {
   currentUser: User | null;
   setCurrentUser: (_user: User) => void;
   signOut: SignOutFunction;
-  getToken: getTokenAction;
+  getToken: GetTokenAction;
 }
 
-export const AuthContext = createContext<AuthContext>({
+const AuthContext = createContext<AuthContext>({
   // "User" comes from firebase auth-public.d.ts
   currentUser: {} as User | null,
   setCurrentUser: (_user: User) => {
@@ -32,7 +32,7 @@ export const AuthContext = createContext<AuthContext>({
   },
 });
 
-export const AuthProvider: React.FC<Props> = (props) => {
+const AuthProvider: React.FC<Props> = (props) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -71,3 +71,6 @@ export const AuthProvider: React.FC<Props> = (props) => {
     <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>
   );
 };
+
+export { AuthProvider, AuthContext };
+export type { GetTokenAction, SignOutFunction };

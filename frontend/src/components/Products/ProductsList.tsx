@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { ProductItem } from "./ProductItem";
 import { useSelector } from "react-redux";
-import type { Product } from "../../store/products-slice";
-import type { RootState, AppDispatch } from "../../store";
+import type { Product } from "../../store/redux/products-slice";
+import type { RootState, AppDispatch } from "../../store/redux";
 
 type ProductsListProps = {
   products: Product[];

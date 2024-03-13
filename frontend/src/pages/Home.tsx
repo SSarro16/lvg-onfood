@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
-import type { Product } from "../store/products-slice";
+import { RootState } from "../store/redux";
+import type { Product } from "../store/redux/products-slice";
 import ProductsList from "../components/Products/ProductsList";
 
 export default function HomePage() {
