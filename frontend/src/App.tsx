@@ -1,16 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
-import { RouterProvider, createBrowserRouter, json } from "react-router-dom";
+// css import
 import "./App.css";
-import HomePage from "./pages/Home";
-import LogInPage, { action as authAction } from "./pages/LogIn";
-import RootLayout from "./pages/RootLayout";
-import { checkAuthLoader, tokenLoader } from "./util/auth";
-import NewProductPage, { action as newproductAction } from "./pages/NewProduct";
-import { action as logoutAction } from "./pages/LogOut";
+// react import
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { productsActions } from "./store/products-slice";
-import { PrimeReactProvider, PrimeReactContext } from "primereact/api";
-import type { Product } from "./store/products-slice";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+// pages import
+import LogInPage, { action as authAction } from "./pages/LogIn";
+import HomePage from "./pages/Home";
+import RootLayout from "./pages/RootLayout";
+import NewProductPage, { action as newProductAction } from "./pages/NewProduct";
+import LoadingPage from "./pages/Loading";
+// store imports
+import type { Product } from "./store/redux/products-slice";
+import { productsActions } from "./store/redux/products-slice";
+// others import
+import { PrimeReactProvider } from "primereact/api";
+import { tokenLoader } from "./util/auth";
+import { fetchProducts } from "./util/http";
 
 const router = createBrowserRouter([
   {
@@ -31,7 +37,7 @@ const router = createBrowserRouter([
       {
         path: "newproduct",
         element: <NewProductPage />,
-        action: newproductAction,
+        action: newProductAction,
       },
     ],
   },
@@ -45,37 +51,43 @@ function App() {
     dispatch(productsActions.setProducts({ products: products }));
   };
 
-  const fetchProducts = async () => {
-    // fetch products in backend
-    // dispatch into redux store
+  const fetchingProducts = async () => {
+    // fetching
     setIsFetching(true);
-    const response = await fetch("http://localhost:8080/api/v2/products", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+
+    const errorHandler = (error: string) => {
+      // TOAST
+      console.log(error);
+    };
+    const successHandler = () => {
+      // TOAST
+    };
+    // fetch products
+    const fetchedProducts = await fetchProducts({
+      errorHandler,
+      successHandler,
     });
 
-    const resData = await response.json();
-
-    if (!response.ok) {
-      throw json({ message: "Could not fetch" }, { status: 500 });
+    if (fetchedProducts) {
+      // redux
+      setProductsHandler(fetchedProducts);
     }
 
-    const fetchedProducts = resData.products as Product[];
-    console.log(fetchedProducts);
-    setProductsHandler(fetchedProducts);
-
+    // end fetching
     setIsFetching(false);
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchingProducts();
   }, []);
 
   return (
     <PrimeReactProvider>
-      <RouterProvider router={router} />
+      {isFetching ? (
+        <LoadingPage text={"Fetching products"} />
+      ) : (
+        <RouterProvider router={router} />
+      )}
     </PrimeReactProvider>
   );
 }

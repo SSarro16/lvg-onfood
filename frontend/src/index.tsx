@@ -10,8 +10,8 @@ import "./index.css";
 import App from "./App";
 
 import { Provider } from "react-redux";
-import store from "./store";
-import { AuthProvider } from "./components/Firebase/context/auth-context";
+import store from "./store/redux";
+import { AuthProvider } from "./store/context/auth-context";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

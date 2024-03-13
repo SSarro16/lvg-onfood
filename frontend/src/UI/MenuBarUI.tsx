@@ -3,7 +3,7 @@ import { Menubar } from "primereact/menubar";
 import { useNavigate } from "react-router-dom";
 import { MenuItem } from "primereact/menuitem";
 import { action as logoutAction } from "../pages/LogOut";
-import { AuthContext } from "../components/Firebase/context/auth-context";
+import { AuthContext } from "../store/context/auth-context";
 
 export default function Items() {
   const { currentUser, signOut, getToken } = useContext(AuthContext);
@@ -11,8 +11,11 @@ export default function Items() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('MenuBar.Items.useEffect', {currentUser, token})
     const handleToken = async () => {
-      setToken(await getToken());
+      const token = await getToken();
+      console.log('MenuBar.Items.useEffect.handleToken', {token})
+      setToken(token);
     };
     handleToken();
   }, [currentUser]);

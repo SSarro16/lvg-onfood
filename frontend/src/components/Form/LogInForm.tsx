@@ -1,10 +1,15 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
-import { signInUser } from "../Firebase/Firebase";
+import { signInUser } from "../../vendors/firebase";
 import { Form, NavLink, useNavigate, useNavigation } from "react-router-dom";
 import classes from "./Form.module.css";
 import { getIdToken } from "firebase/auth";
 import { Password } from "primereact/password";
 import { InputText } from "primereact/inputtext";
+
+type FormFields = {
+  email: string;
+  password: string;
+};
 
 const defaultFormFields = {
   email: "",
@@ -15,7 +20,8 @@ export default function LogInForm() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
-  const [formFields, setFormFields] = useState(defaultFormFields);
+  const [isError, setIsError] = useState(false);
+  const [formFields, setFormFields] = useState<FormFields>(defaultFormFields);
   const { email, password } = formFields;
   const navigate = useNavigate();
 
@@ -31,17 +37,22 @@ export default function LogInForm() {
       const userCredential = await signInUser(email, password);
 
       if (userCredential) {
-        const token = await userCredential.user.getIdToken();
         resetFormFields();
         navigate("/");
+      } else {
+        // TODO: Handle Errors (Toasts)
+        setIsError(true);
       }
     } catch (error: any) {
+      // TODO: Handle Errors (Toasts)
+      setIsError(true);
       console.log("User Sign In Failed", error.message);
     }
   };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    setIsError(false);
     setFormFields({ ...formFields, [name]: value });
   };
 
@@ -51,6 +62,7 @@ export default function LogInForm() {
         <div className="p-inputgroup flex-1">
           <span className="p-float-label">
             <InputText
+              className={isError ? "p-invalid" : ""}
               id="email"
               name="email"
               value={email}
@@ -65,6 +77,7 @@ export default function LogInForm() {
         <div className="p-inputgroup flex-1">
           <span className="p-float-label">
             <Password
+              className={isError ? "p-invalid" : ""}
               id="password"
               inputId="password"
               name="password"
