@@ -4,10 +4,12 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/redux";
 import type { Product } from "../store/redux/products-slice";
 import ProductsList from "../components/Products/ProductsList";
+import { Sidebar } from "primereact/sidebar";
+import { Button } from "primereact/button";
 
 export default function HomePage() {
   const products = useSelector((state: RootState) => state.products.products);
-
+  const [visibleRight, setVisibleRight] = useState(false);
   const [wipProducts, setWipProducts] = useState<Product[]>([]);
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [unavailableProducts, setUnavailableProducts] = useState<Product[]>([]);
@@ -82,16 +84,30 @@ export default function HomePage() {
         />
       </div>
       <div style={{ display: "flex" }}>
+        <div className="right-0 absolute top-70 ">
+          <Button
+            icon="pi pi-arrow-left"
+            onClick={() => setVisibleRight(true)}
+          />
+        </div>
         <section>
           <h2>Product list in lavorazione...</h2>
           <ProductsList products={availableProducts} />
           <h2>Prodotti non disponibili</h2>
           <ProductsList products={unavailableProducts} />
         </section>
-        <aside>
+        <Sidebar
+          visible={visibleRight}
+          position="right"
+          onHide={() => setVisibleRight(false)}
+        >
+          <h2>Work in Products</h2>
+          <ProductsList products={wipProducts} />
+        </Sidebar>
+        {/* <aside>
           <h3>Prodotti WIP in lavorazione...</h3>
           <ProductsList products={wipProducts} />
-        </aside>
+        </aside> */}
       </div>
     </>
   );

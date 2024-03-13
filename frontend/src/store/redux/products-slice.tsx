@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 type Product = {
+  getProducts(): unknown;
   id: string;
   title: string;
   image: string;
