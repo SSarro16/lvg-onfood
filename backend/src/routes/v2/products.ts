@@ -106,14 +106,14 @@ router.put("/", async (req: Request, res, next) => {
 });
 
 // Delete product - DELETE '/products/:id'
-router.delete("/", async (req: Request, res, next) => {
+router.delete("/:id", async (req: Request, res, next) => {
   // get id
   const productId = isValidId(req.params.id) ? req.params.id : null;
   if (productId) {
     try {
       const productsRef = db.collection("products");
       const productRef = productsRef.doc(productId);
-      const result = await productRef.delete();
+      await productRef.delete();
       res.json({ success: true });
     } catch (error: any) {
       next({ message: error.message || "Delete product failed" });
