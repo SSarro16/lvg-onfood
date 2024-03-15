@@ -83,12 +83,13 @@ export default function HomePage() {
           }
         />
       </div>
-      <div style={{ display: "flex" }}>
+      <div>
         <div className="right-0 absolute top-70 ">
           <Button
             icon="pi pi-arrow-left"
             onClick={() => setVisibleRight(true)}
-          />
+            className="gap-1"
+          > WIP Products</Button>
         </div>
         <section>
           <h2>Product list in lavorazione...</h2>
@@ -101,7 +102,7 @@ export default function HomePage() {
           position="right"
           onHide={() => setVisibleRight(false)}
         >
-          <h2>Work in Products</h2>
+          <h2>Prodotti in Lavorazione</h2>
           <ProductsList products={wipProducts} />
         </Sidebar>
         {/* <aside>
