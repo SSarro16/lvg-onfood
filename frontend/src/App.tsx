@@ -5,10 +5,10 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 // pages import
-import LogInPage, { action as authAction } from "./pages/LogIn";
+import LogInPage from "./pages/LogIn";
 import HomePage from "./pages/Home";
 import RootLayout from "./pages/RootLayout";
-import NewProductPage, { action as newProductAction } from "./pages/NewProduct";
+import NewProductPage from "./pages/NewProduct";
 import LoadingPage from "./pages/Loading";
 // store imports
 import type { Product } from "./store/redux/products-slice";
@@ -32,12 +32,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <LogInPage />,
-        action: authAction,
       },
       {
         path: "newproduct",
         element: <NewProductPage />,
-        action: newProductAction,
       },
     ],
   },

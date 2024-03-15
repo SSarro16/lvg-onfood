@@ -1,12 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { DataView } from "primereact/dataview";
 import { Product } from "../../store/redux/products-slice";
+import { Button } from "primereact/button";
+import { Card } from "primereact/card";
 
 type ProductItemProps = { product: Product };
 
 const ProductItem: React.FC<ProductItemProps> = (props) => {
-
-
+  const header = <img alt="ProductDetail" src={props.product.image} />;
+  const footer = (
+    <>
+      <Button label="Save" icon="pi pi-check" />
+      <Button
+        label="Cancel"
+        severity="secondary"
+        icon="pi pi-times"
+        style={{ marginLeft: "0.5em" }}
+      />
+    </>
+  );
 
   const gridItem = () => {
     return (
@@ -18,7 +30,9 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
           <div className="flex flex-wrap align-items-center justify-content-between gap-2">
             <div className="flex align-items-center gap-2"></div>
           </div>
-            <div className="text-xl text-100 text-center font-bold">{props.product.title}</div>
+          <div className="text-xl text-100 text-center font-bold">
+            {props.product.title}
+          </div>
           <div className="flex flex-column align-items-center gap-3 py-5">
             <img
               className="w-9 shadow-2 border-round"
@@ -44,9 +58,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     return gridItem();
   };
 
-  return (
-      <DataView value={[props.product]} itemTemplate={itemTemplate} />
-  );
+  return <DataView value={[props.product]} itemTemplate={itemTemplate} />;
 };
 
 export default ProductItem;

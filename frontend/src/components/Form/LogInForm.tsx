@@ -1,10 +1,12 @@
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { signInUser } from "../../vendors/firebase";
 import { Form, NavLink, useNavigate, useNavigation } from "react-router-dom";
 import classes from "./Form.module.css";
 import { getIdToken } from "firebase/auth";
 import { Password } from "primereact/password";
 import { InputText } from "primereact/inputtext";
+import { Toast } from "primereact/toast";
+import { Button } from "primereact/button";
 
 type FormFields = {
   email: string;
@@ -19,11 +21,15 @@ const defaultFormFields = {
 export default function LogInForm() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
-
+  const toast = useRef<Toast>(null);
   const [isError, setIsError] = useState(false);
   const [formFields, setFormFields] = useState<FormFields>(defaultFormFields);
   const { email, password } = formFields;
   const navigate = useNavigate();
+
+  const showError = (message: string) => {
+    toast.current?.show({severity:'error', summary: 'Error', detail:(message), life: 3000});
+}
 
   const resetFormFields = () => {
     return setFormFields(defaultFormFields);
@@ -97,9 +103,9 @@ export default function LogInForm() {
       </div>
       <div className={classes.actions}>
         <NavLink to="/">Torna alla Home</NavLink>
-        <button id="recaptcha" disabled={isSubmitting}>
+        <Button id="recaptcha" disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : "Log In"}
-        </button>
+        </Button>
       </div>
     </Form>
   );
