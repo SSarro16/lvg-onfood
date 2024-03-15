@@ -1,20 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Menubar } from "primereact/menubar";
 import { useNavigate } from "react-router-dom";
 import { MenuItem } from "primereact/menuitem";
 import { action as logoutAction } from "../pages/LogOut";
 import { AuthContext } from "../store/context/auth-context";
+import { Toast } from "primereact/toast";
 
 export default function Items() {
+  const toast = useRef<Toast>(null);
   const { currentUser, signOut, getToken } = useContext(AuthContext);
   const [token, setToken] = useState<string | undefined>();
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('MenuBar.Items.useEffect', {currentUser, token})
+    console.log("MenuBar.Items.useEffect", { currentUser, token });
     const handleToken = async () => {
       const token = await getToken();
-      console.log('MenuBar.Items.useEffect.handleToken', {token})
+      console.log("MenuBar.Items.useEffect.handleToken", { token });
       setToken(token);
     };
     handleToken();
@@ -66,6 +68,11 @@ export default function Items() {
             try {
               if (token !== undefined) {
                 logoutAction(token, navigate, signOut);
+                toast.current?.show({
+                  severity: "success",
+                  summary: "Logged out",
+                  detail: "Logged out successfully",
+                });
               }
             } catch (error: any) {
               console.log(error.message);
@@ -79,6 +86,7 @@ export default function Items() {
 
   return (
     <div className="card">
+      <Toast ref={toast} />
       <Menubar model={items} />
     </div>
   );

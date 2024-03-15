@@ -27,9 +27,23 @@ export default function LogInForm() {
   const { email, password } = formFields;
   const navigate = useNavigate();
 
-  const showError = (message: string) => {
-    toast.current?.show({severity:'error', summary: 'Error', detail:(message), life: 3000});
-}
+  const showLogin = () => {
+    toast.current?.show({
+      severity: "success",
+      summary: "Logged in",
+      detail: "Logged in successfully",
+      life: 3000,
+    });
+  };
+
+  const showError = () => {
+    toast.current?.show({
+      severity: "error",
+      summary: "Error",
+      detail: "Invalid email or password",
+      life: 3000,
+    });
+  };
 
   const resetFormFields = () => {
     return setFormFields(defaultFormFields);
@@ -43,16 +57,18 @@ export default function LogInForm() {
       const userCredential = await signInUser(email, password);
 
       if (userCredential) {
+        showLogin();
         resetFormFields();
         navigate("/");
       } else {
-        // TODO: Handle Errors (Toasts)
+        // Handle Errors (Toasts)
         setIsError(true);
+        showError();
       }
     } catch (error: any) {
-      // TODO: Handle Errors (Toasts)
+      // Handle Errors (Toasts)
       setIsError(true);
-      console.log("User Sign In Failed", error.message);
+      showError();
     }
   };
 
@@ -63,50 +79,53 @@ export default function LogInForm() {
   };
 
   return (
-    <Form method="post" className={classes.form} onSubmit={handleSubmit}>
-      <div className="card flex flex-columns md:flex-row gap-3">
-        <div className="p-inputgroup flex-1">
-          <span className="p-float-label">
-            <InputText
-              className={isError ? "p-invalid" : ""}
-              id="email"
-              name="email"
-              value={email}
-              type="email"
-              required
-              onChange={handleChange}
-            />
-            <label htmlFor="email">Email</label>
-          </span>
+    <>
+      <Form method="post" className={classes.form} onSubmit={handleSubmit}>
+        <div className="card flex flex-columns md:flex-row gap-3">
+          <div className="p-inputgroup flex-1">
+            <span className="p-float-label">
+              <InputText
+                className={isError ? "p-invalid" : ""}
+                id="email"
+                name="email"
+                value={email}
+                type="email"
+                required
+                onChange={handleChange}
+              />
+              <label htmlFor="email">Email</label>
+            </span>
+          </div>
+
+          <div className="p-inputgroup flex-1">
+            <span className="p-float-label">
+              <Password
+                className={isError ? "p-invalid" : ""}
+                id="password"
+                inputId="password"
+                name="password"
+                value={password}
+                type="password"
+                onChange={handleChange}
+                required
+                toggleMask
+              />
+              <label htmlFor="password">Password</label>
+            </span>
+          </div>
         </div>
 
-        <div className="p-inputgroup flex-1">
-          <span className="p-float-label">
-            <Password
-              className={isError ? "p-invalid" : ""}
-              id="password"
-              inputId="password"
-              name="password"
-              value={password}
-              type="password"
-              onChange={handleChange}
-              required
-              toggleMask
-            />
-            <label htmlFor="password">Password</label>
-          </span>
+        <div hidden>
+          <input id="token" name="token" />
         </div>
-      </div>
-
-      <div hidden>
-        <input id="token" name="token" />
-      </div>
-      <div className={classes.actions}>
-        <NavLink to="/">Torna alla Home</NavLink>
-        <Button id="recaptcha" disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Log In"}
-        </Button>
-      </div>
-    </Form>
+        <div className={classes.actions}>
+          <NavLink to="/">Torna alla Home</NavLink>
+          <Toast ref={toast} />
+          <Button id="recaptcha" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Log In"}
+          </Button>
+        </div>
+      </Form>
+    </>
   );
 }
