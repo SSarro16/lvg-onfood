@@ -27,24 +27,6 @@ export default function LogInForm() {
   const { email, password } = formFields;
   const navigate = useNavigate();
 
-  const showLogin = () => {
-    toast.current?.show({
-      severity: "success",
-      summary: "Logged in",
-      detail: "Logged in successfully",
-      life: 3000,
-    });
-  };
-
-  const showError = () => {
-    toast.current?.show({
-      severity: "error",
-      summary: "Error",
-      detail: "Invalid email or password",
-      life: 3000,
-    });
-  };
-
   const resetFormFields = () => {
     return setFormFields(defaultFormFields);
   };
@@ -57,18 +39,33 @@ export default function LogInForm() {
       const userCredential = await signInUser(email, password);
 
       if (userCredential) {
-        showLogin();
         resetFormFields();
         navigate("/");
+        toast.current?.show({
+          severity: "success",
+          summary: "Logged in",
+          detail: "Logged in successfully",
+          life: 3000,
+        });
       } else {
         // Handle Errors (Toasts)
         setIsError(true);
-        showError();
+        toast.current?.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Invalid email or password",
+          life: 3000,
+        });
       }
     } catch (error: any) {
       // Handle Errors (Toasts)
       setIsError(true);
-      showError();
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Invalid email or password",
+        life: 3000,
+      });
     }
   };
 

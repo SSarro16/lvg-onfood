@@ -1,4 +1,10 @@
-import React, { ChangeEvent, FormEvent, useContext, useState } from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import { Form, useNavigation, Link, useNavigate } from "react-router-dom";
 import classes from "./Form.module.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
@@ -6,6 +12,7 @@ import { InputText, InputTextProps } from "primereact/inputtext";
 import { InputTextarea, InputTextareaProps } from "primereact/inputtextarea";
 import { AuthContext } from "../../store/context/auth-context";
 import { fetchAddProduct } from "../../util/http";
+import { Toast } from "primereact/toast";
 
 type NewProductFormFields = {
   title: string;
@@ -22,6 +29,7 @@ const defaultFormFields: NewProductFormFields = {
 };
 
 function NewProductForm(event: any) {
+  const toast = useRef<Toast>(null);
   const navigation = useNavigation();
   const navigate = useNavigate();
   const isSubmitting = navigation.state === "submitting";
@@ -40,13 +48,22 @@ function NewProductForm(event: any) {
   };
 
   const errorHandler = () => {
-    console.log("error");
-    throw new Error("Impossible to add product");
+    toast.current?.show({
+      severity: "error",
+      summary: "New Product Error",
+      detail: "New product creation failed",
+      life: 3000,
+    });
   };
   const successHandler = () => {
-    console.log("success");
     resetFormFields();
     navigate("/");
+    toast.current?.show({
+      severity: "success",
+      summary: "New Product Success",
+      detail: "New product creation successfully",
+      life: 3000,
+    });
   };
   const newProductSubmitHandler = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -120,7 +137,9 @@ function NewProductForm(event: any) {
                 locale="it-IT"
                 placeholder="Price"
                 required
-                onValueChange={(e: any) => setFormFields({...formFields, price: e.value })}
+                onValueChange={(e: any) =>
+                  setFormFields({ ...formFields, price: e.value })
+                }
               />
             </div>
           </div>
@@ -146,6 +165,7 @@ function NewProductForm(event: any) {
 
       <div className={classes.actions}>
         <Link to="/">Torna alla Home</Link>
+        <Toast ref={toast} />
         <button disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : "Aggiungi nuovo prodotto"}
         </button>

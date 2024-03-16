@@ -1,18 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { DataView } from "primereact/dataview";
 import { Product } from "../../store/redux/products-slice";
 import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
 import { Card } from "primereact/card";
 
 type ProductItemProps = { product: Product };
 
 const ProductItem: React.FC<ProductItemProps> = (props) => {
-  const header = <img alt="ProductDetail" src={props.product.image} />;
+  const [visible, setVisible] = useState(false);
+  const header = (
+    <div>
+      <img alt="ProductDetail" src={props.product.image} />
+    </div>
+  );
   const footer = (
     <>
-      <Button label="Save" icon="pi pi-check" />
       <Button
-        label="Cancel"
+        label="Delete"
         severity="secondary"
         icon="pi pi-times"
         style={{ marginLeft: "0.5em" }}
@@ -44,21 +49,33 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
             <span className="text-xl text-100 font-semibold">
               €{props.product.price}
             </span>
+            <span className="text-xl text-100 font-semibold">
+              <Button icon="pi pi-bars" onClick={() => setVisible(true)} />
+              <Dialog
+                modal
+                maximized
+                visible={visible}
+                onHide={() => setVisible(false)}
+                style={{ width: "auto" }}
+              >
+                <Card
+                  title={props.product.title}
+                  header={header}
+                  footer={footer}
+                  subTitle="Product Detail"
+                  className="md:w-25rem"
+                >
+                  <p className="m-0">{props.product.description}</p>
+                </Card>
+              </Dialog>
+            </span>
           </div>
         </div>
       </div>
     );
   };
 
-  const itemTemplate = () => {
-    if (!props.product) {
-      return;
-    }
-
-    return gridItem();
-  };
-
-  return <DataView value={[props.product]} itemTemplate={itemTemplate} />;
+  return <DataView value={[props.product]} itemTemplate={gridItem} />;
 };
 
 export default ProductItem;

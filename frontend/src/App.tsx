@@ -1,7 +1,7 @@
 // css import
 import "./App.css";
 // react import
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 // pages import
@@ -17,6 +17,7 @@ import { productsActions } from "./store/redux/products-slice";
 import { PrimeReactProvider } from "primereact/api";
 import { tokenLoader } from "./util/auth";
 import { fetchProducts } from "./util/http";
+import { Toast } from "primereact/toast";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  const toast = useRef<Toast>(null);
   const [isFetching, setIsFetching] = useState(false);
   const dispatch = useDispatch();
 
@@ -53,12 +55,23 @@ function App() {
     // fetching
     setIsFetching(true);
 
-    const errorHandler = (error: string) => {
+    const errorHandler = () => {
       // TOAST
-      console.log(error);
+       toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Fetching products failed",
+        life: 3000,
+      });
     };
     const successHandler = () => {
       // TOAST
+      toast.current?.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Fetching products successfully",
+        life: 3000,
+      });
     };
     // fetch products
     const fetchedProducts = await fetchProducts({
@@ -81,6 +94,7 @@ function App() {
 
   return (
     <PrimeReactProvider>
+      <Toast ref={toast} />
       {isFetching ? (
         <LoadingPage text={"Fetching products"} />
       ) : (
