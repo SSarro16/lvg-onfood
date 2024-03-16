@@ -105,10 +105,6 @@ export default function HomePage() {
           <h2>Prodotti in Lavorazione</h2>
           <ProductsList products={wipProducts} />
         </Sidebar>
-        {/* <aside>
-          <h3>Prodotti WIP in lavorazione...</h3>
-          <ProductsList products={wipProducts} />
-        </aside> */}
       </div>
     </>
   );
