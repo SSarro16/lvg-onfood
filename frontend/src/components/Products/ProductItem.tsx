@@ -1,27 +1,83 @@
-import React, { useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { DataView } from "primereact/dataview";
 import { Product } from "../../store/redux/products-slice";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Card } from "primereact/card";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { Toast } from "primereact/toast";
+import { fetchDeleteProduct } from "../../util/http";
+import { AuthContext } from "../../store/context/auth-context";
 
 type ProductItemProps = { product: Product };
 
 const ProductItem: React.FC<ProductItemProps> = (props) => {
+  const toast = useRef<Toast>(null);
   const [visible, setVisible] = useState(false);
+  const { getToken } = useContext(AuthContext);
+
+  const successHandler = () => {
+    toast.current?.show({
+      severity: "success",
+      summary: "Product Deleted",
+      detail: "Product deleted successfully",
+      life: 1000,
+    });
+  };
+
+  const errorHandler = () => {
+    toast.current?.show({
+      severity: "warn",
+      summary: "Product Deletion Interrupted",
+      detail: "Product deletion interrupted successfully",
+      life: 1000,
+    });
+  };
+
+  const accept = async () => {
+    setVisible(false);
+    const token = await getToken();
+    if (token) {
+      fetchDeleteProduct(token, props.product.id, {
+        errorHandler,
+        successHandler,
+      });
+    }
+  };
+
+  const reject = () => {
+    setVisible(false);
+  };
+
   const header = (
     <div>
-      <img alt="ProductDetail" src={props.product.image} />
+      <img alt="Product Detail" src={props.product.image} />
     </div>
   );
+
+  const confirm2 = () => {
+    confirmDialog({
+      message: "Do you want to delete this product?",
+      header: "Delete Confirmation",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      accept,
+      reject,
+    });
+  };
   const footer = (
     <>
+      <Toast ref={toast} />
+      <ConfirmDialog />
+      <Button label="Edit" icon="pi pi-pencil"></Button>
       <Button
         label="Delete"
         severity="secondary"
         icon="pi pi-times"
         style={{ marginLeft: "0.5em" }}
-      />
+        onClick={confirm2}
+      ></Button>
     </>
   );
 
@@ -50,13 +106,16 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
               €{props.product.price}
             </span>
             <span className="text-xl text-100 font-semibold">
-              <Button icon="pi pi-bars" onClick={() => setVisible(true)} />
+              <Button
+                className="bd-red"
+                icon="pi pi-bars"
+                onClick={() => setVisible(true)}
+              />
               <Dialog
-                modal
                 maximized
+                modal
                 visible={visible}
                 onHide={() => setVisible(false)}
-                style={{ width: "auto" }}
               >
                 <Card
                   title={props.product.title}
