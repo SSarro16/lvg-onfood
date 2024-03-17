@@ -125,6 +125,9 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                   className="md:w-25rem"
                 >
                   <p className="m-0">{props.product.description}</p>
+                  <p className="m-0">
+                  €{props.product.price} Qty: {props.product.quantity}
+                  </p>
                 </Card>
               </Dialog>
             </span>
