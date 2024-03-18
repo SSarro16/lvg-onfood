@@ -1,11 +1,11 @@
 import React from "react";
-import MainNavigator from "../components/Navigator Bar/MainNavigator";
 import { Outlet } from "react-router-dom";
+import Items from "../UI/MenuBarUI";
 
 function RootLayout() {
   return (
     <>
-      <MainNavigator />
+      <Items />
       <main>
         <Outlet />
       </main>
