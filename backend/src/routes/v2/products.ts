@@ -15,6 +15,7 @@ const TTL = 1000 * 60; // 1 minute
 router.get("/", async (req: Request, res, next) => {
   if (Date.now() - lastUpdatedTime < TTL) {
     // return cached products if last updated time is within TTL
+    console.info("returned cached products");
     res.json({ products: cached_products });
   } else {
     try {
@@ -98,7 +99,7 @@ router.put("/", async (req: Request, res, next) => {
 
     const id = productRef.id;
     await productRef.update({ id });
-
+    lastUpdatedTime = 0; // force to refresh cache next call
     res.json({ success: true });
   } catch (error: any) {
     next({ message: error.message || "Add product failed" });
@@ -114,6 +115,7 @@ router.delete("/:id", async (req: Request, res, next) => {
       const productsRef = db.collection("products");
       const productRef = productsRef.doc(productId);
       await productRef.delete();
+      lastUpdatedTime = 0; // force to refresh cache next call
       res.json({ success: true });
     } catch (error: any) {
       next({ message: error.message || "Delete product failed" });
@@ -134,6 +136,7 @@ router.patch("/:id", async (req: Request, res, next) => {
       const productRef = productsRef.doc(productId);
       const result = await productRef.set(product);
       console.log(result);
+      lastUpdatedTime = 0; // force to refresh cache next call
       res.json({ success: true });
     } catch (error: any) {
       next({ message: error.message || "Modify product failed" });

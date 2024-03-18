@@ -13,16 +13,18 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use((req, res, next) => {
-  console.log(
-    `Request [${req.method}] ${req.path} ${JSON.stringify(req.body)}`
-  );
+  // add some color to console.log
+  const method = `\x1b[36m${req.method}\x1b[0m`; // Cyan color
+  const path = `\x1b[33m${req.path}\x1b[0m`; // Yellow color
+  const body = `\x1b[32m${JSON.stringify(req.body)}\x1b[0m`; // Green color
+  console.log(`Request [${method}] ${path} ${body}`);
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET,POST,PUT,PATCH,DELETE"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
-  console.log('RES HEADER ', res.header)
+  // console.log('RES HEADER ', res.header)
   next();
 });
 
