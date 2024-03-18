@@ -6,6 +6,8 @@ import type { Product } from "../store/redux/products-slice";
 import ProductsList from "../components/Products/ProductsList";
 import { Sidebar } from "primereact/sidebar";
 import { Button } from "primereact/button";
+import { Accordion, AccordionTab } from "primereact/accordion";
+import { Fieldset } from "primereact/fieldset";
 
 export default function HomePage() {
   const products = useSelector((state: RootState) => state.products.products);
@@ -89,20 +91,24 @@ export default function HomePage() {
             icon="pi pi-arrow-left"
             onClick={() => setVisibleRight(true)}
             className="gap-1"
-          > WIP Products</Button>
+          >
+            {" "}
+            WIP Products
+          </Button>
         </div>
         <section>
-          <h2>Product list in lavorazione...</h2>
-          <ProductsList products={availableProducts} />
-          <h2>Prodotti non disponibili</h2>
-          <ProductsList products={unavailableProducts} />
+          <Fieldset legend="Lista dei Prodotti" toggleable>
+            <ProductsList products={availableProducts} />
+          </Fieldset>
+          <Fieldset legend="Prodotti Non Disponibili" toggleable>
+            <ProductsList products={unavailableProducts} />
+          </Fieldset>
         </section>
         <Sidebar
           visible={visibleRight}
           position="right"
           onHide={() => setVisibleRight(false)}
         >
-          <h2>Prodotti in Lavorazione</h2>
           <ProductsList products={wipProducts} />
         </Sidebar>
       </div>

@@ -122,11 +122,10 @@ const fetchDeleteProduct = async (
     if (!res.ok || data.success !== true) {
       throw new Error("Could not delete product");
     } else {
-      successHandler && successHandler();
+      successHandler;
     }
   } catch (error: any) {
-    errorHandler &&
-      errorHandler(error.message || "Error while deleting product");
+    errorHandler;
   }
 };
 

@@ -8,6 +8,7 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import { fetchDeleteProduct } from "../../util/http";
 import { AuthContext } from "../../store/context/auth-context";
+import { Tag } from "primereact/tag";
 
 type ProductItemProps = { product: Product };
 
@@ -17,6 +18,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   const { getToken } = useContext(AuthContext);
 
   const successHandler = () => {
+    setVisible(false);
     toast.current?.show({
       severity: "success",
       summary: "Product Deleted",
@@ -26,6 +28,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   };
 
   const errorHandler = () => {
+    setVisible(false);
     toast.current?.show({
       severity: "warn",
       summary: "Product Deletion Interrupted",
@@ -84,7 +87,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   const gridItem = () => {
     return (
       <div
-        className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2 w-2 gap-2"
+        className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2 w-2 gap-2 inline"
         key={props.product.id}
       >
         <div className="p-4 border-1 surface-border bg-green-500 border-round ">
@@ -126,7 +129,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                 >
                   <p className="m-0">{props.product.description}</p>
                   <p className="m-0">
-                  €{props.product.price} Qty: {props.product.quantity}
+                    €{props.product.price} Qty: {props.product.quantity}
                   </p>
                 </Card>
               </Dialog>

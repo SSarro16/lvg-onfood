@@ -8,7 +8,7 @@ type ProductsListProps = {
 
 const ProductsList: React.FC<ProductsListProps> = (props) => {
   return (
-    <ol style={{ listStyleType: "none" }}>
+    <ol style={{ listStyleType: "none" }} className="inline-block flex-column">
       {props.products.map((product) => (
         <ProductItem key={product.id} product={product} />
       ))}
