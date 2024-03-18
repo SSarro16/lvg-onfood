@@ -85,7 +85,7 @@ export default function Items() {
   ];
 
   return (
-    <div className="card">
+    <div className="fixed sticky">
       <Toast ref={toast} />
       <Menubar model={items} />
     </div>
