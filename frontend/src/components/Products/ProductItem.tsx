@@ -7,15 +7,12 @@ import { Card } from "primereact/card";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import { fetchDeleteProduct } from "../../util/http";
-import { AuthContext } from "../../store/context/auth-context";
-import { Tag } from "primereact/tag";
 
-type ProductItemProps = { product: Product };
+type ProductItemProps = { product: Product; token?: string };
 
 const ProductItem: React.FC<ProductItemProps> = (props) => {
   const toast = useRef<Toast>(null);
   const [visible, setVisible] = useState(false);
-  const { getToken } = useContext(AuthContext);
 
   const successHandler = () => {
     setVisible(false);
@@ -39,9 +36,8 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
 
   const accept = async () => {
     setVisible(false);
-    const token = await getToken();
-    if (token) {
-      fetchDeleteProduct(token, props.product.id, {
+    if (props.token) {
+      fetchDeleteProduct(props.token, props.product.id, {
         errorHandler,
         successHandler,
       });
@@ -69,25 +65,30 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
       reject,
     });
   };
+
   const footer = (
     <>
       <Toast ref={toast} />
       <ConfirmDialog />
-      <Button label="Edit" icon="pi pi-pencil"></Button>
-      <Button
-        label="Delete"
-        severity="secondary"
-        icon="pi pi-times"
-        style={{ marginLeft: "0.5em" }}
-        onClick={confirm2}
-      ></Button>
+      {props.token && (
+        <>
+          <Button label="Edit" icon="pi pi-pencil"></Button>
+          <Button
+            label="Delete"
+            severity="secondary"
+            icon="pi pi-times"
+            style={{ marginLeft: "0.5em" }}
+            onClick={confirm2}
+          ></Button>
+        </>
+      )}
     </>
   );
 
   const gridItem = () => {
     return (
       <div
-        className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2 w-2 gap-2 inline"
+        className="col-12 sm:col-6 lg:col-12 xl:col-4 gap-2"
         key={props.product.id}
       >
         <div className="p-4 border-1 surface-border bg-green-500 border-round ">
@@ -115,7 +116,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                 onClick={() => setVisible(true)}
               />
               <Dialog
-                maximized
+                // maximized
                 modal
                 visible={visible}
                 onHide={() => setVisible(false)}
@@ -125,7 +126,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                   header={header}
                   footer={footer}
                   subTitle="Product Detail"
-                  className="md:w-25rem"
+                  className="md:w-25rem w-20rem h-25rem"
                 >
                   <p className="m-0">{props.product.description}</p>
                   <p className="m-0">
@@ -140,7 +141,13 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     );
   };
 
-  return <DataView value={[props.product]} itemTemplate={gridItem} />;
+  return (
+    <DataView
+      className="flex-initial flex align-items-center justify-content-center"
+      value={[props.product]}
+      itemTemplate={gridItem}
+    />
+  );
 };
 
 export default ProductItem;
