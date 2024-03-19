@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { RouterProvider, createBrowserRouter, json } from "react-router-dom";
+// css import
 import "./App.css";
-import HomePage from "./pages/Home";
-import LogInPage, { action as authAction } from "./pages/LogIn";
-import RootLayout from "./pages/RootLayout";
-import { checkAuthLoader, tokenLoader } from "./util/auth";
-import NewProductPage, { action as newproductAction } from "./pages/NewProduct";
-import { action as logoutAction } from "./pages/LogOut";
+// react import
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { productsActions } from "./store/products-slice";
-import type { Product } from "./store/products-slice";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+// pages import
+import LogInPage from "./pages/LogIn";
+import HomePage from "./pages/Home";
+import RootLayout from "./pages/RootLayout";
+import NewProductPage from "./pages/NewProduct";
+import LoadingPage from "./pages/Loading";
+// store imports
+import type { Product } from "./store/redux/products-slice";
+import { productsActions } from "./store/redux/products-slice";
+// others import
+import { PrimeReactProvider } from "primereact/api";
+import { tokenLoader } from "./util/auth";
+import { fetchProducts } from "./util/http";
+import { Toast } from "primereact/toast";
 
 const router = createBrowserRouter([
   {
@@ -25,19 +33,17 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <LogInPage />,
-        action: authAction,
       },
-      { path: "logout", action: logoutAction },
       {
         path: "newproduct",
         element: <NewProductPage />,
-        action: newproductAction,
       },
     ],
   },
 ]);
 
 function App() {
+  const toast = useRef<Toast>(null);
   const [isFetching, setIsFetching] = useState(false);
   const dispatch = useDispatch();
 
@@ -45,35 +51,57 @@ function App() {
     dispatch(productsActions.setProducts({ products: products }));
   };
 
-  const fetchProducts = async () => {
-    // fetch products in backend
-    // dispatch into redux store
+  const fetchingProducts = async () => {
+    // fetching
     setIsFetching(true);
-    const response = await fetch("http://localhost:8080/products", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+
+    const errorHandler = () => {
+      // TOAST
+       toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Fetching products failed",
+        life: 3000,
+      });
+    };
+    const successHandler = () => {
+      // TOAST
+      toast.current?.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Fetching products successfully",
+        life: 3000,
+      });
+    };
+    // fetch products
+    const fetchedProducts = await fetchProducts({
+      errorHandler,
+      successHandler,
     });
 
-    const resData = await response.json();
-
-    if (!response.ok) {
-      throw json({ message: "Could not fetch" }, { status: 500 });
+    if (fetchedProducts) {
+      // redux
+      setProductsHandler(fetchedProducts);
     }
-    
-    const fetchedProducts = resData.products as Product[];
-    console.log(fetchedProducts)
-    setProductsHandler(fetchedProducts);
 
+    // end fetching
     setIsFetching(false);
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchingProducts();
   }, []);
 
-  return <RouterProvider router={router} />;
+  return (
+    <PrimeReactProvider>
+      <Toast ref={toast} />
+      {isFetching ? (
+        <LoadingPage text={"Fetching products"} />
+      ) : (
+        <RouterProvider router={router} />
+      )}
+    </PrimeReactProvider>
+  );
 }
 
 export default App;

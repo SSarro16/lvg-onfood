@@ -1,28 +1,29 @@
 import React from "react";
-import {
-  redirect,
-  json,
-} from "react-router-dom";
+import { NavigateFunction } from "react-router-dom";
+import { SignOutFunction } from "../store/context/auth-context";
 
+const action = async (token: string, navigate: NavigateFunction, signOut: SignOutFunction  ) => {
+  try {
+    const response = await fetch("http://localhost:8080/auth/logout-new", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    });
+    console.log(response);
+    if (response.status === 401) {
+      throw "Non autenticato";
+    }
 
-const action = async () => {
-  const response = await fetch("http://localhost:8080/logout", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  console.log(response);
-
-  if (response.status === 401) {
-    return response;
+    if (!response.ok) {
+      throw "Log out non effettuato";
+    }
+  } catch (error: any) {
+    console.log(error);
   }
 
-  if (!response.ok) {
-    throw json({ message: "Could not logged user." }, { status: 500 });
-  }
-
-  localStorage.removeItem("token");
-  return redirect("/");
+  signOut(navigate)
 };
+
 export { action };

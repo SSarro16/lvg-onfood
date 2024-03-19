@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "lvg-onfood",
+  "private_key_id": "2c56b73bfa25f2149778ba1d42f766859a849ba5",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC06D8c0QbyLJQm\nCHingwV+kgv+w3L0Gdeo3QENpnmUPyUCwlOcQwZm+IT8w/Y9T491dNnOqEmcRHNa\nI3l0ByMrtyTkJ+s6S+qShoNrFRIIolY0abi43WyWiD+4WOFoFy2xrWsdUG6V6zHy\nWLSZ5cdqyIHiPP2Eh1fPcwl9XoFGINvfLB+eaBbCNcVqBeRts5LESBTOvw5uUpAj\nbnVktoXRPVwkOBzRqBbXapVbt8d7vKtzEHa4SY2zknQhWYLRUNhbe/uoiGoN0TpI\nL+1/aHRli4Gi6cZdsmeRrshYbQAJMOoYz2DjGVDEFYo0MnsJxtl607mJ8bHqcoCJ\nFhNIuFs7AgMBAAECggEAQ20unMRxxNCFtTlCExk78oVnsCBT15RMM5WPv3E1bmIs\nnr8kH6FBoR5unrFBNW/SZfJT/fjuWq6OmeGP8oV4f+Imf107iMJj3xIAqGg1jP9I\nhweCgHCS+PY2XbTO6pd9AfTDcC0a0ojTWGLkiVnBvlSWSGb4DK3PNjRHrLENGMAk\nLR0CTPxYgL+JgXY97HDcYpTnz5HMtRbdTFZUjlvaDXu1OWZTcEBxGRAz0P31/mix\ny8LB9O9GebWOPFweqTbNV1uBkInZ5INyNpOy6A51Uo4GQ97zcSE4nyS+TVsdH0RV\nRrY5Xb+/ul5aHVXHXfseOJV8bKqVUQAUIBXdLFga/QKBgQDvdYxsB0oeWJvYYhVb\nP9lfQyc2xMDifUDqUH7Jn5VKJglIFeYglFwUVc8u1QmiX8SzqBj5WIJhQlMj5Co5\n7z8NBGxbo/R+5MglJ/eC3bPiYz60jQJGnJq64dqyS6g1Fe/4tei/rlrQfi9eruGf\nQGBO3r4V1qOW9oGNfBxYQMRslQKBgQDBZ0zsPgV/qqXIJoIlk5aKmkCM/9ttGCj/\n0o1lriRYwO/lUpbVOFNA2q/9lA+TivWk9hfXLHFG6oQUz4eSUN5wjUBsN8qQcXT1\n2h99MJdyT5GJ8Z/B3SmeoPahUrn2JCqRF30wzG5qSKzyc/IXq0uy763vg6EsXCjc\ndAONo1/kjwKBgBYlS+hNwEgQL9GSOKFoxUSvJDhHeAM6TD+fVCp3bMofvGoDRHYs\n4lsrGG8fWrW+n6Vx3WVqDxzJkoDWQCV9f9pHV3IeNqVpqSzuhlB/Cnzcatct11EK\neLDh5GTq5FKMhdX9lNntWQ7BLMZX7BvbS0zgArpoUFbM02xvVvu+eawFAoGAQF2T\nwS/m/pUZdWIzgDP9LwWlJAfmzAj1ZCZ7vnJVUGBttoFlB3MmafgeCCOlh3IAzLTG\nPGtjC7ny2UY0FWLqlMS9wwZSWP4ZcdT1E+H/FSEcC6+pfoiPWGazjf8NOrjQndcW\naA4xVRf4zvv9fxkYKWYRGhxRoITPaIcHw7SyrksCgYEAoHIvky3GKvsy4/vh9mDM\nBdu5i6quoIkls5WszLweO2DF/UDGeP4C/Hc2q/xYui8Qev/p8JN4npWUshWmfTJt\nV85ruu0YeCqNLX8CD7UvRNWApKTfdlhAzbkZLgkT+YXyBR/JBQKDcmg5UBfkHDRp\nwaj24GsZcXVbUaC8yRHzk3A=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-v5b65@lvg-onfood.iam.gserviceaccount.com",
+  "client_id": "110963196090826664025",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-v5b65%40lvg-onfood.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

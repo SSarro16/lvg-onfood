@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
-import type { Product } from "../store/products-slice";
+import { RootState } from "../store/redux";
+import type { Product } from "../store/redux/products-slice";
 import ProductsList from "../components/Products/ProductsList";
+import { Sidebar } from "primereact/sidebar";
+import { Button } from "primereact/button";
+import { Accordion, AccordionTab } from "primereact/accordion";
+import { Fieldset } from "primereact/fieldset";
 
 export default function HomePage() {
   const products = useSelector((state: RootState) => state.products.products);
-
+  const [visibleRight, setVisibleRight] = useState(false);
   const [wipProducts, setWipProducts] = useState<Product[]>([]);
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [unavailableProducts, setUnavailableProducts] = useState<Product[]>([]);
@@ -18,6 +22,7 @@ export default function HomePage() {
       products.map((product) => {
         if (product.quantity > 0) {
           setAvailableProducts((prevState) => {
+            const state = prevState;
             const alrCheckedId = prevState.some((element) => {
               if (element.id === product.id) {
                 return true;
@@ -27,13 +32,14 @@ export default function HomePage() {
             if (alrCheckedId === true) {
               return prevState;
             } else {
-              prevState.push(product);
-              return prevState;
+              state.push(product);
+              return state;
             }
           });
         } else {
           if (product.estimatedCompletedTime > 0) {
             setWipProducts((prevState) => {
+              const state = prevState;
               const alrCheckedId = prevState.some((element) => {
                 if (element.id === product.id) {
                   return true;
@@ -43,12 +49,13 @@ export default function HomePage() {
               if (alrCheckedId === true) {
                 return prevState;
               } else {
-                prevState.push(product);
-                return prevState;
+                state.push(product);
+                return state;
               }
             });
           } else {
             setUnavailableProducts((prevState) => {
+              const state = prevState;
               const alrCheckedId = prevState.some((element) => {
                 if (element.id === product.id) {
                   return true;
@@ -58,8 +65,8 @@ export default function HomePage() {
               if (alrCheckedId === true) {
                 return prevState;
               } else {
-                prevState.push(product);
-                return prevState;
+                state.push(product);
+                return state;
               }
             });
           }
@@ -78,17 +85,32 @@ export default function HomePage() {
           }
         />
       </div>
-      <div style={{ display: "flex" }}>
+      <div>
+        <div className="right-0 absolute top-70 ">
+          <Button
+            icon="pi pi-arrow-left"
+            onClick={() => setVisibleRight(true)}
+            className="gap-1"
+          >
+            {" "}
+            WIP Products
+          </Button>
+        </div>
         <section>
-          <h2>Product list in lavorazione...</h2>
-          <ProductsList products={availableProducts} />
-          <h2>Prodotti non disponibili</h2>
-          <ProductsList products={unavailableProducts} />
+          <Fieldset legend="Lista dei Prodotti" toggleable>
+            <ProductsList products={availableProducts} />
+          </Fieldset>
+          <Fieldset legend="Prodotti Non Disponibili" toggleable>
+            <ProductsList products={unavailableProducts} />
+          </Fieldset>
         </section>
-        <aside>
-          <h3>Prodotti WIP in lavorazione...</h3>
+        <Sidebar
+          visible={visibleRight}
+          position="right"
+          onHide={() => setVisibleRight(false)}
+        >
           <ProductsList products={wipProducts} />
-        </aside>
+        </Sidebar>
       </div>
     </>
   );
