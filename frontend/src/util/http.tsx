@@ -1,7 +1,7 @@
 // Http handler for the frontend
 import { Product } from "../store/redux/products-slice";
 
-type Method = "GET" | "POST" | "PUT" | "DELETE";
+type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 type ProdData = {
   title: string;
@@ -13,6 +13,10 @@ type ProdData = {
 interface Handlers {
   errorHandler?: (error: string) => void;
   successHandler?: () => void;
+  errorDeleteHandler?: (error: string) => void;
+  successDeleteHandler?: () => void;
+  errorSavingHandler?: (error: string) => void;
+  successSavingHandler?: () => void;
 }
 
 const fetchBackend = async (
@@ -108,7 +112,7 @@ const fetchAddProduct = async (
 const fetchDeleteProduct = async (
   token: string,
   productId: string,
-  { errorHandler, successHandler }: Handlers
+  { errorDeleteHandler, successDeleteHandler }: Handlers
 ): Promise<void> => {
   // assumption: token is valid
   try {
@@ -122,13 +126,44 @@ const fetchDeleteProduct = async (
     if (!res.ok || data.success !== true) {
       throw new Error("Could not delete product");
     } else {
-      successHandler;
+      successDeleteHandler;
     }
   } catch (error: any) {
-    errorHandler;
+    errorDeleteHandler;
   }
 };
 
 // patch product
+const fetchUpdateProduct = async (
+  token: string,
+  productId: string,
+  bodyData: ProdData,
+  { errorSavingHandler, successSavingHandler }: Handlers
+): Promise<void> => {
+  // assumption: token is valid
+  try {
+    const res = await fetchBackend(
+      `${backendUrl}/products/${productId}`,
+      "PATCH",
+      token,
+      bodyData
+    );
+    const data = await res.json();
+    if (!res.ok || data.success !== true) {
+      throw new Error("Could not update product");
+    } else {
+      successSavingHandler && successSavingHandler();
+    }
+  } catch (error: any) {
+    errorSavingHandler &&
+      errorSavingHandler(error.message || "Error while updating product");
+  }
+};
 
-export { fetchAddProduct, fetchLogout, fetchProducts, fetchDeleteProduct };
+export {
+  fetchAddProduct,
+  fetchLogout,
+  fetchProducts,
+  fetchDeleteProduct,
+  fetchUpdateProduct,
+};
