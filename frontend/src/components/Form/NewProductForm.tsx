@@ -83,8 +83,8 @@ function NewProductForm(event: any) {
 
   return (
     <Form
-      method="post"
       className={classes.form}
+      method="post"
       onSubmit={newProductSubmitHandler}
     >
       <div className="card">
