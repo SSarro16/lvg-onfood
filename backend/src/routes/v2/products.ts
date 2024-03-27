@@ -2,7 +2,7 @@ import express from "express";
 import { Request } from "../../types/express.types";
 import { checkAuthV2 as checkAuth } from "../../util/auth";
 import { Product, isValidId } from "../../types/products.types";
-import { sanitizeNewProduct, sanitizeProduct } from "../../util/validation";
+import { sanitizeNewProduct, sanitizePartialProduct, sanitizeProduct } from "../../util/validation";
 import { db } from "../../util/firebaseAdmin";
 
 const router = express.Router();
@@ -135,14 +135,30 @@ router.patch("/:id", async (req: Request, res, next) => {
   const productId = isValidId(req.params.id) ? req.params.id : null;
   if (productId) {
     try {
-      const product = sanitizeProduct(req.body);
+      // todo partial product sanitize
+      const product = sanitizePartialProduct(req.body);
+      console.log("partial-product", product)
       if (product) {
         const productsRef = db.collection("products");
         const productRef = productsRef.doc(productId);
-        const result = await productRef.set(product);
-        console.log(result);
-        lastUpdatedTime = 0; // force to refresh cache next call
-        res.json({ success: true });
+        const snapshot = await productRef.get();
+        console.log("snapshot", snapshot)
+        if (!snapshot.exists) {
+          next({ message: "Product not found" });
+        } else {
+          const prevProductData = sanitizeProduct(snapshot.data());
+          console.log("prevProductData", prevProductData)
+          const newProduct: Product = {
+            ...prevProductData,
+            ...product,
+            lastUpdatedTime: Date.now(),
+          };
+          console.log("newProduct", newProduct)
+          const result = await productRef.set(newProduct);
+          // console.log(result);
+          lastUpdatedTime = 0; // force to refresh cache next call
+          res.json({ success: true });
+        }
       } else {
         next({ message: "Invalid product" });
       }
