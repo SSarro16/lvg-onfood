@@ -9,7 +9,7 @@ import { Toast } from "primereact/toast";
 import { fetchDeleteProduct, fetchUpdateProduct } from "../../util/http";
 import { Form, useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
-import { InputNumber } from "primereact/inputnumber";
+import { InputNumber, InputNumberValueChangeEvent } from "primereact/inputnumber";
 
 type ProductItemProps = { product: Product; token?: string };
 
@@ -50,9 +50,26 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     setFormFields((prevState) => ({ ...prevState, [name]: value }));
   };
 
+  const handleNumberChange = (event: InputNumberValueChangeEvent) => {
+    const { name, value } = event.target;
+    setFormFields((prevState) => ({ ...prevState, [name]: value }));
+  };
+
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
   };
+
+  const initEditFormFields = () => {
+    const product = props.product;
+    setFormFields({
+      title: product.title,
+      image: product.image,
+      price: product.price,
+      description: product.description || '',
+      quantity: product.quantity,
+      estimatedCompletedTime: product.estimatedCompletedTime,
+    })
+  }
 
   const successDeleteHandler = () => {
     setVisible(false);
@@ -138,10 +155,10 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
       async accept() {
         setVisibleEdit(true);
         setVisible(false);
+        initEditFormFields();
       },
       reject() {
         setVisible(false);
-        setVisibleEdit(false);
       },
     });
   };
@@ -157,6 +174,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
       acceptLabel: "Save",
       accept() {
         setVisible(false);
+        setVisibleEdit(false);
         if (props.token) {
           const bodyData: NewProductFormFields = {
             title,
@@ -171,10 +189,12 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
             errorSavingHandler,
             successSavingHandler,
           });
+          resetFormFields()
         }
       },
       reject() {
         setVisible(false);
+        resetFormFields();
       },
     });
   };
@@ -196,6 +216,14 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
             style={{ marginLeft: "0.5em" }}
           ></Button>
           <Button
+            label="Close"
+            severity="danger"
+            icon="pi pi-times"
+            onClick={() => setVisibleEdit(false)}
+            visible={visibleEdit}
+            style={{ marginLeft: "0.5em" }}
+          ></Button>
+          <Button
             name="Edit"
             label="Edit"
             icon="pi pi-pencil"
@@ -206,8 +234,9 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
           <Button
             name="Delete"
             label="Delete"
-            severity="secondary"
+            severity="danger"
             icon="pi pi-times"
+            visible={visible}
             style={{ marginLeft: "0.5em" }}
             onClick={confirm2}
           ></Button>
@@ -283,6 +312,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                           id="image"
                           type="url"
                           name="image"
+                          value={image}
                           onChange={handleChange}
                           required
                           placeholder="Image URL"
@@ -295,6 +325,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                           id="title"
                           type="text"
                           name="title"
+                          value={title}
                           placeholder={props.product.title}
                           onChange={handleChange}
                           className="p-inputtext-lg"
@@ -306,6 +337,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                           id="description"
                           type="textarea"
                           name="description"
+                          value={description}
                           onChange={handleChange}
                           placeholder={props.product.description}
                           className="p-inputtext-lg"
@@ -317,13 +349,12 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                           id="price"
                           name="price"
                           mode="currency"
+                          value={price}
                           currency="EUR"
                           locale="it-IT"
-                          placeholder="0,00€"
+                          placeholder={props.product.price.toString()}
                           required
-                          onValueChange={(e: any) =>
-                            setFormFields({ ...formFields, price: e.value })
-                          }
+                          onValueChange={handleNumberChange}
                           className="p-inputtext-lg"
                         />
                       </div>
@@ -332,13 +363,9 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                         <InputNumber
                           id="quantity"
                           name="quantity"
-                          placeholder="0"
-                          onValueChange={(e: any) =>
-                            setFormFields({
-                              ...formFields,
-                              price: e.quantity,
-                            })
-                          }
+                          value={quantity}
+                          placeholder={props.product.quantity.toString()}
+                          onValueChange={handleNumberChange}
                           className="p-inputtext-lg"
                         />
                       </div>
@@ -349,13 +376,9 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                         <InputNumber
                           id="estimatedCompletedTime"
                           name="estimatedCompletedTime"
-                          placeholder="0 seconds"
-                          onValueChange={(e: any) =>
-                            setFormFields({
-                              ...formFields,
-                              estimatedCompletedTime: e.estimatedCompletedTime,
-                            })
-                          }
+                          value={estimatedCompletedTime}
+                          placeholder={props.product.estimatedCompletedTime.toString()}
+                          onValueChange={handleNumberChange}
                           className="p-inputtext-lg"
                         />
                       </div>

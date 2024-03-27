@@ -92,7 +92,6 @@ export default function HomePage() {
             onClick={() => setVisibleRight(true)}
             className="gap-1"
           >
-            {" "}
             WIP Products
           </Button>
         </div>
