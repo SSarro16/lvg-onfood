@@ -1,4 +1,11 @@
-import React, { FormEvent, useContext, useRef, useState } from "react";
+import React, {
+  FormEvent,
+  ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { DataView } from "primereact/dataview";
 import { Product } from "../../store/redux/products-slice";
 import { Button } from "primereact/button";
@@ -9,7 +16,11 @@ import { Toast } from "primereact/toast";
 import { fetchDeleteProduct, fetchUpdateProduct } from "../../util/http";
 import { Form, useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
-import { InputNumber, InputNumberValueChangeEvent } from "primereact/inputnumber";
+import {
+  InputNumber,
+  InputNumberValueChangeEvent,
+} from "primereact/inputnumber";
+import { Tag, TagProps } from "primereact/tag";
 
 type ProductItemProps = { product: Product; token?: string };
 
@@ -65,11 +76,11 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
       title: product.title,
       image: product.image,
       price: product.price,
-      description: product.description || '',
+      description: product.description || "",
       quantity: product.quantity,
       estimatedCompletedTime: product.estimatedCompletedTime,
-    })
-  }
+    });
+  };
 
   const successDeleteHandler = () => {
     setVisible(false);
@@ -113,7 +124,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   };
 
   const header = (
-    <div>
+    <div className="block max-w-10rem">
       <img alt={props.product.title} src={props.product.image} />
     </div>
   );
@@ -163,6 +174,30 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     });
   };
 
+  let severity: "success" | "info" | "warning" | "danger" | null | undefined;
+  let status: string;
+
+  useEffect(() => {
+    {
+      if (
+        props.product.quantity > 0 &&
+        props.product.estimatedCompletedTime === 0
+      ) {
+        severity = "success";
+        status = "Disponibile";
+      } else if (
+        props.product.quantity === 0 &&
+        props.product.estimatedCompletedTime === 0
+      ) {
+        severity = "danger";
+        status = "Esaurito";
+      } else {
+        severity = "warning";
+        status = "In Produzione";
+      }
+    }
+  }, [props.product.quantity, props.product.estimatedCompletedTime]);
+
   const saving = () => {
     confirmDialog({
       tagKey: "savingProduct",
@@ -189,7 +224,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
             errorSavingHandler,
             successSavingHandler,
           });
-          resetFormFields()
+          resetFormFields();
         }
       },
       reject() {
@@ -251,16 +286,19 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
         className="col-12 sm:col-6 lg:col-12 xl:col-4 gap-2"
         key={props.product.id}
       >
-        <div className="p-4 border-1 surface-border bg-green-500 border-round ">
+        <div className="p-4 border-1 surface-border surface-900 hover:border-900 focus:bg-white border-round ">
           <div className="flex flex-wrap align-items-center justify-content-between gap-2">
             <div className="flex align-items-center gap-2"></div>
           </div>
           <div className="text-xl text-100 text-center font-bold">
             {props.product.title}
           </div>
+          <div className="flex flex-wrap text-center justify-content-center m-2 pt-1">
+            <Tag severity={severity} value={status} />
+          </div>
           <div className="flex flex-column align-items-center gap-3 py-5">
             <img
-              className="w-9 shadow-2 border-round"
+              className="w-8 shadow-2 border-round"
               src={props.product.image}
               alt={props.product.title}
             />
@@ -271,13 +309,18 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
             </span>
             <span className="text-xl text-100 font-semibold">
               <Button
-                className="bd-red"
+                className="bg-white"
+                severity="success"
                 icon="pi pi-bars"
+                aria-label="details"
                 onClick={() => setVisible(true)}
+                rounded
+                text
+                raised
               />
               <Dialog
                 // maximized
-                modal
+                // modal
                 visible={visible}
                 onHide={() => setVisible(false)}
               >
@@ -286,7 +329,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                   header={header}
                   footer={footer}
                   subTitle="Product Detail"
-                  className="md:w-25rem w-20rem h-25rem"
+                  className="md:w-25rem block"
                 >
                   <p className="m-0 ">{props.product.description}</p>
                   <p className="m-0 ">Quantity: {props.product.quantity} pz</p>

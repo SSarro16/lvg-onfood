@@ -16,6 +16,12 @@ export default function HomePage() {
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [unavailableProducts, setUnavailableProducts] = useState<Product[]>([]);
 
+  const wipHeader = (
+    <div className="pl-6 ">
+      <h2>WIP Products</h2>
+    </div>
+  );
+
   useEffect(() => {
     if (typeof products === "object") {
       console.log(products);
@@ -86,13 +92,14 @@ export default function HomePage() {
         />
       </div>
       <div>
-        <div className="right-0 absolute top-70 ">
+        <div className="right-0 absolute top-50 ">
           <Button
             icon="pi pi-arrow-left"
             onClick={() => setVisibleRight(true)}
-            className="gap-1"
+            className="gap-2"
+            severity="warning"
           >
-            WIP Products
+            WIP
           </Button>
         </div>
         <section>
@@ -105,6 +112,8 @@ export default function HomePage() {
         </section>
         <Sidebar
           visible={visibleRight}
+          header={wipHeader}
+          className="w-7"
           position="right"
           onHide={() => setVisibleRight(false)}
         >
