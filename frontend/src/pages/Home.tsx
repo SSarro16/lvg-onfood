@@ -102,10 +102,12 @@ export default function HomePage() {
             WIP
           </Button>
         </div>
-        <section>
+        <section className="p-2 m-2">
           <Fieldset legend="Lista dei Prodotti" toggleable>
             <ProductsList products={availableProducts} />
           </Fieldset>
+        </section>
+        <section className="p-2 m-2">
           <Fieldset legend="Prodotti Non Disponibili" toggleable>
             <ProductsList products={unavailableProducts} />
           </Fieldset>

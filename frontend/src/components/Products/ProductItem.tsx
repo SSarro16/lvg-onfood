@@ -124,7 +124,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   };
 
   const header = (
-    <div className="block max-w-10rem">
+    <div className="block max-w-30rem">
       <img alt={props.product.title} src={props.product.image} />
     </div>
   );
@@ -283,7 +283,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   const gridItem = () => {
     return (
       <div
-        className="col-12 sm:col-6 lg:col-12 xl:col-4 gap-2"
+        className=" m-2 gap-2 align-items-stretch w-14rem h-auto grid "
         key={props.product.id}
       >
         <div className="p-4 border-1 surface-border surface-900 hover:border-900 focus:bg-white border-round ">
@@ -296,9 +296,9 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
           <div className="flex flex-wrap text-center justify-content-center m-2 pt-1">
             <Tag severity={severity} value={status} />
           </div>
-          <div className="flex flex-column align-items-center gap-3 py-5">
+          <div className="text-center h-0 py-5 ">
             <img
-              className="w-8 shadow-2 border-round"
+              className="max-w-9rem  border-round "
               src={props.product.image}
               alt={props.product.title}
             />
