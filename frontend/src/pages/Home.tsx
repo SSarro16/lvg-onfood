@@ -6,7 +6,6 @@ import type { Product } from "../store/redux/products-slice";
 import ProductsList from "../components/Products/ProductsList";
 import { Sidebar } from "primereact/sidebar";
 import { Button } from "primereact/button";
-import { Accordion, AccordionTab } from "primereact/accordion";
 import { Fieldset } from "primereact/fieldset";
 
 export default function HomePage() {
