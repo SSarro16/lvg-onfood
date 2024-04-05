@@ -192,7 +192,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     severity = "danger";
     status = "Esaurito";
     borderItem =
-      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-black-alpha-70";
+      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-black-alpha-90";
   } else {
     severity = "warning";
     status = "In Produzione";
