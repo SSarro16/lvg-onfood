@@ -82,95 +82,100 @@ function NewProductForm(event: any) {
   };
 
   return (
-    <Form
-      className={classes.form}
-      method="post"
-      onSubmit={newProductSubmitHandler}
-    >
-      <div className="card">
-        <div className="grid p-fluid">
-          <div className="col-12">
-            <div className="p-inputgroup">
-              <span className="p-inputgroup-addon">
-                <i className="pi pi-file-edit" />
-              </span>
-              <InputText
-                id="title"
-                type="text"
-                name="title"
-                required
-                onChange={handleChange}
-                placeholder="Title"
-              />
+    <>
+      <Form
+        className={classes.form}
+        method="post"
+        onSubmit={newProductSubmitHandler}
+      >
+        <div className="text-center text-white">
+          <h2>Aggiungi un nuovo prodotto!</h2>
+        </div>
+        <div className="card">
+          <div className="grid p-fluid">
+            <div className="col-12">
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-file-edit" />
+                </span>
+                <InputText
+                  id="title"
+                  type="text"
+                  name="title"
+                  required
+                  onChange={handleChange}
+                  placeholder="Title"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid p-fluid">
+            <div className="col-12">
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-image" />
+                </span>
+                <InputText
+                  id="image"
+                  type="url"
+                  name="image"
+                  onChange={handleChange}
+                  required
+                  placeholder="url"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="grid">
+            <div className="col-12">
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-money-bill"></i>
+                </span>
+                <InputNumber
+                  id="price"
+                  name="price"
+                  mode="currency"
+                  currency="EUR"
+                  locale="it-IT"
+                  placeholder="Price"
+                  required
+                  onValueChange={(e: any) =>
+                    setFormFields({ ...formFields, price: e.value })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+          <div className="grid p-fluid">
+            <div className="col-12">
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon ">
+                  <i className="pi pi-pencil" />
+                </span>
+                <InputText
+                  id="description"
+                  name="description"
+                  type="textarea"
+                  onChange={handleChange}
+                  required
+                  placeholder="Description"
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="grid p-fluid">
-          <div className="col-12">
-            <div className="p-inputgroup">
-              <span className="p-inputgroup-addon">
-                <i className="pi pi-image" />
-              </span>
-              <InputText
-                id="image"
-                type="url"
-                name="image"
-                onChange={handleChange}
-                required
-                placeholder="url"
-              />
-            </div>
-          </div>
+        <div className={classes.actions}>
+          <Link to="/">Torna alla Home</Link>
+          <Toast ref={toast} />
+          <button disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Aggiungi nuovo prodotto"}
+          </button>
         </div>
-        <div className="grid">
-          <div className="col-12">
-            <div className="p-inputgroup">
-              <span className="p-inputgroup-addon">
-                <i className="pi pi-money-bill"></i>
-              </span>
-              <InputNumber
-                id="price"
-                name="price"
-                mode="currency"
-                currency="EUR"
-                locale="it-IT"
-                placeholder="Price"
-                required
-                onValueChange={(e: any) =>
-                  setFormFields({ ...formFields, price: e.value })
-                }
-              />
-            </div>
-          </div>
-        </div>
-        <div className="grid p-fluid">
-          <div className="col-12">
-            <div className="p-inputgroup">
-              <span className="p-inputgroup-addon ">
-                <i className="pi pi-pencil" />
-              </span>
-              <InputText
-                id="description"
-                name="description"
-                type="textarea"
-                onChange={handleChange}
-                required
-                placeholder="Description"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className={classes.actions}>
-        <Link to="/">Torna alla Home</Link>
-        <Toast ref={toast} />
-        <button disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Aggiungi nuovo prodotto"}
-        </button>
-      </div>
-    </Form>
+      </Form>
+    </>
   );
 }
 
