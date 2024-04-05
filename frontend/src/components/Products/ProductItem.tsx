@@ -176,27 +176,29 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
 
   let severity: "success" | "info" | "warning" | "danger" | null | undefined;
   let status: string;
+  let borderItem =
+    "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round surface-900";
 
-  useEffect(() => {
-    {
-      if (
-        props.product.quantity > 0 &&
-        props.product.estimatedCompletedTime === 0
-      ) {
-        severity = "success";
-        status = "Disponibile";
-      } else if (
-        props.product.quantity === 0 &&
-        props.product.estimatedCompletedTime === 0
-      ) {
-        severity = "danger";
-        status = "Esaurito";
-      } else {
-        severity = "warning";
-        status = "In Produzione";
-      }
-    }
-  }, [props.product.quantity, props.product.estimatedCompletedTime]);
+  if (
+    props.product.quantity > 0 &&
+    props.product.estimatedCompletedTime === 0
+  ) {
+    severity = "success";
+    status = "Disponibile";
+  } else if (
+    props.product.quantity === 0 &&
+    props.product.estimatedCompletedTime === 0
+  ) {
+    severity = "danger";
+    status = "Esaurito";
+    borderItem =
+      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-black-alpha-70";
+  } else {
+    severity = "warning";
+    status = "In Produzione";
+    borderItem =
+      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-orange-600";
+  }
 
   const saving = () => {
     confirmDialog({
@@ -286,7 +288,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
         className=" m-2 gap-2 align-items-stretch w-14rem h-auto grid "
         key={props.product.id}
       >
-        <div className="p-4 border-1 surface-border surface-900 hover:border-900 focus:bg-white border-round ">
+        <div className={borderItem}>
           <div className="flex flex-wrap align-items-center justify-content-between gap-2">
             <div className="flex align-items-center gap-2"></div>
           </div>
@@ -334,6 +336,9 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                   <p className="m-0 ">{props.product.description}</p>
                   <p className="m-0 ">Quantity: {props.product.quantity} pz</p>
                   <p className="m-0 text-right">{props.product.price}€</p>
+                  <div>
+                    Disponibilità: <Tag severity={severity} value={status} />
+                  </div>
                 </Card>
               </Dialog>
               <Dialog
