@@ -272,7 +272,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
             name="Delete"
             label="Delete"
             severity="danger"
-            icon="pi pi-times"
+            icon="pi pi-trash"
             visible={visible}
             style={{ marginLeft: "0.5em" }}
             onClick={confirm2}
@@ -285,7 +285,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   const gridItem = () => {
     return (
       <div
-        className=" m-2 gap-2 align-items-stretch w-14rem h-auto grid "
+        className="m-2 gap-2 align-items-stretch w-14rem grid "
         key={props.product.id}
       >
         <div className={borderItem}>
@@ -303,6 +303,8 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
               className="max-w-9rem  border-round "
               src={props.product.image}
               alt={props.product.title}
+              height={'100vh'}
+              width={'120%'}
             />
           </div>
           <div className="flex align-items-center justify-content-between">
@@ -331,7 +333,9 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                   header={header}
                   footer={footer}
                   subTitle="Product Detail"
-                  className="md:w-25rem block"
+                  className="md:w-25rem"
+                  pt={{root:{style: {boxShadow: "unset"}}}}
+
                 >
                   <p className="m-0 ">{props.product.description}</p>
                   <p className="m-0 ">Quantity: {props.product.quantity} pz</p>

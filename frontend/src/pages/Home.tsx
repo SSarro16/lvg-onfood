@@ -115,6 +115,7 @@ export default function HomePage() {
           visible={visibleRight}
           header={wipHeader}
           className="w-7"
+          style={{display: 'block' ,overflowY: 'scroll'}}
           position="right"
           onHide={() => setVisibleRight(false)}
         >
