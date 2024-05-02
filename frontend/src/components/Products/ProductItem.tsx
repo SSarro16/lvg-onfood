@@ -1,11 +1,4 @@
-import React, {
-  FormEvent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { FormEvent, useRef, useState } from "react";
 import { DataView } from "primereact/dataview";
 import { Product } from "../../store/redux/products-slice";
 import { Button } from "primereact/button";
@@ -303,8 +296,8 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
               className="max-w-9rem  border-round "
               src={props.product.image}
               alt={props.product.title}
-              height={'100vh'}
-              width={'120%'}
+              height={"100vh"}
+              width={"120%"}
             />
           </div>
           <div className="flex align-items-center justify-content-between">
@@ -334,8 +327,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                   footer={footer}
                   subTitle="Product Detail"
                   className="md:w-25rem"
-                  pt={{root:{style: {boxShadow: "unset"}}}}
-
+                  pt={{ root: { style: { boxShadow: "unset" } } }}
                 >
                   <p className="m-0 ">{props.product.description}</p>
                   <p className="m-0 ">Quantity: {props.product.quantity} pz</p>
