@@ -1,4 +1,4 @@
-import { NewProduct, Product, isValidDescription, isValidEstimatedCompletedTime, isValidLastUpdatedTime, isValidNewProduct, isValidProduct } from "../types/products.types";
+import { NewProduct, Product, isValidDescription, isValidEstimatedCompletedTime, isValidId, isValidLastUpdatedTime, isValidNewProduct, isValidPrice, isValidProduct, isValidQuantity, isValidTitle } from "../types/products.types";
 
 const isValidDate = (value: any): value is Date => {
   const date = new Date(value);
@@ -59,4 +59,29 @@ const sanitizeProduct = (product: any): Product => {
   };
 }
 
-export {isValidString, isValidDate, isValidText, isValidImageUrl, isValidEmail, sanitizeProduct, sanitizeNewProduct};
+const sanitizePartialProduct = (product: any): Partial<Product> => {
+  const partialProduct: Partial<Product> = {};
+
+  if (isValidTitle(product.title)) {
+    partialProduct.title = product.title;
+  }
+  if (isValidDescription(product.description)) {
+    partialProduct.description = product.description;
+  }
+  if (isValidImageUrl(product.image)) {
+    partialProduct.image = product.image;
+  }
+  if (isValidPrice(product.price)) {
+    partialProduct.price = product.price;
+  }
+  if (isValidQuantity(product.quantity)) {
+    partialProduct.quantity = product.quantity;
+  }
+  if (isValidEstimatedCompletedTime(product.estimatedCompletedTime)) {
+    partialProduct.estimatedCompletedTime = product.estimatedCompletedTime;
+  }
+
+  return partialProduct;
+}
+
+export {isValidString, isValidDate, isValidText, isValidImageUrl, isValidEmail, sanitizeProduct, sanitizeNewProduct, sanitizePartialProduct};

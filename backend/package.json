@@ -1,10 +1,12 @@
 {
-  "name": "backend-api",
+  "name": "lvg-backend-api",
   "version": "1.0.0",
   "description": "",
   "main": "./src/app.ts",
   "scripts": {
-    "start": "npx ts-node src/app.ts"
+    "start": "node build/app.js",
+    "dev": "npx ts-node src/app.ts",
+    "portinstall": "tsc"
   },
   "keywords": [],
   "author": "",

@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { FormEvent, useRef, useState } from "react";
 import { DataView } from "primereact/dataview";
 import { Product } from "../../store/redux/products-slice";
 import { Button } from "primereact/button";
@@ -6,15 +6,76 @@ import { Dialog } from "primereact/dialog";
 import { Card } from "primereact/card";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
-import { fetchDeleteProduct } from "../../util/http";
+import { fetchDeleteProduct, fetchUpdateProduct } from "../../util/http";
+import { Form, useNavigate } from "react-router-dom";
+import { InputText } from "primereact/inputtext";
+import {
+  InputNumber,
+  InputNumberValueChangeEvent,
+} from "primereact/inputnumber";
+import { Tag, TagProps } from "primereact/tag";
 
 type ProductItemProps = { product: Product; token?: string };
 
+type NewProductFormFields = {
+  title: string;
+  image: string;
+  price: number;
+  description: string;
+  quantity: number;
+  estimatedCompletedTime: number;
+};
+
+const defaultFormFields: NewProductFormFields = {
+  title: "",
+  image: "",
+  price: 0,
+  description: "",
+  quantity: 0,
+  estimatedCompletedTime: 0,
+};
+
 const ProductItem: React.FC<ProductItemProps> = (props) => {
   const toast = useRef<Toast>(null);
+  // #PRODUCT DETAIL VISIBLE
   const [visible, setVisible] = useState(false);
+  // #PRODUCT EDIT VISIBLE
+  const [visibleEdit, setVisibleEdit] = useState(false);
+  // #PRODUCT FORM FIELDS
+  const [formFields, setFormFields] =
+    useState<NewProductFormFields>(defaultFormFields);
+  const { title, image, price, description, quantity, estimatedCompletedTime } =
+    formFields;
+  // #USE NAVIGATE
+  const navigate = useNavigate();
 
-  const successHandler = () => {
+  const handleChange = (event: FormEvent<HTMLInputElement>) => {
+    const { name, value } = event.currentTarget;
+    setFormFields((prevState) => ({ ...prevState, [name]: value }));
+  };
+
+  const handleNumberChange = (event: InputNumberValueChangeEvent) => {
+    const { name, value } = event.target;
+    setFormFields((prevState) => ({ ...prevState, [name]: value }));
+  };
+
+  const resetFormFields = () => {
+    setFormFields(defaultFormFields);
+  };
+
+  const initEditFormFields = () => {
+    const product = props.product;
+    setFormFields({
+      title: product.title,
+      image: product.image,
+      price: product.price,
+      description: product.description || "",
+      quantity: product.quantity,
+      estimatedCompletedTime: product.estimatedCompletedTime,
+    });
+  };
+
+  const successDeleteHandler = () => {
     setVisible(false);
     toast.current?.show({
       severity: "success",
@@ -24,7 +85,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     });
   };
 
-  const errorHandler = () => {
+  const errorDeleteHandler = () => {
     setVisible(false);
     toast.current?.show({
       severity: "warn",
@@ -34,49 +95,178 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     });
   };
 
-  const accept = async () => {
-    setVisible(false);
-    if (props.token) {
-      fetchDeleteProduct(props.token, props.product.id, {
-        errorHandler,
-        successHandler,
-      });
-    }
+  const errorSavingHandler = () => {
+    toast.current?.show({
+      severity: "error",
+      summary: "Edit Product Failed",
+      detail: "Edit product failed !!",
+      life: 3000,
+    });
   };
-
-  const reject = () => {
-    setVisible(false);
+  const successSavingHandler = () => {
+    resetFormFields();
+    setVisibleEdit(false);
+    setVisible(true);
+    navigate("/");
+    toast.current?.show({
+      severity: "success",
+      summary: "Product Updated",
+      detail: "Product updated successfully",
+      life: 3000,
+    });
   };
 
   const header = (
-    <div>
-      <img alt="Product Detail" src={props.product.image} />
+    <div className="block max-w-30rem">
+      <img alt={props.product.title} src={props.product.image} />
     </div>
   );
 
   const confirm2 = () => {
     confirmDialog({
+      tagKey: "deleteProduct",
       message: "Do you want to delete this product?",
       header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
-      accept,
-      reject,
+      acceptLabel: "Delete",
+      async accept() {
+        setVisible(false);
+        if (props.token) {
+          fetchDeleteProduct(props.token, props.product.id, {
+            errorDeleteHandler,
+            successDeleteHandler,
+          });
+        }
+      },
+      reject() {
+        setVisible(false);
+      },
+    });
+  };
+
+  const editing = () => {
+    setVisible(true);
+    confirmDialog({
+      tagKey: "editProduct",
+      message: "Do you want to edit this product?",
+      header: "Edit Confirmation",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-warning",
+      acceptLabel: "Go to edit",
+      async accept() {
+        setVisibleEdit(true);
+        setVisible(false);
+        initEditFormFields();
+      },
+      reject() {
+        setVisible(false);
+      },
+    });
+  };
+
+  let severity: "success" | "info" | "warning" | "danger" | null | undefined;
+  let status: string;
+  let borderItem =
+    "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round surface-900";
+
+  if (
+    props.product.quantity > 0 &&
+    props.product.estimatedCompletedTime === 0
+  ) {
+    severity = "success";
+    status = "Disponibile";
+  } else if (
+    props.product.quantity === 0 &&
+    props.product.estimatedCompletedTime === 0
+  ) {
+    severity = "danger";
+    status = "Esaurito";
+    borderItem =
+      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-black-alpha-90";
+  } else {
+    severity = "warning";
+    status = "In Produzione";
+    borderItem =
+      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-orange-600";
+  }
+
+  const saving = () => {
+    confirmDialog({
+      tagKey: "savingProduct",
+      message: "Do you want to save this edited product?",
+      header: "Save Edit Confirmation",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      acceptLabel: "Save",
+      accept() {
+        setVisible(false);
+        setVisibleEdit(false);
+        if (props.token) {
+          const bodyData: NewProductFormFields = {
+            title,
+            image,
+            price,
+            description,
+            quantity,
+            estimatedCompletedTime,
+          };
+          console.log("New Product form data: ", { bodyData });
+          fetchUpdateProduct(props.token, props.product.id, bodyData, {
+            errorSavingHandler,
+            successSavingHandler,
+          });
+          resetFormFields();
+        }
+      },
+      reject() {
+        setVisible(false);
+        resetFormFields();
+      },
     });
   };
 
   const footer = (
     <>
       <Toast ref={toast} />
-      <ConfirmDialog />
+      <ConfirmDialog tagKey="deleteProduct" />
+      <ConfirmDialog tagKey="editProduct" />
+      <ConfirmDialog tagKey="savingProduct" />
       {props.token && (
         <>
-          <Button label="Edit" icon="pi pi-pencil"></Button>
           <Button
-            label="Delete"
-            severity="secondary"
+            label="Save"
+            severity="success"
+            icon="pi pi-check"
+            onClick={saving}
+            visible={visibleEdit}
+            style={{ marginLeft: "0.5em" }}
+          ></Button>
+          <Button
+            label="Close"
+            severity="danger"
             icon="pi pi-times"
+            onClick={() => setVisibleEdit(false)}
+            visible={visibleEdit}
+            style={{ marginLeft: "0.5em" }}
+          ></Button>
+          <Button
+            name="Edit"
+            label="Edit"
+            icon="pi pi-pencil"
+            visible={visible}
+            onClick={editing}
+            style={{ marginLeft: "0.5em" }}
+          ></Button>
+          <Button
+            name="Delete"
+            label="Delete"
+            severity="danger"
+            icon="pi pi-trash"
+            visible={visible}
             style={{ marginLeft: "0.5em" }}
             onClick={confirm2}
           ></Button>
@@ -88,21 +278,26 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   const gridItem = () => {
     return (
       <div
-        className="col-12 sm:col-6 lg:col-12 xl:col-4 gap-2"
+        className="m-2 gap-2 align-items-stretch w-14rem grid "
         key={props.product.id}
       >
-        <div className="p-4 border-1 surface-border bg-green-500 border-round ">
+        <div className={borderItem}>
           <div className="flex flex-wrap align-items-center justify-content-between gap-2">
             <div className="flex align-items-center gap-2"></div>
           </div>
           <div className="text-xl text-100 text-center font-bold">
             {props.product.title}
           </div>
-          <div className="flex flex-column align-items-center gap-3 py-5">
+          <div className="flex flex-wrap text-center justify-content-center m-2 pt-1">
+            <Tag severity={severity} value={status} />
+          </div>
+          <div className="text-center h-0 py-5 ">
             <img
-              className="w-9 shadow-2 border-round"
+              className="max-w-9rem  border-round "
               src={props.product.image}
               alt={props.product.title}
+              height={"100vh"}
+              width={"120%"}
             />
           </div>
           <div className="flex align-items-center justify-content-between">
@@ -111,13 +306,18 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
             </span>
             <span className="text-xl text-100 font-semibold">
               <Button
-                className="bd-red"
+                className="bg-white"
+                severity="success"
                 icon="pi pi-bars"
+                aria-label="details"
                 onClick={() => setVisible(true)}
+                rounded
+                text
+                raised
               />
               <Dialog
                 // maximized
-                modal
+                // modal
                 visible={visible}
                 onHide={() => setVisible(false)}
               >
@@ -126,12 +326,108 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                   header={header}
                   footer={footer}
                   subTitle="Product Detail"
-                  className="md:w-25rem w-20rem h-25rem"
+                  className="md:w-25rem"
+                  pt={{ root: { style: { boxShadow: "unset" } } }}
                 >
-                  <p className="m-0">{props.product.description}</p>
-                  <p className="m-0">
-                    €{props.product.price} Qty: {props.product.quantity}
-                  </p>
+                  <p className="m-0 ">{props.product.description}</p>
+                  <p className="m-0 ">Quantity: {props.product.quantity} pz</p>
+                  <p className="m-0 text-right">{props.product.price}€</p>
+                  <div>
+                    Disponibilità: <Tag severity={severity} value={status} />
+                  </div>
+                </Card>
+              </Dialog>
+              <Dialog
+                // maximized
+                modal
+                visible={visibleEdit}
+                onHide={() => setVisibleEdit(false)}
+              >
+                <Card
+                  title="Edit Product Details"
+                  footer={footer}
+                  className="md:w-30rem w-40rem h-50rem text-center"
+                >
+                  <Form method="post">
+                    <div>
+                      <div className="gap-2 m-2">
+                        <p className="text-white">Set a new image URL</p>
+                        <InputText
+                          id="image"
+                          type="url"
+                          name="image"
+                          value={image}
+                          onChange={handleChange}
+                          required
+                          placeholder="Image URL"
+                          className="p-inputtext-lg"
+                        />
+                      </div>
+                      <div className="gap-2 m-2">
+                        <p className="text-white">Set a new Title</p>
+                        <InputText
+                          id="title"
+                          type="text"
+                          name="title"
+                          value={title}
+                          placeholder={props.product.title}
+                          onChange={handleChange}
+                          className="p-inputtext-lg"
+                        />
+                      </div>
+                      <div className="gap-2 m-2">
+                        <p className="text-white">Set a new Description</p>
+                        <InputText
+                          id="description"
+                          type="textarea"
+                          name="description"
+                          value={description}
+                          onChange={handleChange}
+                          placeholder={props.product.description}
+                          className="p-inputtext-lg"
+                        />
+                      </div>
+                      <div className="gap-2 m-2">
+                        <p className="text-white">Set a new Price</p>
+                        <InputNumber
+                          id="price"
+                          name="price"
+                          mode="currency"
+                          value={price}
+                          currency="EUR"
+                          locale="it-IT"
+                          placeholder={props.product.price.toString()}
+                          required
+                          onValueChange={handleNumberChange}
+                          className="p-inputtext-lg"
+                        />
+                      </div>
+                      <div className="gap-2 m-2 ">
+                        <p className="text-white">Set a new Quantity</p>
+                        <InputNumber
+                          id="quantity"
+                          name="quantity"
+                          value={quantity}
+                          placeholder={props.product.quantity.toString()}
+                          onValueChange={handleNumberChange}
+                          className="p-inputtext-lg"
+                        />
+                      </div>
+                      <div className="gap-2 m-2">
+                        <p className="text-white">
+                          Set a new Estimated Completed Time
+                        </p>
+                        <InputNumber
+                          id="estimatedCompletedTime"
+                          name="estimatedCompletedTime"
+                          value={estimatedCompletedTime}
+                          placeholder={props.product.estimatedCompletedTime.toString()}
+                          onValueChange={handleNumberChange}
+                          className="p-inputtext-lg"
+                        />
+                      </div>
+                    </div>
+                  </Form>
                 </Card>
               </Dialog>
             </span>
