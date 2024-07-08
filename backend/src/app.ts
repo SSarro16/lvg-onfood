@@ -8,15 +8,17 @@ import productsNewRoutes from "./routes/v2/products";
 import authNewRoutes from "./routes/v2/auth";
 
 import { GenericError } from "./util/errors";
+import colorfulText from "./util/colorfulText";
+
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   // add some color to console.log
-  const method = `\x1b[36m${req.method}\x1b[0m`; // Cyan color
-  const path = `\x1b[33m${req.path}\x1b[0m`; // Yellow color
-  const body = `\x1b[32m${JSON.stringify(req.body)}\x1b[0m`; // Green color
+  const method = colorfulText(req.method, "cyan");
+  const path = colorfulText(req.path, "yellow");
+  const body = colorfulText(JSON.stringify(req.body), "green");
   console.log(`Request [${method}] ${path} ${body}`);
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -50,3 +52,5 @@ app.use(
 );
 
 app.listen(8080);
+
+console.log(`${colorfulText("[OK]", "green")} Server started at ${colorfulText("http://localhost:8080", "magenta")}`);
