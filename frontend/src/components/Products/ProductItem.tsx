@@ -251,18 +251,21 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
 
   let severity: "success" | "info" | "warning" | "danger" | null | undefined;
   let status: string;
+  let icon: string;
   let borderItem =
     "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round surface-900";
 
   if (props.product.quantity > 0) {
     severity = "success";
     status = "Disponibile";
+    icon = "pi pi-check";
   } else if (
     props.product.quantity === 0 &&
     props.product.estimatedCompletedTime === 0
   ) {
     severity = "danger";
     status = "Esaurito";
+    icon = "pi pi-times";
     borderItem =
       "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-black-alpha-80";
   } else if (
@@ -271,6 +274,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   ) {
     severity = "warning";
     status = "In Produzione";
+    icon = "pi pi-wrench";
     borderItem =
       "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-orange-600";
   }
@@ -333,6 +337,8 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   );
 
   const gridItem = () => {
+    const shouldShowTag = props.product.quantity > 0;
+
     return (
       <div
         className="m-2 gap-2 align-items-stretch w-14rem grid "
@@ -345,10 +351,13 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
           <div className="text-xl text-100 text-center font-bold">
             {props.product.title}
           </div>
-          <div className="flex flex-wrap text-center justify-content-center m-2 pt-1">
-            <Tag severity={severity} value={status} />
+          <div className="flex flex-wrap text-center justify-content-center m-2 pt-1 gap-2">
+            <Tag severity={severity} value={status} icon={icon} rounded />
+            {props.product.quantity > 0 && props.product.quantity <= 4 && (
+              <Tag severity="danger" value="Quasi Terminato" rounded />
+            )}
           </div>
-          <div className="text-center h-0 py-5 ">
+          <div className="text-center h-0 py-4">
             <img
               className="max-w-9rem  border-round "
               src={props.product.image}
@@ -387,7 +396,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                   pt={{ root: { style: { boxShadow: "unset" } } }}
                 >
                   <p className="m-0 ">{props.product.description}</p>
-                  <p className="m-0 ">Quantity: {props.product.quantity} pz</p>
+                  <p className="m-0 ">Quantità: {props.product.quantity} pz</p>
                   <p className="m-0 text-right">{props.product.price}€</p>
                   <div>
                     Disponibilità: <Tag severity={severity} value={status} />
