@@ -4,13 +4,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/redux";
 import type { Product } from "../store/redux/products-slice";
 import ProductsList from "../components/Products/ProductsList";
-import { Sidebar } from "primereact/sidebar";
-import { Button } from "primereact/button";
 import { Fieldset } from "primereact/fieldset";
 
 export default function HomePage() {
   const products = useSelector((state: RootState) => state.products.products);
-  const [visibleRight, setVisibleRight] = useState(false);
   const [wipProducts, setWipProducts] = useState<Product[]>([]);
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [unavailableProducts, setUnavailableProducts] = useState<Product[]>([]);

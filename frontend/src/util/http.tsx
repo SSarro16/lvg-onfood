@@ -8,6 +8,8 @@ type ProdData = {
   image: string;
   price: number;
   description: string;
+  quantity?: number;
+  estimatedCompletedTime?: number;
 };
 
 interface Handlers {

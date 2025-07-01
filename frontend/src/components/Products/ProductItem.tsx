@@ -1,4 +1,4 @@
-import React, { FormEvent, useRef, useState } from "react";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { DataView } from "primereact/dataview";
 import { Product } from "../../store/redux/products-slice";
 import { Button } from "primereact/button";
@@ -26,6 +26,15 @@ type NewProductFormFields = {
   estimatedCompletedTime: number;
 };
 
+type ProntoFormFields = {
+  title: string;
+  image: string;
+  price: number;
+  description: string;
+  quantity: number;
+  estimatedCompletedTime: number;
+};
+
 const defaultFormFields: NewProductFormFields = {
   title: "",
   image: "",
@@ -39,6 +48,12 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   const toast = useRef<Toast>(null);
   // #PRODUCT DETAIL VISIBLE
   const [visible, setVisible] = useState(false);
+
+  // #PRONTO EDIT VISIBLE
+  const [prontoEdit, setProntoEdit] = useState(false);
+  // #PRONTO FORM FIELDS
+  const [formQty, setFormQty] = useState<ProntoFormFields>(defaultFormFields);
+
   // #PRODUCT EDIT VISIBLE
   const [visibleEdit, setVisibleEdit] = useState(false);
   // #PRODUCT FORM FIELDS
@@ -46,6 +61,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     useState<NewProductFormFields>(defaultFormFields);
   const { title, image, price, description, quantity, estimatedCompletedTime } =
     formFields;
+
   // #USE NAVIGATE
   const navigate = useNavigate();
 
@@ -106,6 +122,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   const successSavingHandler = () => {
     resetFormFields();
     setVisibleEdit(false);
+    setProntoEdit(false);
     setVisible(true);
     navigate("/");
     toast.current?.show({
@@ -167,31 +184,34 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     });
   };
 
-  let severity: "success" | "info" | "warning" | "danger" | null | undefined;
-  let status: string;
-  let borderItem =
-    "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round surface-900";
-
-  if (
-    props.product.quantity > 0 &&
-    props.product.estimatedCompletedTime === 0
-  ) {
-    severity = "success";
-    status = "Disponibile";
-  } else if (
-    props.product.quantity === 0 &&
-    props.product.estimatedCompletedTime === 0
-  ) {
-    severity = "danger";
-    status = "Esaurito";
-    borderItem =
-      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-black-alpha-80";
-  } else {
-    severity = "warning";
-    status = "In Produzione";
-    borderItem =
-      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-orange-600";
-  }
+  const pronto = () => {
+    confirmDialog({
+      tagKey: "prontoConfirm",
+      message: "Il prodotto è pronto?",
+      header: "Conferma Pronto",
+      icon: "pi pi-check-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-success",
+      acceptLabel: "Sì, imposta quantità",
+      async accept() {
+        // inizializza solo il campo quantità
+        setFormQty({
+          ...formQty,
+          quantity: props.product.quantity,
+          title: props.product.title,
+          image: props.product.image,
+          price: props.product.price,
+          description: props.product.description || "",
+          estimatedCompletedTime: 0,
+        });
+        setProntoEdit(true); // mostra il dialog per edit qty
+      },
+      reject() {
+        setVisible(false);
+        // Non fare nulla, solo chiudi
+      },
+    });
+  };
 
   const saving = () => {
     confirmDialog({
@@ -229,12 +249,39 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     });
   };
 
+  let severity: "success" | "info" | "warning" | "danger" | null | undefined;
+  let status: string;
+  let borderItem =
+    "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round surface-900";
+
+  if (props.product.quantity > 0) {
+    severity = "success";
+    status = "Disponibile";
+  } else if (
+    props.product.quantity === 0 &&
+    props.product.estimatedCompletedTime === 0
+  ) {
+    severity = "danger";
+    status = "Esaurito";
+    borderItem =
+      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-black-alpha-80";
+  } else if (
+    props.product.quantity === 0 &&
+    props.product.estimatedCompletedTime > 0
+  ) {
+    severity = "warning";
+    status = "In Produzione";
+    borderItem =
+      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-orange-600";
+  }
+
   const footer = (
     <>
       <Toast ref={toast} />
       <ConfirmDialog tagKey="deleteProduct" />
       <ConfirmDialog tagKey="editProduct" />
       <ConfirmDialog tagKey="savingProduct" />
+      <ConfirmDialog tagKey="prontoConfirm" />
       {props.token && (
         <>
           <Button
@@ -270,6 +317,16 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
             style={{ marginLeft: "0.5em" }}
             onClick={confirm2}
           ></Button>
+          {props.product.estimatedCompletedTime > 0 && (
+            <Button
+              name="Pronto"
+              label="Pronto"
+              severity="success"
+              icon="pi pi-check"
+              style={{ marginLeft: "0.5em" }}
+              onClick={pronto}
+            ></Button>
+          )}
         </>
       )}
     </>
@@ -428,6 +485,63 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
                       </div>
                     </div>
                   </Form>
+                </Card>
+              </Dialog>
+              <Dialog
+                header="Imposta nuova quantità"
+                visible={prontoEdit}
+                onHide={() => setProntoEdit(false)}
+              >
+                <Card
+                  title="Prodotto Pronto"
+                  footer={
+                    <div className="flex justify-content-end gap">
+                      <Button
+                        label="Annulla"
+                        icon="pi pi-times"
+                        className="p-button-secondary"
+                        onClick={() => setProntoEdit(false)}
+                      />
+                      <Button
+                        label="Salva"
+                        icon="pi pi-check"
+                        className="p-button-success"
+                        onClick={() => {
+                          if (props.token) {
+                            fetchUpdateProduct(
+                              props.token,
+                              props.product.id,
+                              {
+                                ...formQty,
+                                estimatedCompletedTime: 0,
+                              },
+                              { errorSavingHandler, successSavingHandler }
+                            );
+                            setProntoEdit(false);
+                          }
+                        }}
+                      />
+                    </div>
+                  }
+                >
+                  <div className="m-3">
+                    <label htmlFor="quantity" className="block text-white mb-2">
+                      Nuova quantità disponibile
+                    </label>
+                    <InputNumber
+                      id="quantity"
+                      name="quantity"
+                      value={formQty.quantity}
+                      onValueChange={(e) =>
+                        setFormQty((prev) => ({
+                          ...prev,
+                          quantity: e.value || 0,
+                        }))
+                      }
+                      showButtons
+                      className="p-inputtext-lg w-full"
+                    />
+                  </div>
                 </Card>
               </Dialog>
             </span>
