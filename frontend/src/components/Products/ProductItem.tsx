@@ -139,6 +139,42 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     </div>
   );
 
+  const saving = () => {
+    confirmDialog({
+      tagKey: "savingProduct",
+      message: "Do you want to save this edited product?",
+      header: "Save Edit Confirmation",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      acceptLabel: "Save",
+      accept() {
+        setVisible(false);
+        setVisibleEdit(false);
+        if (props.token) {
+          const bodyData: NewProductFormFields = {
+            title,
+            image,
+            price,
+            description,
+            quantity,
+            estimatedCompletedTime,
+          };
+          console.log("New Product form data: ", { bodyData });
+          fetchUpdateProduct(props.token, props.product.id, bodyData, {
+            errorSavingHandler,
+            successSavingHandler,
+          });
+          resetFormFields();
+        }
+      },
+      reject() {
+        setVisible(false);
+        resetFormFields();
+      },
+    });
+  };
+
   const confirm2 = () => {
     confirmDialog({
       tagKey: "deleteProduct",
@@ -213,38 +249,46 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     });
   };
 
-  const saving = () => {
+  const handleOutOfStock = () => {
     confirmDialog({
-      tagKey: "savingProduct",
-      message: "Do you want to save this edited product?",
-      header: "Save Edit Confirmation",
-      icon: "pi pi-info-circle",
+      tagKey: "outOfStockConfirm",
+      message: "Il prodotto è terminato?",
+      header: "Prodotto Terminato",
+      icon: "pi pi-check",
       defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      acceptLabel: "Save",
-      accept() {
-        setVisible(false);
-        setVisibleEdit(false);
-        if (props.token) {
-          const bodyData: NewProductFormFields = {
-            title,
-            image,
-            price,
-            description,
-            quantity,
-            estimatedCompletedTime,
-          };
-          console.log("New Product form data: ", { bodyData });
-          fetchUpdateProduct(props.token, props.product.id, bodyData, {
-            errorSavingHandler,
-            successSavingHandler,
-          });
-          resetFormFields();
+      acceptClassName: "p-button-success",
+      acceptLabel: "Conferma",
+      async accept() {
+        if (!props.token) return;
+
+        // Preparo i dati per aggiornare il prodotto
+        const updatedProduct = {
+          title: props.product.title,
+          image: props.product.image,
+          price: props.product.price,
+          description: props.product.description || "",
+          quantity: 0, // setto quantity a 0 perché è terminato
+          estimatedCompletedTime: props.product.estimatedCompletedTime,
+        };
+
+        try {
+          await fetchUpdateProduct(
+            props.token,
+            props.product.id,
+            updatedProduct,
+            {
+              successSavingHandler,
+              errorSavingHandler,
+            }
+          );
+          setVisible(false); // chiudi eventuale dialog
+        } catch (error) {
+          errorSavingHandler();
         }
       },
       reject() {
         setVisible(false);
-        resetFormFields();
+        // Non fare nulla, solo chiudi
       },
     });
   };
@@ -286,6 +330,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
       <ConfirmDialog tagKey="editProduct" />
       <ConfirmDialog tagKey="savingProduct" />
       <ConfirmDialog tagKey="prontoConfirm" />
+      <ConfirmDialog tagKey="outOfStockConfirm" />
       {props.token && (
         <>
           <Button
@@ -331,14 +376,22 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
               onClick={pronto}
             ></Button>
           )}
+          {props.product.quantity > 0 && (
+            <Button
+              name="Out of Stock"
+              label="OTS"
+              severity="warning"
+              icon="pi pi-times"
+              style={{ marginLeft: "0.5em" }}
+              onClick={handleOutOfStock}
+            ></Button>
+          )}
         </>
       )}
     </>
   );
 
   const gridItem = () => {
-    const shouldShowTag = props.product.quantity > 0;
-
     return (
       <div
         className="m-2 gap-2 align-items-stretch w-14rem grid "
