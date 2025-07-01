@@ -15,12 +15,6 @@ export default function HomePage() {
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [unavailableProducts, setUnavailableProducts] = useState<Product[]>([]);
 
-  const wipHeader = (
-    <div className="pl-6 ">
-      <h2>WIP Products</h2>
-    </div>
-  );
-
   useEffect(() => {
     if (typeof products === "object") {
       console.log(products);
@@ -91,36 +85,21 @@ export default function HomePage() {
         />
       </div>
       <div>
-        <div className="right-0 absolute top-50 ">
-          <Button
-            icon="pi pi-arrow-left"
-            onClick={() => setVisibleRight(true)}
-            className="gap-2"
-            severity="warning"
-          >
-            WIP
-          </Button>
-        </div>
         <section className="p-2 m-2">
-          <Fieldset legend="Lista dei Prodotti" toggleable>
+          <Fieldset legend="Disponibili" toggleable>
             <ProductsList products={availableProducts} />
           </Fieldset>
         </section>
         <section className="p-2 m-2">
-          <Fieldset legend="Prodotti Non Disponibili" toggleable>
+          <Fieldset legend="In Lavorazione" toggleable>
+            <ProductsList products={wipProducts} />
+          </Fieldset>
+        </section>
+        <section className="p-2 m-2">
+          <Fieldset legend="Non Disponibili" toggleable>
             <ProductsList products={unavailableProducts} />
           </Fieldset>
         </section>
-        <Sidebar
-          visible={visibleRight}
-          header={wipHeader}
-          className="w-7"
-          style={{display: 'block' ,overflowY: 'scroll'}}
-          position="right"
-          onHide={() => setVisibleRight(false)}
-        >
-          <ProductsList products={wipProducts} />
-        </Sidebar>
       </div>
     </>
   );
