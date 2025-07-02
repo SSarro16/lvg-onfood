@@ -5,7 +5,6 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Card } from "primereact/card";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { Toast } from "primereact/toast";
 import { fetchDeleteProduct, fetchUpdateProduct } from "../../util/http";
 import { Form, useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -13,7 +12,8 @@ import {
   InputNumber,
   InputNumberValueChangeEvent,
 } from "primereact/inputnumber";
-import { Tag, TagProps } from "primereact/tag";
+import { Tag } from "primereact/tag";
+import { useToast } from "../../store/context/toaster-context";
 
 type ProductItemProps = { product: Product; token?: string };
 
@@ -45,7 +45,7 @@ const defaultFormFields: NewProductFormFields = {
 };
 
 const ProductItem: React.FC<ProductItemProps> = (props) => {
-  const toast = useRef<Toast>(null);
+  const { showToast } = useToast();
   // #PRODUCT DETAIL VISIBLE
   const [visible, setVisible] = useState(false);
 
@@ -93,7 +93,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
 
   const successDeleteHandler = () => {
     setVisible(false);
-    toast.current?.show({
+    showToast({
       severity: "success",
       summary: "Product Deleted",
       detail: "Product deleted successfully",
@@ -103,7 +103,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
 
   const errorDeleteHandler = () => {
     setVisible(false);
-    toast.current?.show({
+    showToast({
       severity: "warn",
       summary: "Product Deletion Interrupted",
       detail: "Product deletion interrupted successfully",
@@ -112,7 +112,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   };
 
   const errorSavingHandler = () => {
-    toast.current?.show({
+    showToast({
       severity: "error",
       summary: "Edit Product Failed",
       detail: "Edit product failed !!",
@@ -125,7 +125,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     setProntoEdit(false);
     setVisible(true);
     navigate("/");
-    toast.current?.show({
+    showToast({
       severity: "success",
       summary: "Product Updated",
       detail: "Product updated successfully",
@@ -325,7 +325,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
 
   const footer = (
     <>
-      <Toast ref={toast} />
+      
       <ConfirmDialog tagKey="deleteProduct" />
       <ConfirmDialog tagKey="editProduct" />
       <ConfirmDialog tagKey="savingProduct" />

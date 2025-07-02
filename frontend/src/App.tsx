@@ -17,7 +17,7 @@ import { productsActions } from "./store/redux/products-slice";
 import { PrimeReactProvider } from "primereact/api";
 import { tokenLoader } from "./util/auth";
 import { fetchProducts } from "./util/http";
-import { Toast } from "primereact/toast";
+import { useToast } from "./store/context/toaster-context";
 
 const router = createBrowserRouter([
   {
@@ -43,7 +43,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  const toast = useRef<Toast>(null);
+  const { showToast } = useToast();
   const [isFetching, setIsFetching] = useState(false);
   const dispatch = useDispatch();
 
@@ -56,8 +56,7 @@ function App() {
     setIsFetching(true);
 
     const errorHandler = () => {
-      // TOAST
-       toast.current?.show({
+      showToast({
         severity: "error",
         summary: "Error",
         detail: "Fetching products failed",
@@ -66,7 +65,7 @@ function App() {
     };
     const successHandler = () => {
       // TOAST
-      toast.current?.show({
+      showToast({
         severity: "success",
         summary: "Success",
         detail: "Fetching products successfully",
@@ -94,7 +93,6 @@ function App() {
 
   return (
     <PrimeReactProvider>
-      <Toast ref={toast} />
       {isFetching ? (
         <LoadingPage text={"Fetching products"} />
       ) : (
