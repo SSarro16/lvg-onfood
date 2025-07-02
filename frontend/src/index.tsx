@@ -13,6 +13,7 @@ import { Provider } from "react-redux";
 import store from "./store/redux";
 import { AuthProvider } from "./store/context/auth-context";
 import { ToastProvider } from "./store/context/toaster-context";
+import LangProvider from "./store/context/lang-context";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -23,7 +24,9 @@ root.render(
       <ToastProvider>
         <Provider store={store}>
           <AuthProvider>
-            <App />
+            <LangProvider>
+              <App />
+            </LangProvider>
           </AuthProvider>
         </Provider>
       </ToastProvider>
