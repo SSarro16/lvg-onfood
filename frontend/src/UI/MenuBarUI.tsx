@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { MenuItem } from "primereact/menuitem";
 import { action as logoutAction } from "../pages/LogOut";
 import { AuthContext } from "../store/context/auth-context";
-import { Toast } from "primereact/toast";
+import { useToast } from "../store/context/toaster-context";
 
 export default function Items() {
-  const toast = useRef<Toast>(null);
+  const { showToast } = useToast();
   const { currentUser, signOut, getToken } = useContext(AuthContext);
   const [token, setToken] = useState<string | undefined>();
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ export default function Items() {
             try {
               if (token !== undefined) {
                 logoutAction(token, navigate, signOut);
-                toast.current?.show({
+                showToast({
                   severity: "success",
                   summary: "Logged out",
                   detail: "Logged out successfully",
@@ -86,7 +86,6 @@ export default function Items() {
 
   return (
     <div className="fixed sticky">
-      <Toast ref={toast} />
       <Menubar model={items} />
     </div>
   );
