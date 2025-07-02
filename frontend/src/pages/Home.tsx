@@ -5,12 +5,14 @@ import { RootState } from "../store/redux";
 import type { Product } from "../store/redux/products-slice";
 import ProductsList from "../components/Products/ProductsList";
 import { Fieldset } from "primereact/fieldset";
+import { useLang } from "../store/context/lang-context";
 
 export default function HomePage() {
   const products = useSelector((state: RootState) => state.products.products);
   const [wipProducts, setWipProducts] = useState<Product[]>([]);
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [unavailableProducts, setUnavailableProducts] = useState<Product[]>([]);
+  const {t: translate, lang} = useLang()
 
   useEffect(() => {
     if (typeof products === "object") {
@@ -75,25 +77,23 @@ export default function HomePage() {
     <>
       <div>
         <Header
-          title={"Benvenuti al LVG Online Food"}
-          message={
-            "Qui potrai prenotare e visionare tutti i prodotti offerti dal nostro servizio di gastronomia e sarai aggiornato anche sui prodotti che sono in lavorazione"
-          }
+          title={translate('title_header')}
+          message={translate('desc_header')}
         />
       </div>
       <div>
         <section className="p-2 m-2">
-          <Fieldset legend="Disponibili" toggleable>
+          <Fieldset legend={translate('product_disponible')} toggleable>
             <ProductsList products={availableProducts} />
           </Fieldset>
         </section>
         <section className="p-2 m-2">
-          <Fieldset legend="In Lavorazione" toggleable>
+          <Fieldset legend={translate('product_wip')} toggleable>
             <ProductsList products={wipProducts} />
           </Fieldset>
         </section>
         <section className="p-2 m-2">
-          <Fieldset legend="Non Disponibili" toggleable>
+          <Fieldset legend={translate('product_undisponible')} toggleable>
             <ProductsList products={unavailableProducts} />
           </Fieldset>
         </section>

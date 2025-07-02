@@ -1,14 +1,16 @@
 import React from "react";
 import Header from "../components/Header";
 import LogInForm from "../components/Form/LogInForm";
+import { useLang } from "../store/context/lang-context";
 
 const LogInPage: React.FC = () => {
+  const {t: translate, lang} = useLang()
   return (
     <>
       <div>
         <Header
           title={"Log In"}
-          message={"Inserisci email e password per autenticarti!"}
+          message={translate('login_mess')}
         />
       </div>
       <div>

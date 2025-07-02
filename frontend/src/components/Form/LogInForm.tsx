@@ -6,6 +6,7 @@ import { Password } from "primereact/password";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { useToast } from "../../store/context/toaster-context";
+import { useLang } from "../../store/context/lang-context";
 
 type FormFields = {
   email: string;
@@ -18,6 +19,7 @@ const defaultFormFields = {
 };
 
 export default function LogInForm() {
+  const { t: translate, lang } = useLang();
   const { showToast } = useToast();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
@@ -115,8 +117,8 @@ export default function LogInForm() {
           <input id="token" name="token" />
         </div>
         <div className={classes.actions}>
-          <NavLink to="/">Torna alla Home</NavLink>
-          
+          <NavLink to="/">{translate("backtohome_button")}</NavLink>
+
           <Button id="recaptcha" disabled={isSubmitting}>
             {isSubmitting ? "Submitting..." : "Log In"}
           </Button>
