@@ -42,7 +42,7 @@ const fetchBackend = async (
   });
 };
 
-const backendUrl = "https://lvg-onfood-backend.onrender.com:8080/api/v2";
+const backendUrl = "https://lvg-onfood-backend.onrender.com/api/v2";
 
 // fetch products
 const fetchProducts = async ({
