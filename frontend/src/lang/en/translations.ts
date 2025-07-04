@@ -7,7 +7,7 @@ export const translations = {
   desc_header:
     "Here you can book and view all the products offered by our gastronomy service and you will also be updated on the products that are being processed",
   product_disponible: "Available Product",
-  product_wip: "Work in Product",
+  product_wip: "Cooking Now",
   product_undisponible: "Out of Stock",
   login_mess: "Insert your email and your password for the authentication",
   backtohome_button: "Back to Home",
@@ -23,7 +23,7 @@ export const translations = {
   saving_acceptlabel: "Save",
   delete_mess: "Do you want to delete this product?",
   delete_head: "Delete Confirmation",
-  delete_label: "Delete",
+  delete_acceptlabel: "Delete",
   edit_mess: "Do you want to edit this product?",
   edit_head: "Edit Confirmation",
   edit_acceptlabel: "Edit",
