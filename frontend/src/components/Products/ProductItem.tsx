@@ -258,6 +258,8 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
       tagKey: "outOfStockConfirm",
       message: "Il prodotto è terminato?",
       header: "Prodotto Terminato",
+      
+      icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
       acceptLabel: "Conferma",
