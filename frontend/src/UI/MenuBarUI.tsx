@@ -4,13 +4,16 @@ import { useNavigate } from "react-router-dom";
 import { MenuItem } from "primereact/menuitem";
 import { action as logoutAction } from "../pages/LogOut";
 import { AuthContext } from "../store/context/auth-context";
-import { Toast } from "primereact/toast";
+import { useToast } from "../store/context/toaster-context";
+import { useLang } from "../store/context/lang-context";
+import "/node_modules/flag-icons/css/flag-icons.min.css";
 
 export default function Items() {
-  const toast = useRef<Toast>(null);
+  const { showToast } = useToast();
   const { currentUser, signOut, getToken } = useContext(AuthContext);
   const [token, setToken] = useState<string | undefined>();
   const navigate = useNavigate();
+  const { t: translate, lang, setLang } = useLang();
 
   useEffect(() => {
     console.log("MenuBar.Items.useEffect", { currentUser, token });
@@ -32,7 +35,7 @@ export default function Items() {
     },
     {
       id: "newproducts-menuitem-bar",
-      label: "New Product",
+      label: translate('new_product'),
       icon: "pi pi-plus",
       command: () => {
         navigate("/newproduct");
@@ -41,7 +44,7 @@ export default function Items() {
     },
     {
       id: "authentication",
-      label: "Authentication",
+      label: translate('authentication'),
       icon: "pi pi-users",
       items: [
         {
@@ -55,7 +58,7 @@ export default function Items() {
         },
         {
           id: "loggeduser-menuitem-bar",
-          label: "Logged User: " + currentUser?.email,
+          label: translate('logged_user') + currentUser?.email,
           icon: "pi pi-user",
           visible: !!token,
         },
@@ -68,7 +71,7 @@ export default function Items() {
             try {
               if (token !== undefined) {
                 logoutAction(token, navigate, signOut);
-                toast.current?.show({
+                showToast({
                   severity: "success",
                   summary: "Logged out",
                   detail: "Logged out successfully",
@@ -82,11 +85,33 @@ export default function Items() {
         },
       ],
     },
+    {
+      id: "translate-menuitem-bar",
+      label: translate("translate"),
+      icon: "pi pi-language",
+      items: [
+        {
+          id: "italiano-menuitem-bar",
+          label: "Italiano",
+          icon: "fi fi-it",
+          command: () => {
+            setLang("it");
+          },
+        },
+        {
+          id: "english-menuitem-bar",
+          label: "English",
+          icon: "fi fi-gb-eng",
+          command: () => {
+            setLang("en");
+          },
+        },
+      ],
+    },
   ];
 
   return (
     <div className="fixed sticky">
-      <Toast ref={toast} />
       <Menubar model={items} />
     </div>
   );

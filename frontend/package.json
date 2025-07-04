@@ -13,6 +13,7 @@
     "@types/react-dom": "^18.2.19",
     "and": "^0.0.3",
     "firebase": "^10.8.1",
+    "flag-icons": "^7.5.0",
     "npm": "^10.5.1",
     "primeflex": "^3.3.1",
     "primeicons": "^6.0.1",

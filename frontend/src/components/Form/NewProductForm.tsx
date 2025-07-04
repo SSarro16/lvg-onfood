@@ -1,18 +1,15 @@
 import React, {
-  ChangeEvent,
   FormEvent,
   useContext,
-  useRef,
   useState,
 } from "react";
 import { Form, useNavigation, Link, useNavigate } from "react-router-dom";
 import classes from "./Form.module.css";
-import { InputNumber, InputNumberProps } from "primereact/inputnumber";
-import { InputText, InputTextProps } from "primereact/inputtext";
-import { InputTextarea, InputTextareaProps } from "primereact/inputtextarea";
+import { InputNumber } from "primereact/inputnumber";
+import { InputText } from "primereact/inputtext";
 import { AuthContext } from "../../store/context/auth-context";
 import { fetchAddProduct } from "../../util/http";
-import { Toast } from "primereact/toast";
+import { useToast } from "../../store/context/toaster-context";
 
 type NewProductFormFields = {
   title: string;
@@ -29,7 +26,7 @@ const defaultFormFields: NewProductFormFields = {
 };
 
 function NewProductForm(event: any) {
-  const toast = useRef<Toast>(null);
+  const {showToast} = useToast();
   const navigation = useNavigation();
   const navigate = useNavigate();
   const isSubmitting = navigation.state === "submitting";
@@ -48,7 +45,7 @@ function NewProductForm(event: any) {
   };
 
   const errorHandler = () => {
-    toast.current?.show({
+    showToast({
       severity: "error",
       summary: "New Product Error",
       detail: "New product creation failed",
@@ -58,7 +55,7 @@ function NewProductForm(event: any) {
   const successHandler = () => {
     resetFormFields();
     navigate("/");
-    toast.current?.show({
+    showToast({
       severity: "success",
       summary: "New Product Success",
       detail: "New product creation successfully",
@@ -169,7 +166,6 @@ function NewProductForm(event: any) {
 
         <div className={classes.actions}>
           <Link to="/">Torna alla Home</Link>
-          <Toast ref={toast} />
           <button disabled={isSubmitting}>
             {isSubmitting ? "Submitting..." : "Aggiungi nuovo prodotto"}
           </button>

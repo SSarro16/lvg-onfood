@@ -2,11 +2,11 @@ import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { signInUser } from "../../vendors/firebase";
 import { Form, NavLink, useNavigate, useNavigation } from "react-router-dom";
 import classes from "./Form.module.css";
-import { getIdToken } from "firebase/auth";
 import { Password } from "primereact/password";
 import { InputText } from "primereact/inputtext";
-import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
+import { useToast } from "../../store/context/toaster-context";
+import { useLang } from "../../store/context/lang-context";
 
 type FormFields = {
   email: string;
@@ -19,9 +19,10 @@ const defaultFormFields = {
 };
 
 export default function LogInForm() {
+  const { t: translate, lang } = useLang();
+  const { showToast } = useToast();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
-  const toast = useRef<Toast>(null);
   const [isError, setIsError] = useState(false);
   const [formFields, setFormFields] = useState<FormFields>(defaultFormFields);
   const { email, password } = formFields;
@@ -41,7 +42,7 @@ export default function LogInForm() {
       if (userCredential) {
         resetFormFields();
         navigate("/");
-        toast.current?.show({
+        showToast({
           severity: "success",
           summary: "Logged in",
           detail: "Logged in successfully",
@@ -50,7 +51,7 @@ export default function LogInForm() {
       } else {
         // Handle Errors (Toasts)
         setIsError(true);
-        toast.current?.show({
+        showToast({
           severity: "error",
           summary: "Error",
           detail: "Invalid email or password",
@@ -60,7 +61,7 @@ export default function LogInForm() {
     } catch (error: any) {
       // Handle Errors (Toasts)
       setIsError(true);
-      toast.current?.show({
+      showToast({
         severity: "error",
         summary: "Error",
         detail: "Invalid email or password",
@@ -116,8 +117,8 @@ export default function LogInForm() {
           <input id="token" name="token" />
         </div>
         <div className={classes.actions}>
-          <NavLink to="/">Torna alla Home</NavLink>
-          <Toast ref={toast} />
+          <NavLink to="/">{translate("backtohome_button")}</NavLink>
+
           <Button id="recaptcha" disabled={isSubmitting}>
             {isSubmitting ? "Submitting..." : "Log In"}
           </Button>

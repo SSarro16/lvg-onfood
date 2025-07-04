@@ -12,6 +12,8 @@ import App from "./App";
 import { Provider } from "react-redux";
 import store from "./store/redux";
 import { AuthProvider } from "./store/context/auth-context";
+import { ToastProvider } from "./store/context/toaster-context";
+import LangProvider from "./store/context/lang-context";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -19,11 +21,15 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <PrimeReactProvider>
-      <Provider store={store}>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
-      </Provider>
+      <ToastProvider>
+        <Provider store={store}>
+          <AuthProvider>
+            <LangProvider>
+              <App />
+            </LangProvider>
+          </AuthProvider>
+        </Provider>
+      </ToastProvider>
     </PrimeReactProvider>
   </React.StrictMode>
 );
