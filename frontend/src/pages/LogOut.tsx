@@ -4,7 +4,7 @@ import { SignOutFunction } from "../store/context/auth-context";
 
 const action = async (token: string, navigate: NavigateFunction, signOut: SignOutFunction  ) => {
   try {
-    const response = await fetch("http://localhost:8080/auth/logout-new", {
+    const response = await fetch("https://lvg-onfood-backend.onrender.com:8080/auth/logout-new", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
