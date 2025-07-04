@@ -3,9 +3,9 @@
     "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "start:frontend": "cd frontend && npm start",
     "start:backend": "cd backend && npm start",
-    "build": "concurrently \"npm run build:frontend\" \"npm run build:backend\"",
-    "build:frontend": "cd frontend && npm run build",
-    "build:backend": "cd backend && npm run build"
+    "build": "npm i && concurrently \"npm run build:frontend\" \"npm run build:backend\"",
+    "build:frontend": "cd frontend && npm i && npm run build",
+    "build:backend": "cd backend && npm i && npm run build"
   },
   "dependencies": {
     "concurrently": "^9.2.0"
