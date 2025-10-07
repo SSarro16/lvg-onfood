@@ -4,7 +4,7 @@ import LogInForm from "../components/Form/LogInForm";
 import { useLang } from "../store/context/lang-context";
 
 const LogInPage: React.FC = () => {
-  const {t: translate, lang} = useLang()
+  const {t: translate} = useLang()
   return (
     <>
       <div>

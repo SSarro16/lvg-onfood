@@ -12,62 +12,32 @@ export default function HomePage() {
   const [wipProducts, setWipProducts] = useState<Product[]>([]);
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [unavailableProducts, setUnavailableProducts] = useState<Product[]>([]);
-  const {t: translate, lang} = useLang()
+  const { t: translate } = useLang();
 
   useEffect(() => {
-    if (typeof products === "object") {
-      console.log(products);
-      products.map((product) => {
+    if (Array.isArray(products)) {
+      products.forEach((product) => {
         if (product.quantity > 0) {
           setAvailableProducts((prevState) => {
-            const state = prevState;
-            const alrCheckedId = prevState.some((element) => {
-              if (element.id === product.id) {
-                return true;
-              }
-              return false;
-            });
-            if (alrCheckedId === true) {
-              return prevState;
-            } else {
-              state.push(product);
-              return state;
-            }
+            const exists = prevState.some((el) => el.id === product.id);
+            if (exists) return prevState;
+            return [...prevState, product];
+          });
+        } else if (
+          product.estimatedCompletedTime &&
+          product.estimatedCompletedTime > 0
+        ) {
+          setWipProducts((prevState) => {
+            const exists = prevState.some((el) => el.id === product.id);
+            if (exists) return prevState;
+            return [...prevState, product];
           });
         } else {
-          if (product.estimatedCompletedTime > 0) {
-            setWipProducts((prevState) => {
-              const state = prevState;
-              const alrCheckedId = prevState.some((element) => {
-                if (element.id === product.id) {
-                  return true;
-                }
-                return false;
-              });
-              if (alrCheckedId === true) {
-                return prevState;
-              } else {
-                state.push(product);
-                return state;
-              }
-            });
-          } else {
-            setUnavailableProducts((prevState) => {
-              const state = prevState;
-              const alrCheckedId = prevState.some((element) => {
-                if (element.id === product.id) {
-                  return true;
-                }
-                return false;
-              });
-              if (alrCheckedId === true) {
-                return prevState;
-              } else {
-                state.push(product);
-                return state;
-              }
-            });
-          }
+          setUnavailableProducts((prevState) => {
+            const exists = prevState.some((el) => el.id === product.id);
+            if (exists) return prevState;
+            return [...prevState, product];
+          });
         }
       });
     }
@@ -77,23 +47,23 @@ export default function HomePage() {
     <>
       <div>
         <Header
-          title={translate('title_header')}
-          message={translate('desc_header')}
+          title={translate("title_header")}
+          message={translate("desc_header")}
         />
       </div>
       <div>
-        <section className="p-2 m-2">
-          <Fieldset legend={translate('product_disponible')} toggleable>
+        <section className="product-list">
+          <Fieldset legend={translate("product_disponible")} toggleable>
             <ProductsList products={availableProducts} />
           </Fieldset>
         </section>
-        <section className="p-2 m-2">
-          <Fieldset legend={translate('product_wip')} toggleable>
+        <section className="product-list">
+          <Fieldset legend={translate("product_wip")} toggleable>
             <ProductsList products={wipProducts} />
           </Fieldset>
         </section>
-        <section className="p-2 m-2">
-          <Fieldset legend={translate('product_undisponible')} toggleable>
+        <section className="product-list">
+          <Fieldset legend={translate("product_undisponible")} toggleable>
             <ProductsList products={unavailableProducts} />
           </Fieldset>
         </section>

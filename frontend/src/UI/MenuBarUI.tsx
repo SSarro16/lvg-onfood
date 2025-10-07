@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Menubar } from "primereact/menubar";
 import { useNavigate } from "react-router-dom";
 import { MenuItem } from "primereact/menuitem";
@@ -6,14 +6,14 @@ import { action as logoutAction } from "../pages/LogOut";
 import { AuthContext } from "../store/context/auth-context";
 import { useToast } from "../store/context/toaster-context";
 import { useLang } from "../store/context/lang-context";
-import "/node_modules/flag-icons/css/flag-icons.min.css";
+import "flag-icons/css/flag-icons.min.css";
 
 export default function Items() {
   const { showToast } = useToast();
   const { currentUser, signOut, getToken } = useContext(AuthContext);
   const [token, setToken] = useState<string | undefined>();
   const navigate = useNavigate();
-  const { t: translate, lang, setLang } = useLang();
+  const { t: translate, setLang } = useLang();
 
   useEffect(() => {
     console.log("MenuBar.Items.useEffect", { currentUser, token });
@@ -77,8 +77,12 @@ export default function Items() {
                   detail: "Logged out successfully",
                 });
               }
-            } catch (error: any) {
-              console.log(error.message);
+            } catch (error) {
+              showToast({
+                  severity: "warn",
+                  summary: "Error",
+                  detail: `An error occured while logging out: ${error}`,
+                });
             }
           },
           visible: !!token,
@@ -111,8 +115,8 @@ export default function Items() {
   ];
 
   return (
-    <div className="fixed sticky">
-      <Menubar model={items} />
+    <div>
+      <Menubar model={items}/>
     </div>
   );
 }

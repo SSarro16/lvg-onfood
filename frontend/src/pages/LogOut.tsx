@@ -1,4 +1,3 @@
-import React from "react";
 import { NavigateFunction } from "react-router-dom";
 import { SignOutFunction } from "../store/context/auth-context";
 
@@ -19,7 +18,7 @@ const action = async (token: string, navigate: NavigateFunction, signOut: SignOu
     if (!response.ok) {
       throw "Log out non effettuato";
     }
-  } catch (error: any) {
+  } catch (error) {
     console.log(error);
   }
 

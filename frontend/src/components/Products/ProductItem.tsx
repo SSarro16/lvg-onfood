@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { DataView } from "primereact/dataview";
 import { Product } from "../../store/redux/products-slice";
 import { Button } from "primereact/button";
@@ -6,7 +6,7 @@ import { Dialog } from "primereact/dialog";
 import { Card } from "primereact/card";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { fetchDeleteProduct, fetchUpdateProduct } from "../../util/http";
-import { Form, useNavigate } from "react-router-dom";
+import { Form } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import {
   InputNumber,
@@ -15,6 +15,7 @@ import {
 import { Tag } from "primereact/tag";
 import { useToast } from "../../store/context/toaster-context";
 import { useLang } from "../../store/context/lang-context";
+import { useProducts } from "../../store/context/products-context";
 
 type ProductItemProps = { product: Product; token?: string };
 
@@ -63,11 +64,11 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   const { title, image, price, description, quantity, estimatedCompletedTime } =
     formFields;
 
-  // #USE NAVIGATE
-  const navigate = useNavigate();
+  // #REFETCH PRODUCTS CONTEXT
+  const { refetchProducts } = useProducts()
 
   // #USE LANG
-  const { t: translate, lang } = useLang();
+  const { t: translate } = useLang();
 
   const handleChange = (event: FormEvent<HTMLInputElement>) => {
     const { name, value } = event.currentTarget;
@@ -95,18 +96,18 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
     });
   };
 
-  const successDeleteHandler = () => {
-    setVisible(false);
+  const successDeleteHandler = async () => {
     showToast({
       severity: "success",
       summary: "Product Deleted",
       detail: "Product deleted successfully",
       life: 1000,
     });
+
+    await refetchProducts()
   };
 
   const errorDeleteHandler = () => {
-    setVisible(false);
     showToast({
       severity: "warn",
       summary: "Product Deletion Interrupted",
@@ -123,18 +124,17 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
       life: 3000,
     });
   };
-  const successSavingHandler = () => {
+
+  const successSavingHandler = async () => {
     resetFormFields();
-    setVisibleEdit(false);
-    setProntoEdit(false);
-    setVisible(true);
-    navigate("/");
     showToast({
       severity: "success",
       summary: "Product Updated",
       detail: "Product updated successfully",
       life: 3000,
     });
+
+    await refetchProducts()
   };
 
   const header = (
@@ -258,7 +258,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
       tagKey: "outOfStockConfirm",
       message: "Il prodotto è terminato?",
       header: "Prodotto Terminato",
-      
+
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
@@ -357,6 +357,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
             <Button
               name="Edit"
               label="Edit"
+              className="p-button"
               icon="pi pi-pencil"
               visible={visible}
               onClick={editing}
@@ -400,7 +401,7 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
   const gridItem = () => {
     return (
       <div
-        className="m-2 gap-2 align-items-stretch w-14rem grid "
+        className="m-2 align-items-stretch w-14rem grid h-24rem"
         key={props.product.id}
       >
         <div className={borderItem}>
@@ -412,9 +413,17 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
           </div>
           <div className="flex flex-wrap text-center justify-content-center m-2 pt-1 gap-2">
             <Tag severity={severity} value={status} icon={icon} rounded />
-            {props.product.quantity > 0 && props.product.quantity <= 4 && (
-              <Tag severity="danger" value={translate("tag_almots")} rounded />
-            )}
+            <Tag
+              severity="danger"
+              value={translate("tag_almots")}
+              rounded
+              style={{
+                visibility:
+                  props.product.quantity > 0 && props.product.quantity <= 4
+                    ? "visible"
+                    : "hidden",
+              }}
+            />
           </div>
           <div className="text-center h-0 py-4">
             <img
@@ -429,10 +438,20 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
             <span className="text-xl text-100 font-semibold">
               €{props.product.price}
             </span>
+            {props.product.quantity > 0 ? (
+              <Tag
+                severity="info"
+                value={`${props.product.quantity} pz`}
+                icon="pi pi-box"
+                rounded
+              />
+            ) : (
+              <></>
+            )}
             <span className="text-xl text-100 font-semibold">
               <Button
-                className="bg-white"
-                severity="success"
+                className="bg-white p-button-rounded-circle"
+                severity="help"
                 icon="pi pi-bars"
                 aria-label="details"
                 onClick={() => setVisible(true)}
