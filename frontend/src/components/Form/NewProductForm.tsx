@@ -1,8 +1,4 @@
-import React, {
-  FormEvent,
-  useContext,
-  useState,
-} from "react";
+import React, { FormEvent, useContext, useState } from "react";
 import { Form, useNavigation, Link, useNavigate } from "react-router-dom";
 import classes from "./Form.module.css";
 import { InputNumber } from "primereact/inputnumber";
@@ -10,6 +6,7 @@ import { InputText } from "primereact/inputtext";
 import { AuthContext } from "../../store/context/auth-context";
 import { fetchAddProduct } from "../../util/http";
 import { useToast } from "../../store/context/toaster-context";
+import { InputNumberValueChangeEvent } from "primereact/inputnumber";
 
 type NewProductFormFields = {
   title: string;
@@ -25,8 +22,8 @@ const defaultFormFields: NewProductFormFields = {
   description: "",
 };
 
-function NewProductForm(event: any) {
-  const {showToast} = useToast();
+function NewProductForm() {
+  const { showToast } = useToast();
   const navigation = useNavigation();
   const navigate = useNavigate();
   const isSubmitting = navigation.state === "submitting";
@@ -44,11 +41,11 @@ function NewProductForm(event: any) {
     setFormFields(defaultFormFields);
   };
 
-  const errorHandler = () => {
+  const errorHandler = (error: string) => {
     showToast({
       severity: "error",
       summary: "New Product Error",
-      detail: "New product creation failed",
+      detail: `New product creation failed: ${error}`,
       life: 3000,
     });
   };
@@ -81,9 +78,9 @@ function NewProductForm(event: any) {
   return (
     <>
       <Form
-        className={classes.form}
         method="post"
         onSubmit={newProductSubmitHandler}
+        className={classes.form}
       >
         <div className="text-center text-white">
           <h2>Aggiungi un nuovo prodotto!</h2>
@@ -138,8 +135,9 @@ function NewProductForm(event: any) {
                   locale="it-IT"
                   placeholder="Price"
                   required
-                  onValueChange={(e: any) =>
-                    setFormFields({ ...formFields, price: e.value })
+                  showButtons
+                  onValueChange={(e: InputNumberValueChangeEvent) =>
+                    setFormFields({ ...formFields, price: e.value ?? 0 })
                   }
                 />
               </div>

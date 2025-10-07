@@ -7,10 +7,10 @@ import type { HeaderComponentProps } from "./types";
 const Header: React.FC<HeaderComponentProps> = (props) => {
   return (
     <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-      <header style={{width: '50vw'}}>
-        <img src={lvglogo} />
-        <h1>{props.title}</h1>
-        <p>{props.message}</p>
+      <header className="header-content">
+        <img src={lvglogo} className="header-logo" />
+        <h1 className="header-title">{props.title}</h1>
+        <p className="header-p">{props.message}</p>
       </header>
     </div>
   );

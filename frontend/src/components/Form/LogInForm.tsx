@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
+import React, { ChangeEvent, FormEvent, useState } from "react";
 import { signInUser } from "../../vendors/firebase";
 import { Form, NavLink, useNavigate, useNavigation } from "react-router-dom";
 import classes from "./Form.module.css";
@@ -19,7 +19,7 @@ const defaultFormFields = {
 };
 
 export default function LogInForm() {
-  const { t: translate, lang } = useLang();
+  const { t: translate } = useLang();
   const { showToast } = useToast();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
@@ -58,7 +58,7 @@ export default function LogInForm() {
           life: 3000,
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle Errors (Toasts)
       setIsError(true);
       showToast({

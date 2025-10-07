@@ -22,7 +22,7 @@ const ProductsList: React.FC<ProductsListProps> = (props) => {
 
   return (
     <ol style={{ listStyleType: "none" }}>
-      <div className="flex">
+      <div className="product-list">
         {props.products.map((product) => (
           <ProductItem key={product.id} product={product} token={token} />
         ))}
