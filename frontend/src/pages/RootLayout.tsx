@@ -4,12 +4,12 @@ import Items from "../UI/MenuBarUI";
 
 function RootLayout() {
   return (
-    <>
+    <div className="lvg-shell">
       <Items />
       <main>
         <Outlet />
       </main>
-    </>
+    </div>
   );
 }
 

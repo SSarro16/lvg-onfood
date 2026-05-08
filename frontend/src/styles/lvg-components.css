@@ -1,0 +1,225 @@
+.lvg-stat {
+  padding: 1rem;
+  border: 1px solid var(--lvg-border);
+  border-radius: var(--lvg-radius-md);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--lvg-shadow-sm);
+}
+
+.lvg-stat span {
+  display: block;
+  color: var(--lvg-muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.lvg-stat strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 2rem;
+}
+
+.lvg-section {
+  margin: 2rem 0;
+}
+
+.lvg-section__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.lvg-section__header h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+}
+
+.lvg-section__header p {
+  margin: 0.35rem 0 0;
+  color: var(--lvg-muted);
+}
+
+.lvg-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: flex-end;
+}
+
+.lvg-filter {
+  border: 1px solid var(--lvg-border);
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  background: var(--lvg-surface);
+  color: var(--lvg-text-soft);
+  cursor: pointer;
+}
+
+.lvg-filter[aria-pressed="true"] {
+  background: var(--lvg-primary);
+  color: #ffffff;
+  border-color: var(--lvg-primary);
+}
+
+.lvg-product-card {
+  position: relative;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--lvg-border);
+  border-radius: var(--lvg-radius-lg);
+  background: var(--lvg-surface);
+  box-shadow: var(--lvg-shadow-sm);
+}
+
+.lvg-product-card--unavailable {
+  opacity: 0.82;
+}
+
+.lvg-product-card__image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--lvg-bg-soft);
+}
+
+.lvg-product-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.lvg-product-card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.lvg-product-card p {
+  margin: 0;
+  color: var(--lvg-text-soft);
+  line-height: 1.55;
+}
+
+.lvg-product-card__meta,
+.lvg-product-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.lvg-price {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--lvg-text);
+}
+
+.lvg-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.lvg-status--available {
+  color: var(--lvg-primary-dark);
+  background: var(--lvg-primary-soft);
+}
+
+.lvg-status--wip {
+  color: var(--lvg-warm-dark);
+  background: var(--lvg-warm-soft);
+}
+
+.lvg-status--unavailable {
+  color: var(--lvg-danger-dark);
+  background: var(--lvg-danger-soft);
+}
+
+.lvg-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--lvg-muted);
+  border: 1px dashed var(--lvg-border-strong);
+  border-radius: var(--lvg-radius-lg);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.lvg-form-card {
+  border: 1px solid var(--lvg-border);
+  border-radius: var(--lvg-radius-xl);
+  background: var(--lvg-surface);
+  box-shadow: var(--lvg-shadow-md);
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
+
+.lvg-form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.lvg-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.lvg-field label {
+  font-weight: 800;
+  color: var(--lvg-text);
+}
+
+.lvg-field small {
+  color: var(--lvg-muted);
+}
+
+.lvg-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.lvg-image-preview {
+  overflow: hidden;
+  border: 1px solid var(--lvg-border);
+  border-radius: var(--lvg-radius-md);
+  background: var(--lvg-bg-soft);
+  min-height: 180px;
+}
+
+.lvg-image-preview img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+@media (max-width: 600px) {
+  .lvg-section__header,
+  .lvg-product-card__actions,
+  .lvg-form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .lvg-filter-group {
+    justify-content: stretch;
+  }
+
+  .lvg-filter,
+  .lvg-form-actions .p-button {
+    width: 100%;
+  }
+}

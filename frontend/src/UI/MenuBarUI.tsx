@@ -7,6 +7,7 @@ import { AuthContext } from "../store/context/auth-context";
 import { useToast } from "../store/context/toaster-context";
 import { useLang } from "../store/context/lang-context";
 import "flag-icons/css/flag-icons.min.css";
+import lvglogo from "../assets/lvglogo.png";
 
 export default function Items() {
   const { showToast } = useToast();
@@ -114,9 +115,16 @@ export default function Items() {
     },
   ];
 
+  const start = (
+    <span className="lvg-brand">
+      <img src={lvglogo} alt="LVG OnFood" />
+      <span>LVG OnFood</span>
+    </span>
+  );
+
   return (
-    <div>
-      <Menubar model={items}/>
-    </div>
+    <nav className="lvg-topbar" aria-label="Navigazione principale">
+      <Menubar model={items} start={start} />
+    </nav>
   );
 }

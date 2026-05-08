@@ -1,0 +1,31 @@
+:root {
+  --lvg-bg: #fff8ed;
+  --lvg-bg-soft: #fff2dc;
+  --lvg-surface: #ffffff;
+  --lvg-surface-soft: #fffaf2;
+  --lvg-surface-dark: #1c1712;
+  --lvg-text: #1c1712;
+  --lvg-text-soft: #4c4035;
+  --lvg-muted: #7a6b5b;
+  --lvg-primary: #168a54;
+  --lvg-primary-dark: #0f5f3b;
+  --lvg-primary-soft: #e8f7ef;
+  --lvg-warm: #f59e0b;
+  --lvg-warm-dark: #b45309;
+  --lvg-warm-soft: #fff4d6;
+  --lvg-danger: #dc2626;
+  --lvg-danger-dark: #991b1b;
+  --lvg-danger-soft: #fee2e2;
+  --lvg-border: rgba(60, 43, 24, 0.12);
+  --lvg-border-strong: rgba(60, 43, 24, 0.22);
+  --lvg-shadow-sm: 0 10px 30px rgba(53, 33, 11, 0.08);
+  --lvg-shadow-md: 0 20px 60px rgba(53, 33, 11, 0.12);
+  --lvg-shadow-lg: 0 30px 90px rgba(53, 33, 11, 0.18);
+  --lvg-radius-sm: 12px;
+  --lvg-radius-md: 16px;
+  --lvg-radius-lg: 24px;
+  --lvg-radius-xl: 32px;
+  --lvg-container: 1180px;
+  --lvg-font: "Inter", "Segoe UI", system-ui, sans-serif;
+  --lvg-display: "Playfair Display", Georgia, serif;
+}

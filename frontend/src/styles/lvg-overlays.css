@@ -1,0 +1,80 @@
+.lvg-loading,
+.lvg-error {
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.lvg-loading--page,
+.lvg-error--page {
+  min-height: 100vh;
+}
+
+.lvg-loading--inline,
+.lvg-error--inline {
+  min-height: 220px;
+}
+
+.lvg-loading__card,
+.lvg-error__card {
+  width: min(100%, 440px);
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+  text-align: center;
+  border: 1px solid var(--lvg-border);
+  border-radius: var(--lvg-radius-xl);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--lvg-shadow-md);
+  padding: 2rem;
+  backdrop-filter: blur(14px);
+}
+
+.lvg-loading__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--lvg-primary);
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.lvg-loading__spinner {
+  width: 54px;
+  height: 54px;
+}
+
+.lvg-loading h2,
+.lvg-error h2 {
+  margin: 0;
+  color: var(--lvg-text);
+}
+
+.lvg-loading p,
+.lvg-error p {
+  margin: 0.45rem 0 0;
+  color: var(--lvg-text-soft);
+  line-height: 1.55;
+}
+
+.lvg-error__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  color: var(--lvg-danger-dark);
+  background: var(--lvg-danger-soft);
+  font-size: 1.4rem;
+}
+
+.lvg-error pre {
+  max-width: 100%;
+  overflow: auto;
+  padding: 0.75rem;
+  border-radius: var(--lvg-radius-sm);
+  background: var(--lvg-bg-soft);
+  text-align: left;
+}

@@ -1,0 +1,128 @@
+.p-menubar {
+  border: 1px solid var(--lvg-border);
+  border-radius: var(--lvg-radius-lg);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--lvg-shadow-sm);
+  backdrop-filter: blur(14px);
+  padding: 0.55rem 0.75rem;
+}
+
+.p-menubar .p-menuitem-link {
+  border-radius: 999px;
+}
+
+.p-button {
+  border-radius: 999px;
+  font-weight: 800;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.p-button:not(.p-button-text):not(.p-button-outlined) {
+  background: var(--lvg-primary);
+  border-color: var(--lvg-primary);
+}
+
+.p-button.p-button-danger {
+  background: var(--lvg-danger);
+  border-color: var(--lvg-danger);
+}
+
+.p-button.p-button-warning {
+  background: var(--lvg-warm);
+  border-color: var(--lvg-warm);
+  color: var(--lvg-text);
+}
+
+.p-button.p-button-secondary,
+.p-button.p-button-outlined {
+  background: var(--lvg-surface);
+  border-color: var(--lvg-border-strong);
+  color: var(--lvg-text);
+}
+
+.p-inputtext,
+.p-inputnumber,
+.p-password,
+.p-inputtextarea {
+  width: 100%;
+}
+
+.p-inputtext,
+.p-password-input,
+.p-inputnumber-input,
+.p-inputtextarea {
+  border-color: var(--lvg-border-strong);
+  border-radius: var(--lvg-radius-sm);
+  color: var(--lvg-text);
+}
+
+.p-dialog {
+  width: min(92vw, 620px);
+  border-radius: var(--lvg-radius-xl);
+  overflow: hidden;
+  box-shadow: var(--lvg-shadow-lg);
+}
+
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-content,
+.p-dialog .p-dialog-footer {
+  background: var(--lvg-surface);
+  color: var(--lvg-text);
+}
+
+.p-confirm-dialog .p-dialog-content {
+  line-height: 1.55;
+}
+
+.p-card {
+  border-radius: var(--lvg-radius-lg);
+  box-shadow: none;
+}
+
+.p-card .p-card-body {
+  padding: 0;
+}
+
+.p-toast .p-toast-message {
+  border-radius: var(--lvg-radius-md);
+  box-shadow: var(--lvg-shadow-md);
+}
+
+.p-fieldset {
+  border-color: var(--lvg-border);
+  border-radius: var(--lvg-radius-lg);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.p-fieldset .p-fieldset-legend {
+  border: 0;
+  border-radius: 999px;
+  background: var(--lvg-surface);
+  color: var(--lvg-text);
+  box-shadow: var(--lvg-shadow-sm);
+}
+
+@media (max-width: 600px) {
+  .p-menubar {
+    border-radius: var(--lvg-radius-md);
+  }
+
+  .p-dialog,
+  .p-confirm-dialog {
+    width: 94vw;
+    max-width: 94vw;
+  }
+
+  .p-dialog .p-dialog-footer,
+  .p-confirm-dialog .p-dialog-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .p-dialog .p-dialog-footer .p-button,
+  .p-confirm-dialog .p-dialog-footer .p-button {
+    width: 100%;
+  }
+}
