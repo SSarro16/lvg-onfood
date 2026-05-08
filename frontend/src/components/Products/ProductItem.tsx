@@ -1,25 +1,16 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useMemo, useState } from "react";
 import { Product } from "../../store/redux/products-slice";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { fetchDeleteProduct, fetchUpdateProduct } from "../../util/http";
-import { InputText } from "primereact/inputtext";
-import {
-  InputNumber,
-  InputNumberValueChangeEvent,
-} from "primereact/inputnumber";
-import { InputTextarea } from "primereact/inputtextarea";
 import { useToast } from "../../store/context/toaster-context";
-import { useLang } from "../../store/context/lang-context";
 import { useProducts } from "../../store/context/products-context";
-import {
-  getProductStatus,
-  getProductStatusIcon,
-  getProductStatusLabel,
-} from "../../util/productStatus";
+import { getProductStatusMeta } from "../../util/productStatus";
 import lvglogo from "../../assets/lvglogo.png";
+import LvgBadge from "../UI/LvgBadge";
+import LvgErrorOverlay from "../UI/LvgErrorOverlay";
+import LvgIcon from "../UI/LvgIcon";
 import LvgLoadingOverlay from "../UI/LvgLoadingOverlay";
+import LvgModalShell from "../UI/LvgModalShell";
+import LvgQuantityStepper from "../UI/LvgQuantityStepper";
 
 type ProductItemProps = { product: Product; token?: string };
 
@@ -32,14 +23,9 @@ type ProductFormFields = {
   estimatedCompletedTime: number;
 };
 
-const emptyFormFields: ProductFormFields = {
-  title: "",
-  image: "",
-  price: 0,
-  description: "",
-  quantity: 0,
-  estimatedCompletedTime: 0,
-};
+type ActiveOverlay = "detail" | "edit" | "ready" | "unavailable" | "delete" | null;
+
+const fallbackCategory = "Gastronomia";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("it-IT", {
@@ -56,23 +42,47 @@ const productToFormFields = (product: Product): ProductFormFields => ({
   estimatedCompletedTime: product.estimatedCompletedTime ?? 0,
 });
 
+const closeErrorCopy =
+  "Non siamo riusciti a completare l'operazione. Riprova tra qualche secondo.";
+
 const ProductItem: React.FC<ProductItemProps> = ({ product, token }) => {
   const { showToast } = useToast();
   const { refetchProducts } = useProducts();
-  const { t: translate } = useLang();
-  const [detailVisible, setDetailVisible] = useState(false);
-  const [editVisible, setEditVisible] = useState(false);
-  const [readyVisible, setReadyVisible] = useState(false);
+  const [activeOverlay, setActiveOverlay] = useState<ActiveOverlay>(null);
   const [isBusy, setIsBusy] = useState(false);
-  const [formFields, setFormFields] = useState<ProductFormFields>(emptyFormFields);
-  const [readyQuantity, setReadyQuantity] = useState(product.quantity ?? 0);
+  const [error, setError] = useState<string | null>(null);
+  const [lastAction, setLastAction] = useState<(() => Promise<void>) | null>(null);
+  const [formFields, setFormFields] = useState<ProductFormFields>(() =>
+    productToFormFields(product)
+  );
+  const [readyQuantity, setReadyQuantity] = useState(
+    Math.max(product.quantity ?? 0, 1)
+  );
 
-  const status = getProductStatus(product);
-  const statusLabel = getProductStatusLabel(status);
+  const statusMeta = useMemo(() => getProductStatusMeta(product), [product]);
+  const formStatusMeta = useMemo(
+    () => getProductStatusMeta(formFields),
+    [formFields]
+  );
   const hasToken = Boolean(token);
   const description = product.description || "Descrizione non disponibile.";
   const quantity = product.quantity ?? 0;
-  const estimatedCompletedTime = product.estimatedCompletedTime ?? 0;
+  const eta = product.estimatedCompletedTime ?? 0;
+
+  const openOverlay = (overlay: ActiveOverlay) => {
+    setError(null);
+    if (overlay === "edit") {
+      setFormFields(productToFormFields(product));
+    }
+    if (overlay === "ready") {
+      setReadyQuantity(Math.max(quantity, 1));
+    }
+    setActiveOverlay(overlay);
+  };
+
+  const closeOverlay = () => {
+    if (!isBusy) setActiveOverlay(null);
+  };
 
   const handleTextChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -86,406 +96,463 @@ const ProductItem: React.FC<ProductItemProps> = ({ product, token }) => {
       ProductFormFields,
       "price" | "quantity" | "estimatedCompletedTime"
     >,
-    event: InputNumberValueChangeEvent
+    value: string
   ) => {
     setFormFields((prevState) => ({
       ...prevState,
-      [name]: event.value ?? 0,
+      [name]: Number(value) || 0,
     }));
   };
 
-  const successSavingHandler = async () => {
-    setIsBusy(false);
-    setEditVisible(false);
-    setReadyVisible(false);
-    setDetailVisible(false);
-    await refetchProducts();
-    showToast({
-      severity: "success",
-      summary: "Banco aggiornato",
-      detail: "Il prodotto e stato salvato correttamente.",
-      life: 2500,
-    });
-  };
-
-  const errorSavingHandler = () => {
-    setIsBusy(false);
-    showToast({
-      severity: "error",
-      summary: "Salvataggio non riuscito",
-      detail: "Non siamo riusciti a salvare il prodotto. Riprova.",
-      life: 3000,
-    });
-  };
-
-  const successDeleteHandler = async () => {
-    setIsBusy(false);
-    setDetailVisible(false);
-    await refetchProducts();
-    showToast({
-      severity: "success",
-      summary: "Prodotto eliminato",
-      detail: "Il banco e stato aggiornato.",
-      life: 2500,
-    });
-  };
-
-  const errorDeleteHandler = () => {
-    setIsBusy(false);
-    showToast({
-      severity: "error",
-      summary: "Eliminazione non riuscita",
-      detail: "Non siamo riusciti a eliminare il prodotto. Riprova.",
-      life: 3000,
-    });
-  };
-
-  const saveProduct = async (bodyData: ProductFormFields) => {
+  const runUpdate = async (
+    bodyData: ProductFormFields,
+    successMessage: string,
+    nextOverlay: ActiveOverlay = null
+  ) => {
     if (!token) return;
+    const action = async () => runUpdate(bodyData, successMessage, nextOverlay);
+    setLastAction(() => action);
     setIsBusy(true);
+    setError(null);
     await fetchUpdateProduct(token, product.id, bodyData, {
-      errorSavingHandler,
-      successSavingHandler,
-    });
-  };
-
-  const openEditConfirmation = () => {
-    confirmDialog({
-      tagKey: "editProduct",
-      message: translate("edit_mess"),
-      header: translate("edit_head"),
-      icon: "pi pi-pencil",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-warning",
-      acceptLabel: translate("edit_acceptlabel"),
-      accept: () => {
-        setFormFields(productToFormFields(product));
-        setEditVisible(true);
-        setDetailVisible(false);
+      errorSavingHandler: (message) => {
+        setError(message);
+        setIsBusy(false);
       },
-    });
-  };
-
-  const openSaveConfirmation = () => {
-    confirmDialog({
-      tagKey: "savingProduct",
-      message: translate("saving_mess"),
-      header: translate("saving_head"),
-      icon: "pi pi-save",
-      defaultFocus: "reject",
-      acceptLabel: translate("saving_acceptlabel"),
-      accept: () => saveProduct(formFields),
-    });
-  };
-
-  const openDeleteConfirmation = () => {
-    confirmDialog({
-      tagKey: "deleteProduct",
-      message: translate("delete_mess"),
-      header: translate("delete_head"),
-      icon: "pi pi-trash",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      acceptLabel: translate("delete_acceptlabel"),
-      accept: async () => {
-        if (!token) return;
-        setIsBusy(true);
-        await fetchDeleteProduct(token, product.id, {
-          errorDeleteHandler,
-          successDeleteHandler,
+      successSavingHandler: async () => {
+        await refetchProducts();
+        setIsBusy(false);
+        setActiveOverlay(nextOverlay);
+        showToast({
+          severity: "success",
+          summary: "Banco aggiornato",
+          detail: successMessage,
+          life: 2500,
         });
       },
     });
   };
 
-  const openReadyConfirmation = () => {
-    confirmDialog({
-      tagKey: "prontoConfirm",
-      message: translate("pronto_mess"),
-      header: translate("pronto_head"),
-      icon: "pi pi-check-circle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-success",
-      acceptLabel: translate("pronto_acceptlabel"),
-      accept: () => {
-        setReadyQuantity(Math.max(quantity, 1));
-        setReadyVisible(true);
+  const runDelete = async () => {
+    if (!token) return;
+    const action = async () => runDelete();
+    setLastAction(() => action);
+    setIsBusy(true);
+    setError(null);
+    await fetchDeleteProduct(token, product.id, {
+      errorDeleteHandler: (message) => {
+        setError(message);
+        setIsBusy(false);
+      },
+      successDeleteHandler: async () => {
+        await refetchProducts();
+        setIsBusy(false);
+        setActiveOverlay(null);
+        showToast({
+          severity: "success",
+          summary: "Prodotto eliminato",
+          detail: "Il banco e stato aggiornato.",
+          life: 2500,
+        });
       },
     });
   };
 
-  const openOutOfStockConfirmation = () => {
-    confirmDialog({
-      tagKey: "outOfStockConfirm",
-      message: "Vuoi segnare questo prodotto come terminato?",
-      header: "Prodotto terminato",
-      icon: "pi pi-exclamation-triangle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      acceptLabel: "Conferma",
-      accept: () =>
-        saveProduct({
-          ...productToFormFields(product),
-          quantity: 0,
-          estimatedCompletedTime: 0,
-        }),
-    });
-  };
-
   const adminActions = hasToken ? (
-    <div className="lvg-product-card__actions">
-      <Button
-        label="Modifica"
-        icon="pi pi-pencil"
-        outlined
-        onClick={openEditConfirmation}
-      />
-      <Button
-        label={translate("delete_button")}
-        icon="pi pi-trash"
-        severity="danger"
-        outlined
-        onClick={openDeleteConfirmation}
-      />
-      {estimatedCompletedTime > 0 && (
-        <Button
-          label={translate("pronto_button")}
-          icon="pi pi-check"
-          severity="success"
-          onClick={openReadyConfirmation}
-        />
-      )}
-      {quantity > 0 && (
-        <Button
-          label="Terminato"
-          icon="pi pi-times"
-          severity="warning"
-          onClick={openOutOfStockConfirmation}
-        />
-      )}
+    <div className="lvg-overlay-actions">
+      <button className="lvg-action-button" type="button" onClick={() => openOverlay("edit")}>
+        <LvgIcon name="edit" />
+        Modifica
+      </button>
+      <button className="lvg-action-button" type="button" onClick={() => openOverlay("ready")}>
+        <LvgIcon name="check" />
+        Segna pronto
+      </button>
+      <button
+        className="lvg-action-button lvg-action-button--warn"
+        type="button"
+        onClick={() => openOverlay("unavailable")}
+      >
+        <LvgIcon name="x" />
+        Termina
+      </button>
+      <button
+        className="lvg-action-button lvg-action-button--danger"
+        type="button"
+        onClick={() => openOverlay("delete")}
+      >
+        <LvgIcon name="trash" />
+        Elimina
+      </button>
     </div>
   ) : null;
 
   return (
     <>
-      <ConfirmDialog tagKey="deleteProduct" />
-      <ConfirmDialog tagKey="editProduct" />
-      <ConfirmDialog tagKey="savingProduct" />
-      <ConfirmDialog tagKey="prontoConfirm" />
-      <ConfirmDialog tagKey="outOfStockConfirm" />
-
-      <article className={`lvg-product-card lvg-product-card--${status}`}>
-        <img
-          className="lvg-product-card__image"
-          src={product.image || lvglogo}
-          alt={product.title || "Prodotto gastronomia LVG"}
-          onError={(event) => {
-            event.currentTarget.src = lvglogo;
-          }}
-        />
-        <div className="lvg-product-card__body">
-          <span className={`lvg-status lvg-status--${status}`}>
-            <i className={getProductStatusIcon(status)} aria-hidden="true" />
-            {statusLabel}
-          </span>
-          <div>
-            <h3>{product.title}</h3>
-            <p>{description}</p>
-          </div>
-          {status === "wip" && (
-            <strong className="lvg-status lvg-status--wip">
-              Pronto tra {estimatedCompletedTime} min
-            </strong>
-          )}
-          <div className="lvg-product-card__meta">
-            <span className="lvg-price">{formatPrice(product.price)}</span>
-            <span>{quantity > 0 ? `${quantity} pz disponibili` : "Non disponibile"}</span>
-          </div>
-          <Button
-            label="Vedi dettaglio"
-            icon="pi pi-eye"
-            onClick={() => setDetailVisible(true)}
+      <article className={`lvg-product-card lvg-product-card--${statusMeta.status}`}>
+        <div className="lvg-product-card__media">
+          <img
+            src={product.image || lvglogo}
+            alt={`Foto di ${product.title || "prodotto gastronomia LVG"}`}
+            onError={(event) => {
+              event.currentTarget.src = lvglogo;
+            }}
           />
+          <div className="lvg-product-card__shade" aria-hidden="true" />
+          <LvgBadge tone={statusMeta.badge} icon={statusMeta.icon}>
+            {statusMeta.label}
+          </LvgBadge>
+          <div className="lvg-product-card__overlay">
+            <span className="lvg-product-card__category">{fallbackCategory}</span>
+            <div className="lvg-product-card__title-row">
+              <h3>{product.title}</h3>
+              <span className="lvg-price">{formatPrice(product.price)}</span>
+            </div>
+          </div>
+        </div>
+        <div className="lvg-product-card__body">
+          <p>{description}</p>
+          <div className="lvg-product-card__quantity">
+            <span>
+              <small>Quantita</small>
+              <strong>{quantity} pz</strong>
+            </span>
+            {statusMeta.status === "wip" && eta > 0 && <em>{eta} min</em>}
+          </div>
+          <button className="lvg-card-cta" type="button" onClick={() => openOverlay("detail")}>
+            {statusMeta.cta}
+          </button>
         </div>
       </article>
 
-      <Dialog
-        header={product.title}
-        visible={detailVisible}
-        modal
-        onHide={() => setDetailVisible(false)}
-        footer={adminActions}
-      >
-        {isBusy && (
-          <LvgLoadingOverlay
-            variant="inline"
-            title="Aggiorno il prodotto..."
-            message="Il banco verra ricaricato tra un momento."
-          />
-        )}
-        {!isBusy && (
-          <div className="lvg-form-grid">
-            <img
-              className="lvg-product-card__image"
-              src={product.image || lvglogo}
-              alt={product.title}
-              onError={(event) => {
-                event.currentTarget.src = lvglogo;
-              }}
-            />
-            <span className={`lvg-status lvg-status--${status}`}>
-              <i className={getProductStatusIcon(status)} aria-hidden="true" />
-              {statusLabel}
-            </span>
-            <p>{description}</p>
-            <div className="lvg-product-card__meta">
-              <strong>{formatPrice(product.price)}</strong>
-              <span>Quantita: {quantity} pz</span>
+      {activeOverlay === "detail" && (
+        <LvgModalShell onClose={closeOverlay} labelledBy={`detail-title-${product.id}`}>
+          <div className="lvg-detail-overlay">
+            <div className="lvg-detail-visual">
+              <img
+                src={product.image || lvglogo}
+                alt={`Foto di ${product.title}`}
+                onError={(event) => {
+                  event.currentTarget.src = lvglogo;
+                }}
+              />
+              <div className="lvg-detail-visual__shade" aria-hidden="true" />
+              <div className="lvg-detail-visual__content">
+                <LvgBadge tone={statusMeta.badge} icon={statusMeta.icon}>
+                  {statusMeta.detailLabel}
+                </LvgBadge>
+                <span>{fallbackCategory}</span>
+                <h2 id={`detail-title-${product.id}`}>{product.title}</h2>
+              </div>
+            </div>
+            <div className="lvg-detail-content">
+              <span className="lvg-eyebrow">Dettaglio prodotto</span>
+              <h3>{statusMeta.title}</h3>
+              <p>{statusMeta.message}</p>
+              <div className="lvg-price-box">
+                <span>Prezzo al banco</span>
+                <strong>{formatPrice(product.price)}</strong>
+              </div>
+              <p className="lvg-detail-description">{description}</p>
+              <div className="lvg-info-grid">
+                <InfoCard label="Quantita" value={`${quantity} pz`} />
+                <InfoCard label="Attesa" value={eta > 0 ? `${eta} min` : "Ora"} />
+                <InfoCard label="Reparto" value={fallbackCategory} />
+              </div>
+              <div className="lvg-status-panel">
+                <LvgBadge tone={statusMeta.badge} icon={statusMeta.icon}>
+                  Stato banco
+                </LvgBadge>
+                <strong>{statusMeta.detailLabel}</strong>
+                <p>{statusMeta.message}</p>
+              </div>
+              {adminActions}
             </div>
           </div>
-        )}
-      </Dialog>
+        </LvgModalShell>
+      )}
 
-      <Dialog
-        header="Modifica prodotto"
-        visible={editVisible}
-        modal
-        onHide={() => setEditVisible(false)}
-        footer={
-          <div className="lvg-form-actions">
-            <Button
-              label="Annulla"
-              icon="pi pi-times"
-              severity="secondary"
-              outlined
-              onClick={() => setEditVisible(false)}
-            />
-            <Button
-              label="Salva"
-              icon="pi pi-check"
-              onClick={openSaveConfirmation}
-              loading={isBusy}
-            />
+      {activeOverlay === "edit" && (
+        <LvgModalShell onClose={closeOverlay} labelledBy={`edit-title-${product.id}`}>
+          <div className="lvg-edit-overlay">
+            <div className="lvg-edit-form">
+              <span className="lvg-eyebrow">Admin banco</span>
+              <h2 id={`edit-title-${product.id}`}>Modifica prodotto</h2>
+              <p>
+                Aggiorna informazioni, disponibilita e tempi senza cambiare il
+                significato del prodotto nel dataset.
+              </p>
+              <ProductField id={`title-${product.id}`} label="Titolo">
+                <input
+                  id={`title-${product.id}`}
+                  name="title"
+                  value={formFields.title}
+                  onChange={handleTextChange}
+                />
+              </ProductField>
+              <ProductField id={`price-${product.id}`} label="Prezzo (EUR)">
+                <input
+                  id={`price-${product.id}`}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formFields.price}
+                  onChange={(event) => handleNumberChange("price", event.target.value)}
+                />
+              </ProductField>
+              <div className="lvg-form-row">
+                <ProductField id={`quantity-${product.id}`} label="Quantita disponibile">
+                  <input
+                    id={`quantity-${product.id}`}
+                    type="number"
+                    min="0"
+                    value={formFields.quantity}
+                    onChange={(event) =>
+                      handleNumberChange("quantity", event.target.value)
+                    }
+                  />
+                </ProductField>
+                <ProductField id={`eta-${product.id}`} label="Tempo stimato (minuti)">
+                  <input
+                    id={`eta-${product.id}`}
+                    type="number"
+                    min="0"
+                    value={formFields.estimatedCompletedTime}
+                    onChange={(event) =>
+                      handleNumberChange("estimatedCompletedTime", event.target.value)
+                    }
+                  />
+                </ProductField>
+              </div>
+              <ProductField id={`description-${product.id}`} label="Descrizione">
+                <textarea
+                  id={`description-${product.id}`}
+                  name="description"
+                  rows={4}
+                  value={formFields.description}
+                  onChange={handleTextChange}
+                />
+              </ProductField>
+              <ProductField id={`image-${product.id}`} label="URL immagine">
+                <input
+                  id={`image-${product.id}`}
+                  name="image"
+                  type="url"
+                  value={formFields.image}
+                  onChange={handleTextChange}
+                />
+              </ProductField>
+              <div className="lvg-modal-footer">
+                <button className="lvg-cta lvg-cta--secondary" type="button" onClick={closeOverlay}>
+                  Annulla
+                </button>
+                <button
+                  className="lvg-cta lvg-cta--primary"
+                  type="button"
+                  onClick={() =>
+                    runUpdate(formFields, "Il prodotto e stato salvato correttamente.")
+                  }
+                >
+                  Salva modifiche
+                </button>
+              </div>
+            </div>
+            <div className="lvg-edit-preview">
+              <img
+                src={formFields.image || lvglogo}
+                alt={`Anteprima di ${formFields.title || product.title}`}
+                onError={(event) => {
+                  event.currentTarget.src = lvglogo;
+                }}
+              />
+              <button
+                className="lvg-action-button"
+                type="button"
+                onClick={() => document.getElementById(`image-${product.id}`)?.focus()}
+              >
+                <LvgIcon name="upload" />
+                Cambia immagine
+              </button>
+              <div className="lvg-status-panel">
+                <span className="lvg-eyebrow">Stato attuale</span>
+                <LvgBadge tone={formStatusMeta.badge} icon={formStatusMeta.icon}>
+                  {formStatusMeta.detailLabel}
+                </LvgBadge>
+                <div className="lvg-info-grid lvg-info-grid--compact">
+                  <InfoCard label="Quantita" value={`${formFields.quantity} pz`} />
+                  <InfoCard
+                    label="Tempo"
+                    value={
+                      formFields.estimatedCompletedTime > 0
+                        ? `${formFields.estimatedCompletedTime} min`
+                        : "Ora"
+                    }
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-        }
-      >
-        <div className="lvg-form-grid">
-          <div className="lvg-field">
-            <label htmlFor={`image-${product.id}`}>Immagine</label>
-            <InputText
-              id={`image-${product.id}`}
-              name="image"
-              type="url"
-              value={formFields.image}
-              onChange={handleTextChange}
-              required
-            />
-          </div>
-          <div className="lvg-field">
-            <label htmlFor={`title-${product.id}`}>Titolo</label>
-            <InputText
-              id={`title-${product.id}`}
-              name="title"
-              value={formFields.title}
-              onChange={handleTextChange}
-              required
-            />
-          </div>
-          <div className="lvg-field">
-            <label htmlFor={`description-${product.id}`}>Descrizione</label>
-            <InputTextarea
-              id={`description-${product.id}`}
-              name="description"
-              value={formFields.description}
-              onChange={handleTextChange}
-              rows={4}
-              autoResize
-            />
-          </div>
-          <div className="lvg-field">
-            <label htmlFor={`price-${product.id}`}>Prezzo</label>
-            <InputNumber
-              inputId={`price-${product.id}`}
-              value={formFields.price}
-              mode="currency"
-              currency="EUR"
-              locale="it-IT"
-              onValueChange={(event) => handleNumberChange("price", event)}
-              required
-            />
-          </div>
-          <div className="lvg-field">
-            <label htmlFor={`quantity-${product.id}`}>Quantita</label>
-            <InputNumber
-              inputId={`quantity-${product.id}`}
-              value={formFields.quantity}
-              showButtons
-              min={0}
-              onValueChange={(event) => handleNumberChange("quantity", event)}
-            />
-          </div>
-          <div className="lvg-field">
-            <label htmlFor={`estimated-${product.id}`}>Tempo stimato</label>
-            <InputNumber
-              inputId={`estimated-${product.id}`}
-              value={formFields.estimatedCompletedTime}
-              suffix=" min"
-              min={0}
-              showButtons
-              onValueChange={(event) =>
-                handleNumberChange("estimatedCompletedTime", event)
-              }
-            />
-          </div>
-        </div>
-      </Dialog>
+        </LvgModalShell>
+      )}
 
-      <Dialog
-        header="Imposta nuova quantita"
-        visible={readyVisible}
-        modal
-        onHide={() => setReadyVisible(false)}
-        footer={
-          <div className="lvg-form-actions">
-            <Button
-              label="Annulla"
-              icon="pi pi-times"
-              severity="secondary"
-              outlined
-              onClick={() => setReadyVisible(false)}
-            />
-            <Button
-              label="Salva"
-              icon="pi pi-check"
-              loading={isBusy}
-              onClick={() =>
-                saveProduct({
-                  ...productToFormFields(product),
-                  quantity: readyQuantity,
-                  estimatedCompletedTime: 0,
-                })
-              }
-            />
+      {activeOverlay === "ready" && (
+        <LvgModalShell size="medium" onClose={closeOverlay} labelledBy={`ready-title-${product.id}`}>
+          <div className="lvg-confirm-overlay lvg-confirm-overlay--success">
+            <LvgBadge tone="success" icon="check">Banco live</LvgBadge>
+            <h2 id={`ready-title-${product.id}`}>Segna prodotto come pronto</h2>
+            <p>
+              Questo prodotto tornera disponibile nel banco. Inserisci la
+              quantita ora pronta per i clienti.
+            </p>
+            <div className="lvg-ready-box">
+              <span>Quantita disponibile</span>
+              <LvgQuantityStepper value={readyQuantity} onChange={setReadyQuantity} min={0} />
+            </div>
+            <div className="lvg-modal-footer">
+              <button className="lvg-cta lvg-cta--secondary" type="button" onClick={closeOverlay}>
+                Annulla
+              </button>
+              <button
+                className="lvg-cta lvg-cta--primary"
+                type="button"
+                onClick={() =>
+                  runUpdate(
+                    {
+                      ...productToFormFields(product),
+                      quantity: readyQuantity,
+                      estimatedCompletedTime: 0,
+                    },
+                    "Il prodotto e tornato disponibile."
+                  )
+                }
+              >
+                Conferma disponibilita
+              </button>
+            </div>
           </div>
-        }
-      >
-        <div className="lvg-field">
-          <label htmlFor={`ready-quantity-${product.id}`}>
-            Nuova quantita disponibile
-          </label>
-          <InputNumber
-            inputId={`ready-quantity-${product.id}`}
-            value={readyQuantity}
-            showButtons
-            min={0}
-            onValueChange={(event) => setReadyQuantity(event.value ?? 0)}
-          />
-        </div>
-      </Dialog>
+        </LvgModalShell>
+      )}
+
+      {activeOverlay === "unavailable" && (
+        <LvgModalShell size="medium" onClose={closeOverlay} labelledBy={`unavailable-title-${product.id}`}>
+          <div className="lvg-confirm-overlay lvg-confirm-overlay--warn">
+            <LvgBadge tone="warn" icon="alert">Aggiornamento banco</LvgBadge>
+            <h2 id={`unavailable-title-${product.id}`}>Segna come terminato</h2>
+            <p>
+              Il prodotto non sara piu visibile come disponibile. Potrai
+              riattivarlo aggiornando quantita e tempi in seguito.
+            </p>
+            <ProductMiniCard product={product} />
+            <div className="lvg-modal-footer">
+              <button className="lvg-cta lvg-cta--secondary" type="button" onClick={closeOverlay}>
+                Annulla
+              </button>
+              <button
+                className="lvg-cta lvg-cta--warning"
+                type="button"
+                onClick={() =>
+                  runUpdate(
+                    {
+                      ...productToFormFields(product),
+                      quantity: 0,
+                      estimatedCompletedTime: 0,
+                    },
+                    "Il prodotto e stato segnato come terminato."
+                  )
+                }
+              >
+                Segna terminato
+              </button>
+            </div>
+          </div>
+        </LvgModalShell>
+      )}
+
+      {activeOverlay === "delete" && (
+        <LvgModalShell size="medium" onClose={closeOverlay} labelledBy={`delete-title-${product.id}`}>
+          <div className="lvg-confirm-overlay lvg-confirm-overlay--danger">
+            <span className="lvg-danger-mark">
+              <LvgIcon name="trash" />
+            </span>
+            <h2 id={`delete-title-${product.id}`}>Eliminare questo prodotto?</h2>
+            <ProductMiniCard product={product} />
+            <p className="lvg-warning-copy">Questa azione non puo essere annullata.</p>
+            <div className="lvg-modal-footer">
+              <button className="lvg-cta lvg-cta--secondary" type="button" onClick={closeOverlay}>
+                Torna indietro
+              </button>
+              <button className="lvg-cta lvg-cta--danger" type="button" onClick={runDelete}>
+                Elimina definitivamente
+              </button>
+            </div>
+          </div>
+        </LvgModalShell>
+      )}
+
+      <LvgLoadingOverlay
+        visible={isBusy}
+        variant="modal"
+        title="Stiamo aggiornando il banco..."
+        message="Un attimo di pazienza, per offrirti il meglio."
+      />
+      <LvgErrorOverlay
+        visible={Boolean(error)}
+        variant="modal"
+        title="Qualcosa e andato storto"
+        message={closeErrorCopy}
+        details={error || undefined}
+        onRetry={lastAction || undefined}
+        onClose={() => setError(null)}
+      />
     </>
   );
 };
 
-export default ProductItem;
+function InfoCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="lvg-info-card">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
 
+function ProductField({
+  id,
+  label,
+  children,
+}: {
+  id: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="lvg-field">
+      <label htmlFor={id}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function ProductMiniCard({ product }: { product: Product }) {
+  return (
+    <div className="lvg-mini-product">
+      <img
+        src={product.image || lvglogo}
+        alt={`Foto di ${product.title}`}
+        onError={(event) => {
+          event.currentTarget.src = lvglogo;
+        }}
+      />
+      <div>
+        <strong>{product.title}</strong>
+        <span>
+          {formatPrice(product.price)} - {product.quantity ?? 0} pz
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export default ProductItem;
 export { ProductItem };
