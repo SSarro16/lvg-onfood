@@ -1,7 +1,6 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { signInUser } from "../../vendors/firebase";
-import { Form, NavLink, useNavigate, useNavigation } from "react-router-dom";
-import classes from "./Form.module.css";
+import { Form, NavLink, useNavigate } from "react-router-dom";
 import { Password } from "primereact/password";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
@@ -21,8 +20,7 @@ const defaultFormFields = {
 export default function LogInForm() {
   const { t: translate } = useLang();
   const { showToast } = useToast();
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isError, setIsError] = useState(false);
   const [formFields, setFormFields] = useState<FormFields>(defaultFormFields);
   const { email, password } = formFields;
@@ -34,9 +32,9 @@ export default function LogInForm() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      // Send the email and password to firebase
       const userCredential = await signInUser(email, password);
 
       if (userCredential) {
@@ -59,7 +57,6 @@ export default function LogInForm() {
         });
       }
     } catch (error: unknown) {
-      // Handle Errors (Toasts)
       setIsError(true);
       showToast({
         severity: "error",
@@ -67,6 +64,8 @@ export default function LogInForm() {
         detail: "Invalid email or password",
         life: 3000,
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -77,53 +76,64 @@ export default function LogInForm() {
   };
 
   return (
-    <>
-      <Form method="post" className={classes.form} onSubmit={handleSubmit}>
-        <div className="card flex flex-columns md:flex-row gap-3">
-          <div className="p-inputgroup flex-1">
-            <span className="p-float-label">
-              <InputText
-                className={isError ? "p-invalid" : ""}
-                id="email"
-                name="email"
-                value={email}
-                type="email"
-                required
-                onChange={handleChange}
-              />
-              <label htmlFor="email">Email</label>
-            </span>
-          </div>
-
-          <div className="p-inputgroup flex-1">
-            <span className="p-float-label">
-              <Password
-                className={isError ? "p-invalid" : ""}
-                id="password"
-                inputId="password"
-                name="password"
-                value={password}
-                type="password"
-                onChange={handleChange}
-                required
-                toggleMask
-              />
-              <label htmlFor="password">Password</label>
-            </span>
-          </div>
+    <Form method="post" className="lvg-form-card" onSubmit={handleSubmit}>
+      <div className="lvg-form-grid">
+        <div className="lvg-field">
+          <label htmlFor="email">Email</label>
+          <InputText
+            className={isError ? "p-invalid" : ""}
+            id="email"
+            name="email"
+            value={email}
+            type="email"
+            required
+            onChange={handleChange}
+            placeholder="admin@lvg.it"
+          />
         </div>
+
+        <div className="lvg-field">
+          <label htmlFor="password">Password</label>
+          <Password
+            className={isError ? "p-invalid" : ""}
+            inputId="password"
+            name="password"
+            value={password}
+            onChange={handleChange}
+            required
+            toggleMask
+            feedback={false}
+            placeholder="Password"
+          />
+        </div>
+
+        {isError && (
+          <div className="lvg-error lvg-error--inline">
+            <div className="lvg-error__card">
+              <span className="lvg-error__icon pi pi-lock" aria-hidden="true" />
+              <p>Email o password non corretti. Controlla i dati e riprova.</p>
+            </div>
+          </div>
+        )}
 
         <div hidden>
           <input id="token" name="token" />
         </div>
-        <div className={classes.actions}>
-          <NavLink to="/">{translate("backtohome_button")}</NavLink>
 
-          <Button id="recaptcha" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Log In"}
-          </Button>
+        <div className="lvg-form-actions">
+          <NavLink className="p-button p-button-outlined" to="/">
+            {translate("backtohome_button")}
+          </NavLink>
+          <Button
+            id="recaptcha"
+            type="submit"
+            label="Log In"
+            icon="pi pi-sign-in"
+            loading={isSubmitting}
+            disabled={isSubmitting}
+          />
         </div>
-      </Form>
-    </>
+      </div>
+    </Form>
   );
 }

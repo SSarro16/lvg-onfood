@@ -1,22 +1,23 @@
 import React from "react";
-import Header from "../components/Header";
 import LogInForm from "../components/Form/LogInForm";
 import { useLang } from "../store/context/lang-context";
 
 const LogInPage: React.FC = () => {
   const {t: translate} = useLang()
   return (
-    <>
-      <div>
-        <Header
-          title={"Log In"}
-          message={translate('login_mess')}
-        />
+    <section className="lvg-auth">
+      <div className="lvg-auth__intro">
+        <h1>Accesso banco LVG</h1>
+        <p>{translate('login_mess')}</p>
+        <p>
+          Entra per aggiornare disponibilita, preparazioni, prodotti terminati e
+          schede del banco gastronomia.
+        </p>
       </div>
       <div>
         <LogInForm />
       </div>
-    </>
+    </section>
   );
 }
 

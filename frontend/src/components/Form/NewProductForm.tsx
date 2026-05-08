@@ -1,12 +1,14 @@
-import React, { FormEvent, useContext, useState } from "react";
-import { Form, useNavigation, Link, useNavigate } from "react-router-dom";
-import classes from "./Form.module.css";
+import React, { ChangeEvent, FormEvent, useContext, useState } from "react";
+import { Form, Link, useNavigate } from "react-router-dom";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
 import { AuthContext } from "../../store/context/auth-context";
 import { fetchAddProduct } from "../../util/http";
 import { useToast } from "../../store/context/toaster-context";
 import { InputNumberValueChangeEvent } from "primereact/inputnumber";
+import { Button } from "primereact/button";
+import lvglogo from "../../assets/lvglogo.png";
 
 type NewProductFormFields = {
   title: string;
@@ -24,16 +26,17 @@ const defaultFormFields: NewProductFormFields = {
 
 function NewProductForm() {
   const { showToast } = useToast();
-  const navigation = useNavigation();
   const navigate = useNavigate();
-  const isSubmitting = navigation.state === "submitting";
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { getToken } = useContext(AuthContext);
   const [formFields, setFormFields] =
     useState<NewProductFormFields>(defaultFormFields);
   const { title, image, price, description } = formFields;
 
-  const handleChange = (event: FormEvent<HTMLInputElement>) => {
-    const { name, value } = event.currentTarget;
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
     setFormFields((prevState) => ({ ...prevState, [name]: value }));
   };
 
@@ -42,6 +45,7 @@ function NewProductForm() {
   };
 
   const errorHandler = (error: string) => {
+    setIsSubmitting(false);
     showToast({
       severity: "error",
       summary: "New Product Error",
@@ -50,6 +54,7 @@ function NewProductForm() {
     });
   };
   const successHandler = () => {
+    setIsSubmitting(false);
     resetFormFields();
     navigate("/");
     showToast({
@@ -61,6 +66,7 @@ function NewProductForm() {
   };
   const newProductSubmitHandler = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
     const token = await getToken();
     if (token) {
@@ -71,105 +77,107 @@ function NewProductForm() {
         description,
       };
       console.log("New Product form data: ", { bodyData, token });
-      fetchAddProduct(token, bodyData, { errorHandler, successHandler });
+      await fetchAddProduct(token, bodyData, { errorHandler, successHandler });
+    } else {
+      setIsSubmitting(false);
+      showToast({
+        severity: "warn",
+        summary: "Accesso richiesto",
+        detail: "Effettua il login per aggiungere un prodotto.",
+        life: 3000,
+      });
     }
   };
 
   return (
-    <>
-      <Form
-        method="post"
-        onSubmit={newProductSubmitHandler}
-        className={classes.form}
-      >
-        <div className="text-center text-white">
-          <h2>Aggiungi un nuovo prodotto!</h2>
-        </div>
-        <div className="card">
-          <div className="grid p-fluid">
-            <div className="col-12">
-              <div className="p-inputgroup">
-                <span className="p-inputgroup-addon">
-                  <i className="pi pi-file-edit" />
-                </span>
-                <InputText
-                  id="title"
-                  type="text"
-                  name="title"
-                  required
-                  onChange={handleChange}
-                  placeholder="Title"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid p-fluid">
-            <div className="col-12">
-              <div className="p-inputgroup">
-                <span className="p-inputgroup-addon">
-                  <i className="pi pi-image" />
-                </span>
-                <InputText
-                  id="image"
-                  type="url"
-                  name="image"
-                  onChange={handleChange}
-                  required
-                  placeholder="url"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="grid">
-            <div className="col-12">
-              <div className="p-inputgroup">
-                <span className="p-inputgroup-addon">
-                  <i className="pi pi-money-bill"></i>
-                </span>
-                <InputNumber
-                  id="price"
-                  name="price"
-                  mode="currency"
-                  currency="EUR"
-                  locale="it-IT"
-                  placeholder="Price"
-                  required
-                  showButtons
-                  onValueChange={(e: InputNumberValueChangeEvent) =>
-                    setFormFields({ ...formFields, price: e.value ?? 0 })
-                  }
-                />
-              </div>
-            </div>
-          </div>
-          <div className="grid p-fluid">
-            <div className="col-12">
-              <div className="p-inputgroup">
-                <span className="p-inputgroup-addon ">
-                  <i className="pi pi-pencil" />
-                </span>
-                <InputText
-                  id="description"
-                  name="description"
-                  type="textarea"
-                  onChange={handleChange}
-                  required
-                  placeholder="Description"
-                />
-              </div>
-            </div>
-          </div>
+    <Form
+      method="post"
+      onSubmit={newProductSubmitHandler}
+      className="lvg-form-card"
+    >
+      <div className="lvg-form-grid">
+        <div className="lvg-image-preview" aria-label="Anteprima immagine prodotto">
+          <img
+            src={image || lvglogo}
+            alt={title || "Anteprima prodotto LVG"}
+            onError={(event) => {
+              event.currentTarget.src = lvglogo;
+            }}
+          />
         </div>
 
-        <div className={classes.actions}>
-          <Link to="/">Torna alla Home</Link>
-          <button disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Aggiungi nuovo prodotto"}
-          </button>
+        <div className="lvg-field">
+          <label htmlFor="title">Titolo prodotto</label>
+          <InputText
+            id="title"
+            type="text"
+            name="title"
+            value={title}
+            required
+            onChange={handleChange}
+            placeholder="Es. Lasagne al forno"
+          />
         </div>
-      </Form>
-    </>
+
+        <div className="lvg-field">
+          <label htmlFor="image">URL immagine</label>
+          <InputText
+            id="image"
+            type="url"
+            name="image"
+            value={image}
+            onChange={handleChange}
+            required
+            placeholder="https://..."
+          />
+        </div>
+
+        <div className="lvg-field">
+          <label htmlFor="price">Prezzo</label>
+          <InputNumber
+            inputId="price"
+            name="price"
+            value={price}
+            mode="currency"
+            currency="EUR"
+            locale="it-IT"
+            placeholder="Prezzo"
+            required
+            showButtons
+            onValueChange={(e: InputNumberValueChangeEvent) =>
+              setFormFields({ ...formFields, price: e.value ?? 0 })
+            }
+          />
+        </div>
+
+        <div className="lvg-field">
+          <label htmlFor="description">Descrizione</label>
+          <InputTextarea
+            id="description"
+            name="description"
+            value={description}
+            onChange={handleChange}
+            required
+            rows={4}
+            autoResize
+            placeholder="Ingredienti, preparazione o nota per il banco"
+          />
+        </div>
+
+        <div className="lvg-form-actions">
+          <Link className="p-button p-button-outlined" to="/">
+            Torna alla Home
+          </Link>
+          <Button
+            type="submit"
+            label="Aggiungi prodotto"
+            icon="pi pi-plus"
+            loading={isSubmitting}
+            disabled={isSubmitting}
+          />
+        </div>
+      </div>
+    </Form>
   );
 }
 
