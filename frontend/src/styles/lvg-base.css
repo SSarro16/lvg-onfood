@@ -5,6 +5,7 @@
 html {
   min-width: 0;
   background: var(--lvg-bg);
+  scroll-behavior: smooth;
 }
 
 body {
@@ -12,10 +13,8 @@ body {
   min-width: 320px;
   font-family: var(--lvg-font);
   font-weight: 400;
-  background:
-    radial-gradient(circle at 16% 8%, rgba(245, 158, 11, 0.12), transparent 28rem),
-    linear-gradient(180deg, var(--lvg-bg) 0%, #fffdf8 54%, var(--lvg-bg-soft) 100%);
-  color: var(--lvg-text);
+  background: var(--lvg-bg);
+  color: var(--lvg-stone-950);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -26,6 +25,10 @@ textarea {
   font: inherit;
 }
 
+button {
+  border: 0;
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -33,20 +36,71 @@ img {
 
 a {
   color: inherit;
+  text-decoration: none;
 }
 
 :focus-visible {
-  outline: 3px solid rgba(22, 138, 84, 0.35);
+  outline: 3px solid rgba(5, 150, 105, 0.35);
   outline-offset: 3px;
 }
 
-main {
-  min-height: calc(100vh - 5rem);
+.lvg-page {
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--lvg-bg);
+  color: var(--lvg-stone-950);
+  position: relative;
 }
 
-.lvg-page {
+.lvg-bg-blobs {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.7;
+  z-index: 0;
+}
+
+.lvg-bg-blobs::before {
+  content: "";
+  position: absolute;
+  left: -8rem;
+  top: -8rem;
+  width: 24rem;
+  height: 24rem;
+  border-radius: 999px;
+  background: #fde68a;
+  filter: blur(64px);
+}
+
+.lvg-bg-blobs::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 6rem;
+  width: 20rem;
+  height: 20rem;
+  border-radius: 999px;
+  background: #a7f3d0;
+  filter: blur(64px);
+}
+
+.lvg-bg-blob-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 33%;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 999px;
+  background: #fed7aa;
+  filter: blur(64px);
+}
+
+.lvg-main,
+.lvg-header {
+  position: relative;
+  z-index: 1;
   width: min(100% - 2rem, var(--lvg-container));
-  margin: 0 auto;
+  margin-inline: auto;
 }
 
 .sr-only {
@@ -61,13 +115,43 @@ main {
   border: 0;
 }
 
+@keyframes lvgFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lvgModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes lvgSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
+    animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0.001ms !important;
   }
 }

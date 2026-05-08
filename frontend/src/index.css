@@ -1,7 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap");
+@import "flag-icons/css/flag-icons.min.css";
 @import "./styles/lvg-tokens.css";
 @import "./styles/lvg-base.css";
 @import "./styles/lvg-layout.css";
 @import "./styles/lvg-components.css";
 @import "./styles/lvg-overlays.css";
+@import "./styles/lvg-menu-live.css";
+@import "./styles/lvg-add-product.css";
 @import "./styles/lvg-prime-overrides.css";

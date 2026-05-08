@@ -5,10 +5,14 @@ function NewProductPage() {
   return (
     <section className="lvg-form-page">
       <div className="lvg-form-page__intro">
-        <h1>Nuovo prodotto</h1>
+        <span className="lvg-hero__badge">
+          <i className="pi pi-pencil" aria-hidden="true" />
+          Admin banco
+        </span>
+        <h1>Aggiungi prodotto</h1>
         <p>
-          Aggiungi una scheda chiara per il banco LVG. I dati restano compatibili
-          con il dataset esistente.
+          Una pagina pulita per inserire nuovi prodotti scegliendo prima lo
+          stato corretto del banco: disponibile, in lavorazione o terminato.
         </p>
       </div>
       <NewProductForm />

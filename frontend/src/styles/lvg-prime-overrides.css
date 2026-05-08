@@ -1,113 +1,116 @@
-.p-menubar {
-  border: 1px solid var(--lvg-border);
-  border-radius: var(--lvg-radius-lg);
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: var(--lvg-shadow-sm);
-  backdrop-filter: blur(14px);
-  padding: 0.55rem 0.75rem;
-}
-
-.p-menubar .p-menuitem-link {
-  border-radius: 999px;
-}
-
-.p-button {
-  border-radius: 999px;
-  font-weight: 800;
+.lvg-page .p-button {
+  border-radius: 16px;
+  font-weight: 900;
   box-shadow: none;
   text-decoration: none;
 }
 
-.p-button:not(.p-button-text):not(.p-button-outlined) {
-  background: var(--lvg-primary);
-  border-color: var(--lvg-primary);
+.lvg-page .p-button:not(.p-button-text):not(.p-button-outlined) {
+  background: var(--lvg-emerald);
+  border-color: var(--lvg-emerald);
 }
 
-.p-button.p-button-danger {
+.lvg-page .p-button.p-button-danger {
   background: var(--lvg-danger);
   border-color: var(--lvg-danger);
 }
 
-.p-button.p-button-warning {
+.lvg-page .p-button.p-button-warning {
   background: var(--lvg-warm);
   border-color: var(--lvg-warm);
   color: var(--lvg-text);
 }
 
-.p-button.p-button-secondary,
-.p-button.p-button-outlined {
+.lvg-page .p-button.p-button-secondary,
+.lvg-page .p-button.p-button-outlined {
   background: var(--lvg-surface);
   border-color: var(--lvg-border-strong);
   color: var(--lvg-text);
 }
 
-.p-inputtext,
-.p-inputnumber,
-.p-password,
-.p-inputtextarea {
+.lvg-page .p-inputtext,
+.lvg-page .p-inputnumber,
+.lvg-page .p-password,
+.lvg-page .p-inputtextarea {
   width: 100%;
 }
 
-.p-inputtext,
-.p-password-input,
-.p-inputnumber-input,
-.p-inputtextarea {
+.lvg-page .p-inputtext,
+.lvg-page .p-password-input,
+.lvg-page .p-inputnumber-input,
+.lvg-page .p-inputtextarea {
   border-color: var(--lvg-border-strong);
-  border-radius: var(--lvg-radius-sm);
+  border-radius: 16px;
   color: var(--lvg-text);
 }
 
 .p-dialog {
   width: min(92vw, 620px);
-  border-radius: var(--lvg-radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 28px;
   overflow: hidden;
-  box-shadow: var(--lvg-shadow-lg);
+  box-shadow: var(--lvg-shadow-hover);
 }
 
 .p-dialog .p-dialog-header,
 .p-dialog .p-dialog-content,
 .p-dialog .p-dialog-footer {
-  background: var(--lvg-surface);
+  background: rgba(255, 255, 255, 0.96);
   color: var(--lvg-text);
+}
+
+.p-dialog .p-dialog-header {
+  padding: 1.3rem 1.5rem 0.8rem;
+}
+
+.p-dialog .p-dialog-title {
+  color: var(--lvg-stone-950);
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 0 1.5rem 1.35rem;
+}
+
+.p-dialog .p-dialog-footer {
+  border-top: 1px solid var(--lvg-border);
+  padding: 1rem 1.5rem 1.35rem;
 }
 
 .p-confirm-dialog .p-dialog-content {
   line-height: 1.55;
 }
 
-.p-card {
-  border-radius: var(--lvg-radius-lg);
-  box-shadow: none;
+.p-confirm-dialog {
+  width: min(92vw, 430px);
 }
 
-.p-card .p-card-body {
-  padding: 0;
+.p-confirm-dialog .p-confirm-dialog-icon {
+  color: var(--lvg-emerald);
 }
 
 .p-toast .p-toast-message {
-  border-radius: var(--lvg-radius-md);
-  box-shadow: var(--lvg-shadow-md);
+  border-radius: 16px;
+  box-shadow: var(--lvg-shadow-soft);
 }
 
-.p-fieldset {
+.lvg-page .p-fieldset {
   border-color: var(--lvg-border);
-  border-radius: var(--lvg-radius-lg);
+  border-radius: var(--lvg-radius-xl);
   background: rgba(255, 255, 255, 0.58);
 }
 
-.p-fieldset .p-fieldset-legend {
+.lvg-page .p-fieldset .p-fieldset-legend {
   border: 0;
   border-radius: 999px;
   background: var(--lvg-surface);
   color: var(--lvg-text);
-  box-shadow: var(--lvg-shadow-sm);
+  box-shadow: var(--lvg-shadow-soft);
 }
 
 @media (max-width: 600px) {
-  .p-menubar {
-    border-radius: var(--lvg-radius-md);
-  }
-
   .p-dialog,
   .p-confirm-dialog {
     width: 94vw;

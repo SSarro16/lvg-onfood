@@ -10,7 +10,6 @@ const action = async (token: string, navigate: NavigateFunction, signOut: SignOu
         Authorization: "Bearer " + token,
       },
     });
-    console.log(response);
     if (response.status === 401) {
       throw "Non autenticato";
     }
@@ -19,7 +18,7 @@ const action = async (token: string, navigate: NavigateFunction, signOut: SignOu
       throw "Log out non effettuato";
     }
   } catch (error) {
-    console.log(error);
+    void error;
   }
 
   signOut(navigate)

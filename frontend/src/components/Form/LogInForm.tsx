@@ -76,7 +76,14 @@ export default function LogInForm() {
   };
 
   return (
-    <Form method="post" className="lvg-form-card" onSubmit={handleSubmit}>
+    <Form method="post" className="lvg-form-card lvg-login-card" onSubmit={handleSubmit}>
+      <div className="lvg-login-card__header">
+        <span>
+          <strong>LVG OnFood</strong>
+          <span>Bentornato</span>
+        </span>
+        <i className="lvg-login-card__icon pi pi-lock" aria-hidden="true" />
+      </div>
       <div className="lvg-form-grid">
         <div className="lvg-field">
           <label htmlFor="email">Email</label>
@@ -127,7 +134,7 @@ export default function LogInForm() {
           <Button
             id="recaptcha"
             type="submit"
-            label="Log In"
+            label="Accedi alla dashboard"
             icon="pi pi-sign-in"
             loading={isSubmitting}
             disabled={isSubmitting}
