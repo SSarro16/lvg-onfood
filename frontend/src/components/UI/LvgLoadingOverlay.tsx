@@ -1,5 +1,6 @@
 import React from "react";
-import { ProgressSpinner } from "primereact/progressspinner";
+import LvgIcon from "./LvgIcon";
+import LvgModalShell from "./LvgModalShell";
 
 type LvgLoadingOverlayProps = {
   visible?: boolean;
@@ -16,15 +17,13 @@ export default function LvgLoadingOverlay({
 }: LvgLoadingOverlayProps) {
   if (!visible) return null;
 
-  return (
+  const content = (
     <div className={`lvg-loading lvg-loading--${variant}`} role="status" aria-live="polite">
       <div className="lvg-loading__card">
-        <span className="lvg-loading__mark">LVG</span>
-        <ProgressSpinner
-          className="lvg-loading__spinner"
-          strokeWidth="5"
-          animationDuration=".7s"
-        />
+        <span className="lvg-loading__mark">
+          <LvgIcon name="chef" />
+        </span>
+        <span className="lvg-loading__spinner" aria-hidden="true" />
         <div>
           <h2>{title}</h2>
           <p>{message}</p>
@@ -32,4 +31,14 @@ export default function LvgLoadingOverlay({
       </div>
     </div>
   );
+
+  if (variant === "modal") {
+    return (
+      <LvgModalShell size="small" tone="dark">
+        {content}
+      </LvgModalShell>
+    );
+  }
+
+  return content;
 }
