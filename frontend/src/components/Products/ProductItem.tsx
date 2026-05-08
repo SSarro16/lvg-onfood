@@ -1,25 +1,29 @@
-import React, { FormEvent, useState } from "react";
-import { DataView } from "primereact/dataview";
+import React, { ChangeEvent, useState } from "react";
 import { Product } from "../../store/redux/products-slice";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import { Card } from "primereact/card";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { fetchDeleteProduct, fetchUpdateProduct } from "../../util/http";
-import { Form } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import {
   InputNumber,
   InputNumberValueChangeEvent,
 } from "primereact/inputnumber";
-import { Tag } from "primereact/tag";
+import { InputTextarea } from "primereact/inputtextarea";
 import { useToast } from "../../store/context/toaster-context";
 import { useLang } from "../../store/context/lang-context";
 import { useProducts } from "../../store/context/products-context";
+import {
+  getProductStatus,
+  getProductStatusIcon,
+  getProductStatusLabel,
+} from "../../util/productStatus";
+import lvglogo from "../../assets/lvglogo.png";
+import LvgLoadingOverlay from "../UI/LvgLoadingOverlay";
 
 type ProductItemProps = { product: Product; token?: string };
 
-type NewProductFormFields = {
+type ProductFormFields = {
   title: string;
   image: string;
   price: number;
@@ -28,16 +32,7 @@ type NewProductFormFields = {
   estimatedCompletedTime: number;
 };
 
-type ProntoFormFields = {
-  title: string;
-  image: string;
-  price: number;
-  description: string;
-  quantity: number;
-  estimatedCompletedTime: number;
-};
-
-const defaultFormFields: NewProductFormFields = {
+const emptyFormFields: ProductFormFields = {
   title: "",
   image: "",
   price: 0,
@@ -46,185 +41,164 @@ const defaultFormFields: NewProductFormFields = {
   estimatedCompletedTime: 0,
 };
 
-const ProductItem: React.FC<ProductItemProps> = (props) => {
+const formatPrice = (price: number) =>
+  new Intl.NumberFormat("it-IT", {
+    style: "currency",
+    currency: "EUR",
+  }).format(price ?? 0);
+
+const productToFormFields = (product: Product): ProductFormFields => ({
+  title: product.title,
+  image: product.image,
+  price: product.price ?? 0,
+  description: product.description || "",
+  quantity: product.quantity ?? 0,
+  estimatedCompletedTime: product.estimatedCompletedTime ?? 0,
+});
+
+const ProductItem: React.FC<ProductItemProps> = ({ product, token }) => {
   const { showToast } = useToast();
-  // #PRODUCT DETAIL VISIBLE
-  const [visible, setVisible] = useState(false);
-
-  // #PRONTO EDIT VISIBLE
-  const [prontoEdit, setProntoEdit] = useState(false);
-  // #PRONTO FORM FIELDS
-  const [formQty, setFormQty] = useState<ProntoFormFields>(defaultFormFields);
-
-  // #PRODUCT EDIT VISIBLE
-  const [visibleEdit, setVisibleEdit] = useState(false);
-  // #PRODUCT FORM FIELDS
-  const [formFields, setFormFields] =
-    useState<NewProductFormFields>(defaultFormFields);
-  const { title, image, price, description, quantity, estimatedCompletedTime } =
-    formFields;
-
-  // #REFETCH PRODUCTS CONTEXT
-  const { refetchProducts } = useProducts()
-
-  // #USE LANG
+  const { refetchProducts } = useProducts();
   const { t: translate } = useLang();
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [editVisible, setEditVisible] = useState(false);
+  const [readyVisible, setReadyVisible] = useState(false);
+  const [isBusy, setIsBusy] = useState(false);
+  const [formFields, setFormFields] = useState<ProductFormFields>(emptyFormFields);
+  const [readyQuantity, setReadyQuantity] = useState(product.quantity ?? 0);
 
-  const handleChange = (event: FormEvent<HTMLInputElement>) => {
-    const { name, value } = event.currentTarget;
-    setFormFields((prevState) => ({ ...prevState, [name]: value }));
-  };
+  const status = getProductStatus(product);
+  const statusLabel = getProductStatusLabel(status);
+  const hasToken = Boolean(token);
+  const description = product.description || "Descrizione non disponibile.";
+  const quantity = product.quantity ?? 0;
+  const estimatedCompletedTime = product.estimatedCompletedTime ?? 0;
 
-  const handleNumberChange = (event: InputNumberValueChangeEvent) => {
+  const handleTextChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = event.target;
     setFormFields((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const resetFormFields = () => {
-    setFormFields(defaultFormFields);
+  const handleNumberChange = (
+    name: keyof Pick<
+      ProductFormFields,
+      "price" | "quantity" | "estimatedCompletedTime"
+    >,
+    event: InputNumberValueChangeEvent
+  ) => {
+    setFormFields((prevState) => ({
+      ...prevState,
+      [name]: event.value ?? 0,
+    }));
   };
 
-  const initEditFormFields = () => {
-    const product = props.product;
-    setFormFields({
-      title: product.title,
-      image: product.image,
-      price: product.price,
-      description: product.description || "",
-      quantity: product.quantity,
-      estimatedCompletedTime: product.estimatedCompletedTime,
-    });
-  };
-
-  const successDeleteHandler = async () => {
+  const successSavingHandler = async () => {
+    setIsBusy(false);
+    setEditVisible(false);
+    setReadyVisible(false);
+    setDetailVisible(false);
+    await refetchProducts();
     showToast({
       severity: "success",
-      summary: "Product Deleted",
-      detail: "Product deleted successfully",
-      life: 1000,
-    });
-
-    await refetchProducts()
-  };
-
-  const errorDeleteHandler = () => {
-    showToast({
-      severity: "warn",
-      summary: "Product Deletion Interrupted",
-      detail: "Product deletion interrupted successfully",
-      life: 1000,
+      summary: "Banco aggiornato",
+      detail: "Il prodotto e stato salvato correttamente.",
+      life: 2500,
     });
   };
 
   const errorSavingHandler = () => {
+    setIsBusy(false);
     showToast({
       severity: "error",
-      summary: "Edit Product Failed",
-      detail: "Edit product failed !!",
+      summary: "Salvataggio non riuscito",
+      detail: "Non siamo riusciti a salvare il prodotto. Riprova.",
       life: 3000,
     });
   };
 
-  const successSavingHandler = async () => {
-    resetFormFields();
+  const successDeleteHandler = async () => {
+    setIsBusy(false);
+    setDetailVisible(false);
+    await refetchProducts();
     showToast({
       severity: "success",
-      summary: "Product Updated",
-      detail: "Product updated successfully",
+      summary: "Prodotto eliminato",
+      detail: "Il banco e stato aggiornato.",
+      life: 2500,
+    });
+  };
+
+  const errorDeleteHandler = () => {
+    setIsBusy(false);
+    showToast({
+      severity: "error",
+      summary: "Eliminazione non riuscita",
+      detail: "Non siamo riusciti a eliminare il prodotto. Riprova.",
       life: 3000,
     });
-
-    await refetchProducts()
   };
 
-  const header = (
-    <div className="block max-w-30rem">
-      <img alt={props.product.title} src={props.product.image} />
-    </div>
-  );
-
-  const saving = () => {
-    confirmDialog({
-      tagKey: "savingProduct",
-      message: translate("saving_mess"),
-      header: translate("Save Edit Confirmation"),
-      icon: "pi pi-info-circle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      acceptLabel: translate("saving_acceptlabel"),
-      accept() {
-        setVisible(false);
-        setVisibleEdit(false);
-        if (props.token) {
-          const bodyData: NewProductFormFields = {
-            title,
-            image,
-            price,
-            description,
-            quantity,
-            estimatedCompletedTime,
-          };
-          console.log("New Product form data: ", { bodyData });
-          fetchUpdateProduct(props.token, props.product.id, bodyData, {
-            errorSavingHandler,
-            successSavingHandler,
-          });
-          resetFormFields();
-        }
-      },
-      reject() {
-        setVisible(false);
-        resetFormFields();
-      },
+  const saveProduct = async (bodyData: ProductFormFields) => {
+    if (!token) return;
+    setIsBusy(true);
+    await fetchUpdateProduct(token, product.id, bodyData, {
+      errorSavingHandler,
+      successSavingHandler,
     });
   };
 
-  const confirm2 = () => {
-    confirmDialog({
-      tagKey: "deleteProduct",
-      message: translate("delete_mess"),
-      header: translate("delete_head"),
-      icon: "pi pi-info-circle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      acceptLabel: translate("delete_acceptlabel"),
-      async accept() {
-        setVisible(false);
-        if (props.token) {
-          fetchDeleteProduct(props.token, props.product.id, {
-            errorDeleteHandler,
-            successDeleteHandler,
-          });
-        }
-      },
-      reject() {
-        setVisible(false);
-      },
-    });
-  };
-
-  const editing = () => {
-    setVisible(true);
+  const openEditConfirmation = () => {
     confirmDialog({
       tagKey: "editProduct",
       message: translate("edit_mess"),
       header: translate("edit_head"),
-      icon: "pi pi-info-circle",
+      icon: "pi pi-pencil",
       defaultFocus: "reject",
       acceptClassName: "p-button-warning",
       acceptLabel: translate("edit_acceptlabel"),
-      async accept() {
-        setVisibleEdit(true);
-        setVisible(false);
-        initEditFormFields();
-      },
-      reject() {
-        setVisible(false);
+      accept: () => {
+        setFormFields(productToFormFields(product));
+        setEditVisible(true);
+        setDetailVisible(false);
       },
     });
   };
 
-  const pronto = () => {
+  const openSaveConfirmation = () => {
+    confirmDialog({
+      tagKey: "savingProduct",
+      message: translate("saving_mess"),
+      header: translate("saving_head"),
+      icon: "pi pi-save",
+      defaultFocus: "reject",
+      acceptLabel: translate("saving_acceptlabel"),
+      accept: () => saveProduct(formFields),
+    });
+  };
+
+  const openDeleteConfirmation = () => {
+    confirmDialog({
+      tagKey: "deleteProduct",
+      message: translate("delete_mess"),
+      header: translate("delete_head"),
+      icon: "pi pi-trash",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      acceptLabel: translate("delete_acceptlabel"),
+      accept: async () => {
+        if (!token) return;
+        setIsBusy(true);
+        await fetchDeleteProduct(token, product.id, {
+          errorDeleteHandler,
+          successDeleteHandler,
+        });
+      },
+    });
+  };
+
+  const openReadyConfirmation = () => {
     confirmDialog({
       tagKey: "prontoConfirm",
       message: translate("pronto_mess"),
@@ -233,418 +207,282 @@ const ProductItem: React.FC<ProductItemProps> = (props) => {
       defaultFocus: "reject",
       acceptClassName: "p-button-success",
       acceptLabel: translate("pronto_acceptlabel"),
-      async accept() {
-        // inizializza solo il campo quantità
-        setFormQty({
-          ...formQty,
-          quantity: props.product.quantity,
-          title: props.product.title,
-          image: props.product.image,
-          price: props.product.price,
-          description: props.product.description || "",
-          estimatedCompletedTime: 0,
-        });
-        setProntoEdit(true); // mostra il dialog per edit qty
-      },
-      reject() {
-        setVisible(false);
-        // Non fare nulla, solo chiudi
+      accept: () => {
+        setReadyQuantity(Math.max(quantity, 1));
+        setReadyVisible(true);
       },
     });
   };
 
-  const handleOutOfStock = () => {
+  const openOutOfStockConfirmation = () => {
     confirmDialog({
       tagKey: "outOfStockConfirm",
-      message: "Il prodotto è terminato?",
-      header: "Prodotto Terminato",
-
-      icon: "pi pi-info-circle",
+      message: "Vuoi segnare questo prodotto come terminato?",
+      header: "Prodotto terminato",
+      icon: "pi pi-exclamation-triangle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
       acceptLabel: "Conferma",
-      async accept() {
-        if (!props.token) return;
-
-        // Preparo i dati per aggiornare il prodotto
-        const updatedProduct = {
-          title: props.product.title,
-          image: props.product.image,
-          price: props.product.price,
-          description: props.product.description || "",
-          quantity: 0, // setto quantity a 0 perché è terminato
-          estimatedCompletedTime: props.product.estimatedCompletedTime,
-        };
-
-        try {
-          await fetchUpdateProduct(
-            props.token,
-            props.product.id,
-            updatedProduct,
-            {
-              successSavingHandler,
-              errorSavingHandler,
-            }
-          );
-          setVisible(false); // chiudi eventuale dialog
-        } catch (error) {
-          errorSavingHandler();
-        }
-      },
-      reject() {
-        setVisible(false);
-        // Non fare nulla, solo chiudi
-      },
+      accept: () =>
+        saveProduct({
+          ...productToFormFields(product),
+          quantity: 0,
+          estimatedCompletedTime: 0,
+        }),
     });
   };
 
-  let severity: "success" | "info" | "warning" | "danger" | null | undefined;
-  let status: string;
-  let icon: string;
-  let borderItem =
-    "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round surface-900";
+  const adminActions = hasToken ? (
+    <div className="lvg-product-card__actions">
+      <Button
+        label="Modifica"
+        icon="pi pi-pencil"
+        outlined
+        onClick={openEditConfirmation}
+      />
+      <Button
+        label={translate("delete_button")}
+        icon="pi pi-trash"
+        severity="danger"
+        outlined
+        onClick={openDeleteConfirmation}
+      />
+      {estimatedCompletedTime > 0 && (
+        <Button
+          label={translate("pronto_button")}
+          icon="pi pi-check"
+          severity="success"
+          onClick={openReadyConfirmation}
+        />
+      )}
+      {quantity > 0 && (
+        <Button
+          label="Terminato"
+          icon="pi pi-times"
+          severity="warning"
+          onClick={openOutOfStockConfirmation}
+        />
+      )}
+    </div>
+  ) : null;
 
-  if (props.product.quantity > 0) {
-    severity = "success";
-    status = translate("tag_disp");
-    icon = "pi pi-check";
-  } else if (
-    props.product.quantity === 0 &&
-    props.product.estimatedCompletedTime === 0
-  ) {
-    severity = "danger";
-    status = translate("tag_undisp");
-    icon = "pi pi-times";
-    borderItem =
-      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-black-alpha-80";
-  } else if (
-    props.product.quantity === 0 &&
-    props.product.estimatedCompletedTime > 0
-  ) {
-    severity = "warning";
-    status = translate("tag_wip");
-    icon = "pi pi-wrench";
-    borderItem =
-      "p-4 border-1 surface-border hover:border-900 focus:bg-white border-round bg-orange-600";
-  }
-
-  const footer = (
+  return (
     <>
       <ConfirmDialog tagKey="deleteProduct" />
       <ConfirmDialog tagKey="editProduct" />
       <ConfirmDialog tagKey="savingProduct" />
       <ConfirmDialog tagKey="prontoConfirm" />
       <ConfirmDialog tagKey="outOfStockConfirm" />
-      {props.token && (
-        <>
-          <div className="flex justify-content-end gap">
-            <Button
-              label="Save"
-              severity="success"
-              icon="pi pi-check"
-              onClick={saving}
-              visible={visibleEdit}
-              style={{ marginLeft: "0.3em" }}
-            ></Button>
-            <Button
-              label="Close"
-              severity="danger"
-              icon="pi pi-times"
-              onClick={() => setVisibleEdit(false)}
-              visible={visibleEdit}
-              style={{ marginLeft: "0.5em" }}
-            ></Button>
-            <Button
-              name="Edit"
-              label="Edit"
-              className="p-button"
-              icon="pi pi-pencil"
-              visible={visible}
-              onClick={editing}
-              style={{ marginLeft: "0.5em" }}
-            ></Button>
-            <Button
-              name="Delete"
-              label={translate("delete_button")}
-              severity="danger"
-              icon="pi pi-trash"
-              visible={visible}
-              style={{ marginLeft: "0.5em" }}
-              onClick={confirm2}
-            ></Button>
-            {props.product.estimatedCompletedTime > 0 && (
-              <Button
-                name="Pronto"
-                label={translate("pronto_button")}
-                severity="success"
-                icon="pi pi-check"
-                style={{ marginLeft: "0.5em" }}
-                onClick={pronto}
-              ></Button>
-            )}
-            {props.product.quantity > 0 && (
-              <Button
-                name="Out of Stock"
-                label="OTS"
-                severity="warning"
-                icon="pi pi-times"
-                style={{ marginLeft: "0.5em" }}
-                onClick={handleOutOfStock}
-              ></Button>
-            )}
-          </div>
-        </>
-      )}
-    </>
-  );
 
-  const gridItem = () => {
-    return (
-      <div
-        className="m-2 align-items-stretch w-14rem grid h-24rem"
-        key={props.product.id}
+      <article className={`lvg-product-card lvg-product-card--${status}`}>
+        <img
+          className="lvg-product-card__image"
+          src={product.image || lvglogo}
+          alt={product.title || "Prodotto gastronomia LVG"}
+          onError={(event) => {
+            event.currentTarget.src = lvglogo;
+          }}
+        />
+        <div className="lvg-product-card__body">
+          <span className={`lvg-status lvg-status--${status}`}>
+            <i className={getProductStatusIcon(status)} aria-hidden="true" />
+            {statusLabel}
+          </span>
+          <div>
+            <h3>{product.title}</h3>
+            <p>{description}</p>
+          </div>
+          {status === "wip" && (
+            <strong className="lvg-status lvg-status--wip">
+              Pronto tra {estimatedCompletedTime} min
+            </strong>
+          )}
+          <div className="lvg-product-card__meta">
+            <span className="lvg-price">{formatPrice(product.price)}</span>
+            <span>{quantity > 0 ? `${quantity} pz disponibili` : "Non disponibile"}</span>
+          </div>
+          <Button
+            label="Vedi dettaglio"
+            icon="pi pi-eye"
+            onClick={() => setDetailVisible(true)}
+          />
+        </div>
+      </article>
+
+      <Dialog
+        header={product.title}
+        visible={detailVisible}
+        modal
+        onHide={() => setDetailVisible(false)}
+        footer={adminActions}
       >
-        <div className={borderItem}>
-          <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-            <div className="flex align-items-center gap-2"></div>
-          </div>
-          <div className="text-xl text-100 text-center font-bold">
-            {props.product.title}
-          </div>
-          <div className="flex flex-wrap text-center justify-content-center m-2 pt-1 gap-2">
-            <Tag severity={severity} value={status} icon={icon} rounded />
-            <Tag
-              severity="danger"
-              value={translate("tag_almots")}
-              rounded
-              style={{
-                visibility:
-                  props.product.quantity > 0 && props.product.quantity <= 4
-                    ? "visible"
-                    : "hidden",
+        {isBusy && (
+          <LvgLoadingOverlay
+            variant="inline"
+            title="Aggiorno il prodotto..."
+            message="Il banco verra ricaricato tra un momento."
+          />
+        )}
+        {!isBusy && (
+          <div className="lvg-form-grid">
+            <img
+              className="lvg-product-card__image"
+              src={product.image || lvglogo}
+              alt={product.title}
+              onError={(event) => {
+                event.currentTarget.src = lvglogo;
               }}
             />
+            <span className={`lvg-status lvg-status--${status}`}>
+              <i className={getProductStatusIcon(status)} aria-hidden="true" />
+              {statusLabel}
+            </span>
+            <p>{description}</p>
+            <div className="lvg-product-card__meta">
+              <strong>{formatPrice(product.price)}</strong>
+              <span>Quantita: {quantity} pz</span>
+            </div>
           </div>
-          <div className="text-center h-0 py-4">
-            <img
-              className="max-w-9rem  border-round "
-              src={props.product.image}
-              alt={props.product.title}
-              height={"100vh"}
-              width={"120%"}
+        )}
+      </Dialog>
+
+      <Dialog
+        header="Modifica prodotto"
+        visible={editVisible}
+        modal
+        onHide={() => setEditVisible(false)}
+        footer={
+          <div className="lvg-form-actions">
+            <Button
+              label="Annulla"
+              icon="pi pi-times"
+              severity="secondary"
+              outlined
+              onClick={() => setEditVisible(false)}
+            />
+            <Button
+              label="Salva"
+              icon="pi pi-check"
+              onClick={openSaveConfirmation}
+              loading={isBusy}
             />
           </div>
-          <div className="flex align-items-center justify-content-between">
-            <span className="text-xl text-100 font-semibold">
-              €{props.product.price}
-            </span>
-            {props.product.quantity > 0 ? (
-              <Tag
-                severity="info"
-                value={`${props.product.quantity} pz`}
-                icon="pi pi-box"
-                rounded
-              />
-            ) : (
-              <></>
-            )}
-            <span className="text-xl text-100 font-semibold">
-              <Button
-                className="bg-white p-button-rounded-circle"
-                severity="help"
-                icon="pi pi-bars"
-                aria-label="details"
-                onClick={() => setVisible(true)}
-                rounded
-                text
-                raised
-              />
-              <Dialog
-                // maximized
-                // modal
-                visible={visible}
-                onHide={() => setVisible(false)}
-              >
-                <Card
-                  title={props.product.title}
-                  header={header}
-                  footer={footer}
-                  subTitle="Product Detail"
-                  className="md:w-25rem"
-                  pt={{ root: { style: { boxShadow: "unset" } } }}
-                >
-                  <p className="m-0 ">{props.product.description}</p>
-                  <p className="m-0 ">Quantità: {props.product.quantity} pz</p>
-                  <p className="m-0 text-right">{props.product.price}€</p>
-                  <div>
-                    {translate("carddetails_disponibility")}{" "}
-                    <Tag severity={severity} value={status} />
-                  </div>
-                </Card>
-              </Dialog>
-              <Dialog
-                // maximized
-                modal
-                visible={visibleEdit}
-                onHide={() => setVisibleEdit(false)}
-              >
-                <Card
-                  title="Edit Product Details"
-                  footer={footer}
-                  className="md:w-30rem w-40rem h-50rem text-center"
-                >
-                  <Form method="post">
-                    <div>
-                      <div className="gap-2 m-2">
-                        <p className="text-white">Set a new image URL</p>
-                        <InputText
-                          id="image"
-                          type="url"
-                          name="image"
-                          value={image}
-                          onChange={handleChange}
-                          required
-                          placeholder="Image URL"
-                          className="p-inputtext-lg"
-                        />
-                      </div>
-                      <div className="gap-2 m-2">
-                        <p className="text-white">Set a new Title</p>
-                        <InputText
-                          id="title"
-                          type="text"
-                          name="title"
-                          value={title}
-                          placeholder={props.product.title}
-                          onChange={handleChange}
-                          className="p-inputtext-lg"
-                        />
-                      </div>
-                      <div className="gap-2 m-2">
-                        <p className="text-white">Set a new Description</p>
-                        <InputText
-                          id="description"
-                          type="textarea"
-                          name="description"
-                          value={description}
-                          onChange={handleChange}
-                          placeholder={props.product.description}
-                          className="p-inputtext-lg"
-                        />
-                      </div>
-                      <div className="gap-2 m-2">
-                        <p className="text-white">Set a new Price</p>
-                        <InputNumber
-                          id="price"
-                          name="price"
-                          mode="currency"
-                          value={price}
-                          currency="EUR"
-                          locale="it-IT"
-                          placeholder={props.product.price.toString()}
-                          required
-                          onValueChange={handleNumberChange}
-                          className="p-inputtext-lg"
-                        />
-                      </div>
-                      <div className="gap-2 m-2 ">
-                        <p className="text-white">Set a new Quantity</p>
-                        <InputNumber
-                          id="quantity"
-                          name="quantity"
-                          value={quantity}
-                          placeholder={props.product.quantity.toString()}
-                          onValueChange={handleNumberChange}
-                          className="p-inputtext-lg"
-                        />
-                      </div>
-                      <div className="gap-2 m-2">
-                        <p className="text-white">
-                          Set a new Estimated Completed Time
-                        </p>
-                        <InputNumber
-                          id="estimatedCompletedTime"
-                          name="estimatedCompletedTime"
-                          value={estimatedCompletedTime}
-                          placeholder={props.product.estimatedCompletedTime.toString()}
-                          onValueChange={handleNumberChange}
-                          className="p-inputtext-lg"
-                        />
-                      </div>
-                    </div>
-                  </Form>
-                </Card>
-              </Dialog>
-              <Dialog
-                header="Imposta nuova quantità"
-                visible={prontoEdit}
-                onHide={() => setProntoEdit(false)}
-              >
-                <Card
-                  title="Prodotto Pronto"
-                  footer={
-                    <div className="flex justify-content-end gap">
-                      <Button
-                        label="Annulla"
-                        icon="pi pi-times"
-                        className="p-button-secondary"
-                        onClick={() => setProntoEdit(false)}
-                      />
-                      <Button
-                        label="Salva"
-                        icon="pi pi-check"
-                        className="p-button-success"
-                        onClick={() => {
-                          if (props.token) {
-                            fetchUpdateProduct(
-                              props.token,
-                              props.product.id,
-                              {
-                                ...formQty,
-                                estimatedCompletedTime: 0,
-                              },
-                              { errorSavingHandler, successSavingHandler }
-                            );
-                            setProntoEdit(false);
-                          }
-                        }}
-                      />
-                    </div>
-                  }
-                >
-                  <div className="m-3">
-                    <label htmlFor="quantity" className="block text-white mb-2">
-                      Nuova quantità disponibile
-                    </label>
-                    <InputNumber
-                      id="quantity"
-                      name="quantity"
-                      value={formQty.quantity}
-                      onValueChange={(e) =>
-                        setFormQty((prev) => ({
-                          ...prev,
-                          quantity: e.value || 0,
-                        }))
-                      }
-                      showButtons
-                      className="p-inputtext-lg w-full"
-                    />
-                  </div>
-                </Card>
-              </Dialog>
-            </span>
+        }
+      >
+        <div className="lvg-form-grid">
+          <div className="lvg-field">
+            <label htmlFor={`image-${product.id}`}>Immagine</label>
+            <InputText
+              id={`image-${product.id}`}
+              name="image"
+              type="url"
+              value={formFields.image}
+              onChange={handleTextChange}
+              required
+            />
+          </div>
+          <div className="lvg-field">
+            <label htmlFor={`title-${product.id}`}>Titolo</label>
+            <InputText
+              id={`title-${product.id}`}
+              name="title"
+              value={formFields.title}
+              onChange={handleTextChange}
+              required
+            />
+          </div>
+          <div className="lvg-field">
+            <label htmlFor={`description-${product.id}`}>Descrizione</label>
+            <InputTextarea
+              id={`description-${product.id}`}
+              name="description"
+              value={formFields.description}
+              onChange={handleTextChange}
+              rows={4}
+              autoResize
+            />
+          </div>
+          <div className="lvg-field">
+            <label htmlFor={`price-${product.id}`}>Prezzo</label>
+            <InputNumber
+              inputId={`price-${product.id}`}
+              value={formFields.price}
+              mode="currency"
+              currency="EUR"
+              locale="it-IT"
+              onValueChange={(event) => handleNumberChange("price", event)}
+              required
+            />
+          </div>
+          <div className="lvg-field">
+            <label htmlFor={`quantity-${product.id}`}>Quantita</label>
+            <InputNumber
+              inputId={`quantity-${product.id}`}
+              value={formFields.quantity}
+              showButtons
+              min={0}
+              onValueChange={(event) => handleNumberChange("quantity", event)}
+            />
+          </div>
+          <div className="lvg-field">
+            <label htmlFor={`estimated-${product.id}`}>Tempo stimato</label>
+            <InputNumber
+              inputId={`estimated-${product.id}`}
+              value={formFields.estimatedCompletedTime}
+              suffix=" min"
+              min={0}
+              showButtons
+              onValueChange={(event) =>
+                handleNumberChange("estimatedCompletedTime", event)
+              }
+            />
           </div>
         </div>
-      </div>
-    );
-  };
+      </Dialog>
 
-  return (
-    <DataView
-      className="flex-initial flex align-items-center justify-content-center"
-      value={[props.product]}
-      itemTemplate={gridItem}
-    />
+      <Dialog
+        header="Imposta nuova quantita"
+        visible={readyVisible}
+        modal
+        onHide={() => setReadyVisible(false)}
+        footer={
+          <div className="lvg-form-actions">
+            <Button
+              label="Annulla"
+              icon="pi pi-times"
+              severity="secondary"
+              outlined
+              onClick={() => setReadyVisible(false)}
+            />
+            <Button
+              label="Salva"
+              icon="pi pi-check"
+              loading={isBusy}
+              onClick={() =>
+                saveProduct({
+                  ...productToFormFields(product),
+                  quantity: readyQuantity,
+                  estimatedCompletedTime: 0,
+                })
+              }
+            />
+          </div>
+        }
+      >
+        <div className="lvg-field">
+          <label htmlFor={`ready-quantity-${product.id}`}>
+            Nuova quantita disponibile
+          </label>
+          <InputNumber
+            inputId={`ready-quantity-${product.id}`}
+            value={readyQuantity}
+            showButtons
+            min={0}
+            onValueChange={(event) => setReadyQuantity(event.value ?? 0)}
+          />
+        </div>
+      </Dialog>
+    </>
   );
 };
 

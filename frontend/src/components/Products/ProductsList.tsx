@@ -20,13 +20,22 @@ const ProductsList: React.FC<ProductsListProps> = (props) => {
     refreshToken()
   }, [currentUser, getToken]);
 
-  return (
-    <ol style={{ listStyleType: "none" }}>
-      <div className="product-list">
-        {props.products.map((product) => (
-          <ProductItem key={product.id} product={product} token={token} />
-        ))}
+  if (props.products.length === 0) {
+    return (
+      <div className="lvg-empty">
+        <strong>Nessun prodotto trovato.</strong>
+        <p>Prova a cambiare filtro o ricerca per vedere altri prodotti del banco.</p>
       </div>
+    );
+  }
+
+  return (
+    <ol className="lvg-products-grid">
+      {props.products.map((product) => (
+        <li key={product.id}>
+          <ProductItem key={product.id} product={product} token={token} />
+        </li>
+      ))}
     </ol>
   );
 };
