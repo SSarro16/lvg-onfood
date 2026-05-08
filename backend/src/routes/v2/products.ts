@@ -94,8 +94,6 @@ router.put("/", async (req: Request, res, next) => {
     product = {
       ...product,
       lastUpdatedTime: Date.now(),
-      quantity: 0, // choice: products start with 0 quantity
-      estimatedCompletedTime: 0,
     };
     // logic to call add on firebase ...
     const productsRef = db.collection("products");
