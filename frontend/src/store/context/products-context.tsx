@@ -3,11 +3,13 @@ import { useDispatch } from "react-redux";
 import { useToast } from "./toaster-context";
 import { fetchProducts } from "../../util/http";
 import { productsActions } from "../redux/products-slice";
-import LoadingPage from "../../pages/Loading";
+import LvgLoadingOverlay from "../../components/UI/LvgLoadingOverlay";
+import LvgErrorOverlay from "../../components/UI/LvgErrorOverlay";
 
 type ProductsContextType = {
   refetchProducts: () => Promise<void>;
   isLoading: boolean;
+  error: string | null;
 };
 
 const ProductsContext = createContext<ProductsContextType | null>(null);
@@ -27,26 +29,21 @@ export const ProductsProvider = ({
   const dispatch = useDispatch();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const refetchProducts = async () => {
     setIsLoading(true);
+    setError(null);
     const errorHandler = (error: string) => {
+      setError(error);
       showToast({
         severity: "error",
         summary: "Errore",
-        detail: `Errore nel fetching: ${error}`,
+        detail: "Non siamo riusciti ad aggiornare il banco.",
         life: 3000,
       });
     };
-    const successHandler = () => {
-      showToast({
-        severity: "success",
-        summary: "Successo",
-        detail: "Prodotti Aggiornati",
-        life: 2000,
-      });
-    };
-    const products = await fetchProducts({ errorHandler, successHandler });
+    const products = await fetchProducts({ errorHandler });
     if (products) {
       dispatch(productsActions.setProducts({ products }));
     }
@@ -58,11 +55,27 @@ export const ProductsProvider = ({
   }, []);
 
   if (isLoading) {
-    return <LoadingPage text="Caricamento prodotti..." />;
+    return (
+      <LvgLoadingOverlay
+        title="Carico i prodotti del giorno..."
+        message="Stiamo preparando il banco digitale LVG."
+      />
+    );
+  }
+
+  if (error) {
+    return (
+      <LvgErrorOverlay
+        title="Non siamo riusciti ad aggiornare il banco."
+        message="Controlla la connessione e riprova tra qualche secondo."
+        details={error}
+        onRetry={refetchProducts}
+      />
+    );
   }
 
   return (
-    <ProductsContext.Provider value={{ refetchProducts, isLoading }}>
+    <ProductsContext.Provider value={{ refetchProducts, isLoading, error }}>
       {children}
     </ProductsContext.Provider>
   );

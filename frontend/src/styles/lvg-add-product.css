@@ -1,0 +1,251 @@
+.lvg-form-page {
+  width: min(100%, 1180px);
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+.lvg-add-product-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.lvg-add-product-form h2,
+.lvg-photo-picker h2,
+.lvg-status-picker h2,
+.lvg-minute-picker h2,
+.lvg-terminated-box h2 {
+  margin: 0;
+  color: var(--lvg-stone-950);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.lvg-photo-picker,
+.lvg-status-picker,
+.lvg-minute-picker,
+.lvg-preview-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.lvg-photo-picker,
+.lvg-status-picker,
+.lvg-minute-picker,
+.lvg-terminated-box {
+  border: 1px solid var(--lvg-border);
+  border-radius: 24px;
+  background: rgba(250, 250, 249, 0.74);
+  padding: 1rem;
+}
+
+.lvg-photo-picker p,
+.lvg-helper-note,
+.lvg-terminated-box p {
+  margin: 0;
+  color: var(--lvg-muted);
+  line-height: 1.55;
+}
+
+.lvg-image-compat-field {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.lvg-status-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.lvg-status-option {
+  display: grid;
+  gap: 0.35rem;
+  min-height: 152px;
+  border: 1px solid var(--lvg-border-strong);
+  border-radius: 24px;
+  background: #ffffff;
+  padding: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.lvg-status-option:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 40px rgba(53, 33, 11, 0.1);
+}
+
+.lvg-status-option[aria-pressed="true"] {
+  border-color: var(--lvg-stone-950);
+  background: var(--lvg-stone-950);
+  color: #ffffff;
+  box-shadow: 0 20px 52px rgba(12, 10, 9, 0.2);
+}
+
+.lvg-status-option strong {
+  color: var(--lvg-stone-950);
+  font-size: 1.08rem;
+  font-weight: 900;
+}
+
+.lvg-status-option[aria-pressed="true"] strong {
+  color: #ffffff;
+}
+
+.lvg-status-option span {
+  color: var(--lvg-emerald);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.lvg-status-option[aria-pressed="true"] span {
+  color: #a7f3d0;
+}
+
+.lvg-status-option p {
+  margin: 0;
+  color: var(--lvg-muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.lvg-status-option[aria-pressed="true"] p {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.lvg-minute-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lvg-minute-presets button {
+  min-height: 40px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--lvg-stone-700);
+  cursor: pointer;
+  padding: 0 0.85rem;
+  font-weight: 900;
+}
+
+.lvg-minute-presets button[aria-pressed="true"],
+.lvg-minute-presets button:hover {
+  background: var(--lvg-stone-950);
+  color: #ffffff;
+}
+
+.lvg-manual-minutes {
+  grid-template-columns: 1fr auto;
+  align-items: end;
+}
+
+.lvg-manual-minutes label {
+  grid-column: 1 / -1;
+}
+
+.lvg-manual-minutes span {
+  padding-bottom: 0.9rem;
+  color: var(--lvg-muted);
+  font-weight: 900;
+}
+
+.lvg-terminated-box {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.9rem;
+  align-items: start;
+  background: var(--lvg-rose-soft);
+  border-color: var(--lvg-rose-border);
+}
+
+.lvg-terminated-box i {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--lvg-rose-text);
+}
+
+.lvg-preview-panel__sticky {
+  position: sticky;
+  top: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.lvg-preview-card-shell {
+  display: grid;
+  gap: 1rem;
+  border-radius: 36px;
+  background:
+    radial-gradient(circle at right top, rgba(5, 150, 105, 0.28), transparent 34%),
+    linear-gradient(135deg, #0c0a09 0%, #1c1712 100%);
+  padding: clamp(1rem, 3vw, 1.25rem);
+  color: #ffffff;
+  box-shadow: var(--lvg-shadow-hero);
+}
+
+.lvg-preview-card-shell > span {
+  color: #a7f3d0;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lvg-preview-card-shell > p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+}
+
+.lvg-preview-card-shell .lvg-product-card {
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.lvg-eyebrow {
+  color: var(--lvg-emerald);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.lvg-preview-notes {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 1rem 1rem 1rem 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--lvg-muted);
+  box-shadow: var(--lvg-shadow-soft);
+  line-height: 1.5;
+}
+
+@media (max-width: 1024px) {
+  .lvg-add-product-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .lvg-preview-panel__sticky {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .lvg-status-options {
+    grid-template-columns: 1fr;
+  }
+}

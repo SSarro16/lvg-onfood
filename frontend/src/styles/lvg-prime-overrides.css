@@ -1,0 +1,131 @@
+.lvg-page .p-button {
+  border-radius: 16px;
+  font-weight: 900;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.lvg-page .p-button:not(.p-button-text):not(.p-button-outlined) {
+  background: var(--lvg-emerald);
+  border-color: var(--lvg-emerald);
+}
+
+.lvg-page .p-button.p-button-danger {
+  background: var(--lvg-danger);
+  border-color: var(--lvg-danger);
+}
+
+.lvg-page .p-button.p-button-warning {
+  background: var(--lvg-warm);
+  border-color: var(--lvg-warm);
+  color: var(--lvg-text);
+}
+
+.lvg-page .p-button.p-button-secondary,
+.lvg-page .p-button.p-button-outlined {
+  background: var(--lvg-surface);
+  border-color: var(--lvg-border-strong);
+  color: var(--lvg-text);
+}
+
+.lvg-page .p-inputtext,
+.lvg-page .p-inputnumber,
+.lvg-page .p-password,
+.lvg-page .p-inputtextarea {
+  width: 100%;
+}
+
+.lvg-page .p-inputtext,
+.lvg-page .p-password-input,
+.lvg-page .p-inputnumber-input,
+.lvg-page .p-inputtextarea {
+  border-color: var(--lvg-border-strong);
+  border-radius: 16px;
+  color: var(--lvg-text);
+}
+
+.p-dialog {
+  width: min(92vw, 620px);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: var(--lvg-shadow-hover);
+}
+
+.p-dialog .p-dialog-header,
+.p-dialog .p-dialog-content,
+.p-dialog .p-dialog-footer {
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--lvg-text);
+}
+
+.p-dialog .p-dialog-header {
+  padding: 1.3rem 1.5rem 0.8rem;
+}
+
+.p-dialog .p-dialog-title {
+  color: var(--lvg-stone-950);
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 0 1.5rem 1.35rem;
+}
+
+.p-dialog .p-dialog-footer {
+  border-top: 1px solid var(--lvg-border);
+  padding: 1rem 1.5rem 1.35rem;
+}
+
+.p-confirm-dialog .p-dialog-content {
+  line-height: 1.55;
+}
+
+.p-confirm-dialog {
+  width: min(92vw, 430px);
+}
+
+.p-confirm-dialog .p-confirm-dialog-icon {
+  color: var(--lvg-emerald);
+}
+
+.p-toast .p-toast-message {
+  border-radius: 16px;
+  box-shadow: var(--lvg-shadow-soft);
+}
+
+.lvg-page .p-fieldset {
+  border-color: var(--lvg-border);
+  border-radius: var(--lvg-radius-xl);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.lvg-page .p-fieldset .p-fieldset-legend {
+  border: 0;
+  border-radius: 999px;
+  background: var(--lvg-surface);
+  color: var(--lvg-text);
+  box-shadow: var(--lvg-shadow-soft);
+}
+
+@media (max-width: 600px) {
+  .p-dialog,
+  .p-confirm-dialog {
+    width: 94vw;
+    max-width: 94vw;
+  }
+
+  .p-dialog .p-dialog-footer,
+  .p-confirm-dialog .p-dialog-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .p-dialog .p-dialog-footer .p-button,
+  .p-confirm-dialog .p-dialog-footer .p-button {
+    width: 100%;
+  }
+}
