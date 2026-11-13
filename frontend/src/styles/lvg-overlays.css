@@ -1,0 +1,475 @@
+.lvg-loading,
+.lvg-error {
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.lvg-loading--page,
+.lvg-error--page {
+  min-height: 100vh;
+}
+
+.lvg-loading--inline,
+.lvg-error--inline {
+  min-height: 220px;
+}
+
+.lvg-loading__card,
+.lvg-error__card {
+  width: min(100%, 440px);
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+  text-align: center;
+  border: 1px solid var(--lvg-border);
+  border-radius: var(--lvg-radius-xl);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--lvg-shadow-md);
+  padding: 2rem;
+  backdrop-filter: blur(14px);
+}
+
+.lvg-loading__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--lvg-primary);
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.lvg-loading__spinner {
+  width: 54px;
+  height: 54px;
+  border: 5px solid rgba(217, 119, 6, 0.18);
+  border-top-color: var(--lvg-warm);
+  border-radius: 50%;
+  animation: lvgSpin 0.7s linear infinite;
+}
+
+.lvg-loading h2,
+.lvg-error h2 {
+  margin: 0;
+  color: var(--lvg-text);
+}
+
+.lvg-loading p,
+.lvg-error p {
+  margin: 0.45rem 0 0;
+  color: var(--lvg-text-soft);
+  line-height: 1.55;
+}
+
+.lvg-error__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  color: var(--lvg-danger-dark);
+  background: var(--lvg-danger-soft);
+  font-size: 1.4rem;
+}
+
+.lvg-error pre {
+  max-width: 100%;
+  overflow: auto;
+  padding: 0.75rem;
+  border-radius: var(--lvg-radius-sm);
+  background: var(--lvg-bg-soft);
+  text-align: left;
+}
+
+.lvg-error__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.lvg-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.75rem, 3vw, 1.5rem);
+  background: rgba(12, 10, 9, 0.55);
+  backdrop-filter: blur(16px);
+}
+
+.lvg-modal-backdrop--dark {
+  background: rgba(12, 10, 9, 0.68);
+}
+
+.lvg-modal-shell {
+  position: relative;
+  width: min(100%, 1080px);
+  max-height: 92vh;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: var(--lvg-radius-2xl);
+  background: var(--lvg-bg);
+  box-shadow: var(--lvg-shadow-modal, 0 40px 120px rgba(12, 10, 9, 0.45));
+  animation: lvgModalIn 0.22s ease both;
+}
+
+.lvg-modal-shell--small {
+  width: min(100%, 520px);
+}
+
+.lvg-modal-shell--medium {
+  width: min(100%, 720px);
+}
+
+.lvg-modal-close {
+  position: sticky;
+  top: 1rem;
+  right: 1rem;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin: 1rem 1rem -3rem auto;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--lvg-stone-950);
+  cursor: pointer;
+  box-shadow: var(--lvg-shadow-sm);
+}
+
+.lvg-detail-overlay,
+.lvg-edit-overlay {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 1.5rem);
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.lvg-detail-visual,
+.lvg-edit-preview {
+  position: relative;
+}
+
+.lvg-detail-visual {
+  min-height: 620px;
+  overflow: hidden;
+  border-radius: 32px;
+  background: var(--lvg-stone-950);
+}
+
+.lvg-detail-visual img,
+.lvg-edit-preview > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lvg-detail-visual__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(12, 10, 9, 0.86), rgba(12, 10, 9, 0.22), transparent);
+}
+
+.lvg-detail-visual__content {
+  position: absolute;
+  inset: auto 1.25rem 1.25rem;
+  display: grid;
+  gap: 0.65rem;
+  color: #ffffff;
+}
+
+.lvg-detail-visual__content > span:not(.lvg-badge),
+.lvg-eyebrow {
+  color: var(--lvg-emerald);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.lvg-detail-visual h2,
+.lvg-detail-content h3,
+.lvg-edit-form h2,
+.lvg-confirm-overlay h2 {
+  margin: 0;
+  color: var(--lvg-stone-950);
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  font-weight: 900;
+  line-height: 0.98;
+}
+
+.lvg-detail-visual h2 {
+  color: #ffffff;
+  text-shadow: 0 18px 44px rgba(12, 10, 9, 0.45);
+}
+
+.lvg-detail-content,
+.lvg-edit-form,
+.lvg-edit-preview,
+.lvg-confirm-overlay {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.lvg-detail-content p,
+.lvg-edit-form p,
+.lvg-confirm-overlay p {
+  margin: 0;
+  color: var(--lvg-muted);
+  line-height: 1.65;
+}
+
+.lvg-price-box,
+.lvg-status-panel,
+.lvg-ready-box {
+  display: grid;
+  gap: 0.75rem;
+  border: 1px solid var(--lvg-border);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 1rem;
+}
+
+.lvg-price-box {
+  background: var(--lvg-stone-950);
+  color: #ffffff;
+}
+
+.lvg-price-box span {
+  color: rgba(255, 255, 255, 0.56);
+  font-weight: 900;
+}
+
+.lvg-price-box strong {
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.lvg-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.lvg-info-grid--compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.lvg-info-card {
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 0.9rem;
+  box-shadow: 0 12px 30px rgba(53, 33, 11, 0.08);
+}
+
+.lvg-info-card span,
+.lvg-ready-box > span {
+  display: block;
+  color: var(--lvg-muted);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lvg-info-card strong,
+.lvg-status-panel strong {
+  display: block;
+  color: var(--lvg-stone-950);
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.lvg-overlay-actions,
+.lvg-modal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.lvg-modal-footer {
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.lvg-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  border: 1px solid var(--lvg-border);
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--lvg-stone-950);
+  cursor: pointer;
+  padding: 0 0.9rem;
+  font-weight: 900;
+}
+
+.lvg-action-button--warn {
+  color: var(--lvg-amber-text);
+}
+
+.lvg-action-button--danger {
+  color: var(--lvg-rose-text);
+}
+
+.lvg-edit-preview {
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.lvg-edit-preview > img {
+  height: 320px;
+  border-radius: 28px;
+}
+
+.lvg-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.lvg-confirm-overlay {
+  text-align: left;
+}
+
+.lvg-confirm-overlay--success .lvg-ready-box {
+  background: var(--lvg-emerald-soft);
+  border-color: var(--lvg-emerald-border);
+}
+
+.lvg-confirm-overlay--warn {
+  background: linear-gradient(180deg, var(--lvg-bg), var(--lvg-amber-soft));
+}
+
+.lvg-confirm-overlay--danger {
+  background: linear-gradient(180deg, var(--lvg-bg), var(--lvg-rose-soft));
+}
+
+.lvg-danger-mark {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 22px;
+  background: var(--lvg-rose-soft);
+  color: var(--lvg-rose-text);
+  font-size: 1.4rem;
+}
+
+.lvg-mini-product {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 0.9rem;
+  align-items: center;
+  border: 1px solid var(--lvg-border);
+  border-radius: 22px;
+  background: #ffffff;
+  padding: 0.75rem;
+}
+
+.lvg-mini-product img {
+  width: 84px;
+  height: 84px;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+.lvg-mini-product strong,
+.lvg-mini-product span {
+  display: block;
+}
+
+.lvg-mini-product strong {
+  color: var(--lvg-stone-950);
+  font-weight: 900;
+}
+
+.lvg-mini-product span {
+  margin-top: 0.25rem;
+  color: var(--lvg-muted);
+  font-weight: 800;
+}
+
+.lvg-warning-copy {
+  color: var(--lvg-rose-text) !important;
+  font-weight: 900;
+}
+
+.lvg-stepper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(100%, 260px);
+  border: 1px solid var(--lvg-border-strong);
+  border-radius: 20px;
+  background: #ffffff;
+  padding: 0.35rem;
+}
+
+.lvg-stepper button {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  background: var(--lvg-stone-950);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.lvg-stepper strong {
+  color: var(--lvg-stone-950);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+@media (max-width: 820px) {
+  .lvg-detail-overlay,
+  .lvg-edit-overlay,
+  .lvg-info-grid,
+  .lvg-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .lvg-detail-visual {
+    min-height: 360px;
+  }
+
+  .lvg-modal-shell {
+    border-radius: 28px;
+  }
+}
+
+@media (max-width: 520px) {
+  .lvg-modal-backdrop {
+    align-items: end;
+    padding: 0.5rem;
+  }
+
+  .lvg-modal-shell {
+    max-height: 94vh;
+    border-radius: 26px;
+  }
+
+  .lvg-detail-content,
+  .lvg-edit-form,
+  .lvg-edit-preview,
+  .lvg-confirm-overlay {
+    padding: 1rem;
+  }
+
+  .lvg-modal-footer .lvg-cta,
+  .lvg-overlay-actions .lvg-action-button {
+    width: 100%;
+  }
+}

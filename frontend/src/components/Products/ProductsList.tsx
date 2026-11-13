@@ -5,6 +5,7 @@ import { AuthContext } from "../../store/context/auth-context";
 
 type ProductsListProps = {
   products: Product[];
+  onResetFilters?: () => void;
 };
 
 const ProductsList: React.FC<ProductsListProps> = (props) => {
@@ -20,13 +21,28 @@ const ProductsList: React.FC<ProductsListProps> = (props) => {
     refreshToken()
   }, [currentUser, getToken]);
 
-  return (
-    <ol style={{ listStyleType: "none" }}>
-      <div className="flex">
-        {props.products.map((product) => (
-          <ProductItem key={product.id} product={product} token={token} />
-        ))}
+  if (props.products.length === 0) {
+    return (
+      <div className="lvg-empty">
+        <i className="pi pi-search" aria-hidden="true" />
+        <strong>Nessun prodotto trovato</strong>
+        <p>Prova a cambiare ricerca o filtro.</p>
+        {props.onResetFilters && (
+          <button className="lvg-cta lvg-cta--secondary" type="button" onClick={props.onResetFilters}>
+            Mostra tutto
+          </button>
+        )}
       </div>
+    );
+  }
+
+  return (
+    <ol className="lvg-products-grid">
+      {props.products.map((product, index) => (
+        <li key={product.id} style={{ "--lvg-card-delay": `${index * 55}ms` } as React.CSSProperties}>
+          <ProductItem key={product.id} product={product} token={token} />
+        </li>
+      ))}
     </ol>
   );
 };

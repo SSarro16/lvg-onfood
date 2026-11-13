@@ -4,7 +4,9 @@
   "description": "",
   "main": "./src/app.ts",
   "scripts": {
-    "start": "node build/app.js",
+    "start": "node build/src/app.js",
+    "build": "tsc",
+    "deploy": "npm run build && npm run start",
     "dev": "npx ts-node src/app.ts",
     "portinstall": "tsc"
   },

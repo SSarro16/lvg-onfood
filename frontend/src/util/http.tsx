@@ -8,8 +8,9 @@ type ProdData = {
   image: string;
   price: number;
   description: string;
+  quantity?: number;
+  estimatedCompletedTime?: number;
 };
-
 interface Handlers {
   errorHandler?: (error: string) => void;
   successHandler?: () => void;
@@ -40,7 +41,7 @@ const fetchBackend = async (
   });
 };
 
-const backendUrl = "http://localhost:8080/api/v2";
+const backendUrl = "https://lvg-onfood-backend.onrender.com/api/v2";
 
 // fetch products
 const fetchProducts = async ({
@@ -55,10 +56,24 @@ const fetchProducts = async ({
     }
     successHandler && successHandler();
     return data.products;
-  } catch (error: any) {
+    //typescript-eslint\no-explicit-any
+  } catch (error: unknown) {
     // TODO: Handle Error (Toasts)
-    errorHandler &&
-      errorHandler(error.message || "Error while fetching products");
+    if (error instanceof Error) {
+      errorHandler &&
+        errorHandler(
+          error.message
+            ? error.message
+            : `Error while fetching products: ${error}`
+        );
+    } else {
+      errorHandler &&
+        errorHandler(
+          typeof error === "string"
+            ? error
+            : `Unknown Error while fetching products: ${error}`
+        );
+    }
   }
   return null;
 };
@@ -76,8 +91,20 @@ const fetchLogout = async (
       throw new Error("Could not logout");
     }
     successHandler && successHandler();
-  } catch (error: any) {
-    errorHandler && errorHandler(error.message || "Error while logging out");
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      errorHandler &&
+        errorHandler(
+          error.message ? error.message : `Error while logging out: ${error}`
+        );
+    } else {
+      errorHandler &&
+        errorHandler(
+          typeof error === "string"
+            ? error
+            : `Unknown Error while logging out: ${error}`
+        );
+    }
   }
 };
 
@@ -102,8 +129,20 @@ const fetchAddProduct = async (
     } else {
       successHandler && successHandler();
     }
-  } catch (error: any) {
-    errorHandler && errorHandler(error.message || "Error while adding product");
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      errorHandler &&
+        errorHandler(
+          error.message ? error.message : `Error while adding product: ${error}`
+        );
+    } else {
+      errorHandler &&
+        errorHandler(
+          typeof error === "string"
+            ? error
+            : `Unknown Error while adding product: ${error}`
+        );
+    }
   }
 };
 
@@ -126,10 +165,24 @@ const fetchDeleteProduct = async (
     if (!res.ok || data.success !== true) {
       throw new Error("Could not delete product");
     } else {
-      successDeleteHandler;
+      successDeleteHandler && successDeleteHandler();
     }
-  } catch (error: any) {
-    errorDeleteHandler;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      errorDeleteHandler &&
+        errorDeleteHandler(
+          error.message
+            ? error.message
+            : `Error while deleting product: ${error}`
+        );
+    } else {
+      errorDeleteHandler &&
+        errorDeleteHandler(
+          typeof error === "string"
+            ? error
+            : `Unknown error while deleting product: ${error}`
+        );
+    }
   }
 };
 
@@ -154,9 +207,20 @@ const fetchUpdateProduct = async (
     } else {
       successSavingHandler && successSavingHandler();
     }
-  } catch (error: any) {
-    errorSavingHandler &&
-      errorSavingHandler(error.message || "Error while updating product");
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      errorSavingHandler &&
+        errorSavingHandler(
+          error.message ? error.message : `Error while saving product: ${error}`
+        );
+    } else {
+      errorSavingHandler &&
+        errorSavingHandler(
+          typeof error === "string"
+            ? error
+            : `Unknown Error while saving product: ${error}`
+        );
+    }
   }
 };
 

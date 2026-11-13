@@ -3,7 +3,8 @@ import * as admin from 'firebase-admin';
 import {initializeApp, cert} from 'firebase-admin/app';
 import {getFirestore} from 'firebase-admin/firestore';
 
-import serviceAccount from '../../service/lvg-onfood-2c56b73bfa25.json';
+// This file is saved on Render
+import serviceAccount from '/etc/secrets/service-account-key.json';
 
 initializeApp({
   // @ts-ignore

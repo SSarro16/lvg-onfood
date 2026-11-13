@@ -21,10 +21,10 @@ interface AuthContext {
 const AuthContext = createContext<AuthContext>({
   // "User" comes from firebase auth-public.d.ts
   currentUser: {} as User | null,
-  setCurrentUser: (_user: User) => {
+  setCurrentUser: () => {
     return;
   },
-  signOut: (navigate: NavigateFunction) => {
+  signOut: () => {
     return;
   },
   getToken: async () => {
